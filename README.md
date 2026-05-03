@@ -18,8 +18,11 @@ The site is plain HTML/CSS — Vite is just the dev server and bundler. Any stat
 
 ```
 app/
-├── index.html              gallery — all 14 screens at 0.55× scale, click-through
+├── index.html              redirects to the dashboard so users land in the app
+├── gallery.html            design overview — all 14 screens at 0.55× scale
 ├── directions.html         the four design directions side-by-side
+├── _redirects              Netlify: / → /screens/01-dashboard-light.html (302)
+├── netlify.toml            Netlify config (no build step; publish source)
 ├── screens/
 │   ├── _anchorage.css      shared design tokens + device frame
 │   ├── 01-dashboard-light.html
@@ -41,6 +44,8 @@ app/
 ```
 
 Every screen is self-contained: open it directly in a browser at iPhone-16-Pro size (393×852) and it renders without the gallery shell.
+
+The site root (`/`) lands directly in the app (the dashboard). The full design overview is at `/gallery.html` and is linked from the gallery's footer with "← Open the app" pointing back.
 
 ## Design language
 

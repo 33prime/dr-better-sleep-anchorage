@@ -14,20 +14,20 @@
       tabs: [null, '05-trends.html', '04-chat.html', '13-reorder.html'],
     },
     '03-morning-reveal.html': {
-      stage: '01-dashboard-light.html',
+      stage: '/',
     },
-    '04-chat.html': { back: '01-dashboard-light.html' },
+    '04-chat.html': { back: '/' },
     '05-trends.html': {
-      tabs: ['01-dashboard-light.html', null, '04-chat.html', '13-reorder.html'],
+      tabs: ['/', null, '04-chat.html', '13-reorder.html'],
     },
     '06-night.html': {},
     '07-onboarding-triage.html': {},
-    '08-detailed-night.html': { back: '01-dashboard-light.html' },
+    '08-detailed-night.html': { back: '/' },
     '09-boil-and-bite.html': { back: '07-onboarding-triage.html' },
     '10-device-overview.html': { back: '07-onboarding-triage.html' },
-    '11-chat-rich.html': { back: '01-dashboard-light.html' },
+    '11-chat-rich.html': { back: '/' },
     '12-comparisons.html': { back: '05-trends.html' },
-    '13-reorder.html': { back: '01-dashboard-light.html' },
+    '13-reorder.html': { back: '/' },
     '14-science.html': { back: '05-trends.html' },
   };
 
