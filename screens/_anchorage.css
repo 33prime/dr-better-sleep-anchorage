@@ -1,0 +1,124 @@
+/* ===== Anchorage shared tokens + device frame =====
+   Used by all Dr. Better Sleep screens.
+   Type: Instrument Serif (display) · Manrope (UI) · JetBrains Mono (numerals)
+*/
+:root {
+  --bg-page:        #14181A;
+
+  /* Day */
+  --bg-primary:     #DDE2E2;
+  --bg-secondary:   #D4DAD9;
+  --bg-tertiary:    #CBD2D1;
+  --text-primary:   #0B1416;
+  --text-secondary: #4A5558;
+  --text-tertiary:  #7A8488;
+
+  /* Night (used on dark mode + sleep state) */
+  --night-bg-0:     #060B0D;
+  --night-bg-1:     #0B1416;
+  --night-bg-2:     #14242A;
+  --night-text-1:   #DCE6E2;
+  --night-text-2:   #8B9A98;
+  --night-text-3:   #5C6669;
+
+  --accent:         #3E7565;
+  --accent-soft:    #86C8B8;
+  --positive:       #4A7A55;
+  --warn:           #B58A4A;
+
+  --hairline:       rgba(11,20,22,0.10);
+  --hairline-strong:rgba(11,20,22,0.16);
+  --hairline-night: rgba(220,230,226,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Manrope", system-ui, sans-serif;
+  background: var(--bg-page);
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 20px;
+  -webkit-font-smoothing: antialiased;
+  color: var(--text-primary);
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+
+/* Device frame */
+.device {
+  width: 393px; height: 852px;
+  border-radius: 56px;
+  background: #0B1416;
+  padding: 12px;
+  box-shadow:
+    0 0 0 2px #1C2628,
+    0 30px 80px -20px rgba(0,0,0,0.7),
+    0 8px 24px rgba(0,0,0,0.4);
+  position: relative;
+}
+.screen {
+  width: 100%; height: 100%;
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+.screen.day {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, #E6EBEA 0%, transparent 60%),
+    linear-gradient(180deg, #DDE2E2 0%, #D6DCDB 100%);
+}
+.screen.day::before {
+  content: ""; position: absolute; inset: -10% -10% auto -10%; height: 50%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(134,200,184,0.18) 0%, transparent 70%);
+  pointer-events: none; animation: breathe-day 9s ease-in-out infinite; z-index: 0;
+}
+.screen.night {
+  background:
+    radial-gradient(ellipse 130% 70% at 50% 110%, #14242A 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 50% -10%, #102023 0%, transparent 70%),
+    linear-gradient(180deg, #0B1416 0%, #060B0D 100%);
+  color: var(--night-text-1);
+}
+.screen.night::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 30%, rgba(134,200,184,0.06) 0%, transparent 65%);
+  animation: breathe-night 5s ease-in-out infinite;
+}
+@keyframes breathe-day   { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+@keyframes breathe-night { 0%,100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+@media (prefers-reduced-motion: reduce) {
+  .screen::before { animation: none; }
+}
+
+/* Status bar */
+.status-bar {
+  position: relative; z-index: 2;
+  height: 47px; padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: "Manrope", sans-serif; font-weight: 600; font-size: 15px;
+  color: inherit;
+}
+.status-bar .right { display: flex; gap: 6px; align-items: center; }
+.island {
+  position: absolute; left: 50%; transform: translateX(-50%); top: 11px;
+  width: 110px; height: 30px; background: #0B1416; border-radius: 18px; z-index: 3;
+}
+.screen.night .island { background: #000; box-shadow: 0 0 0 1px #1c2628; }
+
+/* Caption */
+.caption {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px;
+  color: #6F7A7E; font-family: "JetBrains Mono", monospace;
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+}
+
+/* Mono utility classes */
+.mono     { font-family: "JetBrains Mono", monospace; }
+.serif    { font-family: "Instrument Serif", serif; font-weight: 400; }
+.serif-it { font-family: "Instrument Serif", serif; font-style: italic; font-weight: 400; }
+
+.label-mono {
+  font-family: "JetBrains Mono", monospace; font-weight: 300;
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+}

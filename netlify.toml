@@ -1,0 +1,25 @@
+# Static site — the screens are deployable HTML/CSS/JS as-is.
+# Vite is only used for `npm run dev`; no build step is required to deploy.
+[build]
+  command = ""
+  publish = "."
+
+# Skip uploading dev/build artifacts.
+[build.processing]
+  skip_processing = false
+
+# Cache fonts and the shared CSS aggressively; HTML is short-cache so updates land.
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/screens/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/screens/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

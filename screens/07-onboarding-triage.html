@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Onboarding Triage · Anchorage</title>
+<!-- Screen 07 — Onboarding triage. The first emotionally important moment. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_anchorage.css">
+<style>
+  .content { position: relative; z-index: 1; padding: 8px 24px 24px; height: calc(100% - 47px); overflow-y: auto; display: flex; flex-direction: column; }
+  .content::-webkit-scrollbar { display: none; }
+
+  .progress {
+    margin-top: 4px;
+    display: flex; gap: 6px;
+  }
+  .progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(11,20,22,0.10); }
+  .progress .pip.done { background: var(--accent); }
+
+  .who-line {
+    margin-top: 22px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .who-line .av { width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #C6D5D0, #6FA796 55%, #2E5145); }
+  .who-line .name { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
+
+  h1 {
+    margin-top: 14px;
+    font-family: "Instrument Serif", serif; font-weight: 400;
+    font-size: 32px; line-height: 1.08; letter-spacing: -0.005em;
+    color: var(--text-primary); text-wrap: balance;
+  }
+  h1 .it { font-style: italic; }
+
+  .body-copy {
+    margin-top: 14px;
+    font-size: 15px; line-height: 1.55;
+    color: var(--text-secondary); text-wrap: pretty;
+    max-width: 32ch;
+  }
+  .body-copy .em { color: var(--text-primary); font-weight: 500; }
+
+  /* "Here's what I picked up" — small structured findings list */
+  .findings {
+    margin-top: 22px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    padding: 4px 0;
+  }
+  .finding {
+    padding: 14px 0;
+    display: flex; gap: 14px; align-items: flex-start;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .finding:last-child { border-bottom: 0; }
+  .finding .num {
+    flex: none;
+    font-family: "JetBrains Mono", monospace; font-weight: 300;
+    font-size: 11px; letter-spacing: 0.06em; color: var(--text-tertiary);
+    width: 18px; padding-top: 2px;
+  }
+  .finding .copy { font-size: 14.5px; line-height: 1.5; color: var(--text-primary); text-wrap: pretty; }
+  .finding .copy .em { font-family: "Instrument Serif", serif; font-style: italic; }
+  .finding .copy .data { font-family: "JetBrains Mono", monospace; font-weight: 400; }
+
+  /* Recommended path card */
+  .path {
+    margin-top: 24px;
+    background: var(--bg-secondary);
+    border-radius: 22px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .path::before {
+    content: ""; position: absolute; right: -40px; top: -40px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(134,200,184,0.20) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .path .label-mono { color: var(--accent); }
+  .path h2 {
+    margin-top: 8px;
+    font-family: "Instrument Serif", serif; font-size: 24px; font-weight: 400;
+    color: var(--text-primary); line-height: 1.1;
+  }
+  .path h2 .it { font-style: italic; }
+  .path p { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+
+  .steps {
+    margin-top: 16px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .step {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--hairline);
+  }
+  .step:first-child { border-top: 0; padding-top: 4px; }
+  .step .dot {
+    width: 22px; height: 22px; flex: none; border-radius: 50%;
+    border: 1px solid var(--accent);
+    display: grid; place-items: center;
+    font-family: "JetBrains Mono", monospace; font-size: 10px;
+    color: var(--accent);
+  }
+  .step .label { flex: 1; font-size: 14px; color: var(--text-primary); }
+  .step .when { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); }
+
+  .actions {
+    margin-top: 24px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .btn {
+    height: 50px; border-radius: 14px;
+    display: grid; place-items: center;
+    font-size: 15px; font-weight: 500;
+  }
+  .btn.primary { background: var(--text-primary); color: var(--bg-primary); }
+  .btn.primary span { display: inline-flex; align-items: center; gap: 8px; }
+  .btn.primary svg { width: 16px; height: 16px; }
+  .btn.ghost { color: var(--text-secondary); font-style: italic; font-family: "Instrument Serif", serif; font-size: 16px; }
+
+  .scroll-pad { height: 16px; }
+</style>
+</head>
+<body>
+  <div class="device" data-screen-label="07 Onboarding triage">
+    <div class="screen day">
+      <div class="status-bar">
+        <div class="time">9:14</div>
+        <div class="island"></div>
+        <div class="right">
+          <svg viewBox="0 0 18 12" fill="currentColor" style="width:18px;height:12px;"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="5" y="6" width="3" height="6" rx="0.5"/><rect x="10" y="3" width="3" height="9" rx="0.5"/><rect x="15" y="0" width="3" height="12" rx="0.5"/></svg>
+          <svg viewBox="0 0 16 12" fill="currentColor" style="width:15px;height:11px;"><path d="M8 11.2a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8Z"/><path d="M8 7.5c1.4 0 2.7.5 3.7 1.4l1.5-1.5A8 8 0 0 0 8 5.3a8 8 0 0 0-5.2 2.1l1.5 1.5A5.4 5.4 0 0 1 8 7.5Z"/><path d="M8 3.6a10.4 10.4 0 0 1 7.4 3l-1.5 1.5A8.4 8.4 0 0 0 8 5.6a8.4 8.4 0 0 0-5.9 2.5L0.6 6.6A10.4 10.4 0 0 1 8 3.6Z"/></svg>
+          <svg viewBox="0 0 26 12" fill="none" style="width:24px;height:11px;"><rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="progress">
+          <div class="pip done"></div>
+          <div class="pip done"></div>
+          <div class="pip done"></div>
+          <div class="pip done"></div>
+          <div class="pip done"></div>
+          <div class="pip done"></div>
+          <div class="pip"></div>
+        </div>
+
+        <div class="who-line">
+          <div class="av"></div>
+          <div class="name">Dr. Sommers</div>
+        </div>
+
+        <h1>Here's what I picked up,<br/><span class="it">Matt.</span></h1>
+
+        <p class="body-copy">Six questions isn't a lot, but it's enough to start. <span class="em">Honest read:</span> you're a textbook positional snorer. That's a good thing — it means we have leverage.</p>
+
+        <div class="findings">
+          <div class="finding"><div class="num">01</div><div class="copy">You snore <span class="em">most nights</span>, loudest on your back, and your partner has noticed it getting worse over the last two years.</div></div>
+          <div class="finding"><div class="num">02</div><div class="copy">You wake feeling <span class="em">unrested</span> more often than not, even at <span class="data">7+ hours</span>.</div></div>
+          <div class="finding"><div class="num">03</div><div class="copy">No diagnosed sleep apnea, no recent sleep study. <span class="em">Worth flagging</span> — we'll keep an eye on it.</div></div>
+          <div class="finding"><div class="num">04</div><div class="copy">You'd rather not see a sleep doctor right now. Fine. Most people in your shoes don't, and we can do real work without one.</div></div>
+        </div>
+
+        <div class="path">
+          <div class="label-mono">Recommended path</div>
+          <h2>Start with the <span class="it">device</span>. We titrate together over four weeks.</h2>
+          <p>I'll watch every night and adjust the strap position with you. If we're not seeing a real drop by week three, we change course — together.</p>
+
+          <div class="steps">
+            <div class="step"><div class="dot">1</div><div class="label">Fit the device tonight</div><div class="when">Tonight</div></div>
+            <div class="step"><div class="dot">2</div><div class="label">Three nights at position 1</div><div class="when">Wed–Fri</div></div>
+            <div class="step"><div class="dot">3</div><div class="label">Daily 90-second check-ins</div><div class="when">Mornings</div></div>
+            <div class="step"><div class="dot">4</div><div class="label">Re-evaluate together</div><div class="when">In 4 weeks</div></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="btn primary" data-href="09-boil-and-bite.html"><span>Start with this plan <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+          <div class="btn ghost" data-href="10-device-overview.html">Tell me more first</div>
+        </div>
+        <div class="scroll-pad"></div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">Screen 07 · Onboarding Triage</div>
+  <script src="_router.js" defer></script>
+</body>
+</html>

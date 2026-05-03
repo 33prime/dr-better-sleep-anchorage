@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Dashboard — Light · Anchorage</title>
+<!--
+  DR. BETTER SLEEP — Screen 01 · Dashboard, light mode
+  DIRECTION: Anchorage (locked)
+  TYPEFACES:
+    Display  — Instrument Serif (greeting, hero copy)
+    UI       — Manrope (Geist substitute — same geometric character, Google-hosted)
+    Numerals — JetBrains Mono Light
+  PALETTE (semantic vars in :root):
+    --bg-primary    #DDE2E2  dawn day surface
+    --bg-secondary  #D4DAD9  card recess
+    --bg-tertiary   #CBD2D1  subtle inset
+    --text-primary  #0B1416
+    --text-secondary #4A5558
+    --text-tertiary  #7A8488
+    --accent        #3E7565  verdigris (deep)
+    --accent-soft   #86C8B8  verdigris (luminous)
+    --positive      #4A7A55  desaturated forest
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_anchorage.css">
+<style>
+  /* ===================== App content ===================== */
+  .content {
+    position: relative; z-index: 1;
+    padding: 0 20px 0;
+    height: calc(100% - 47px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Top bar */
+  .topbar {
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 0;
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 35% 30%, #C6D5D0, #6FA796 55%, #2E5145);
+    box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    position: relative;
+  }
+  .avatar::after {
+    /* status dot */
+    content: "";
+    position: absolute; right: -1px; bottom: -1px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--bg-primary);
+  }
+  .icon-btn {
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  .icon-btn svg { width: 20px; height: 20px; }
+
+  /* Greeting */
+  .greeting {
+    margin-top: 24px;
+    padding-left: 0;
+  }
+  .greeting h1 {
+    font-family: "Instrument Serif", serif;
+    font-weight: 400;
+    font-size: 34px;
+    letter-spacing: -0.005em;
+    line-height: 1.05;
+    color: var(--text-primary);
+  }
+  .greeting h1 .name {
+    /* keep the name in serif, no italic accent */
+  }
+  .greeting .date {
+    margin-top: 6px;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+  }
+
+  /* Hero card */
+  .hero {
+    margin-top: 24px;
+    background: var(--bg-secondary);
+    border-radius: 22px;
+    padding: 24px;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero:active { transform: scale(0.99); }
+  .hero .label {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .hero .num-row {
+    margin-top: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .hero .num {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 300;
+    font-size: 76px;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--text-primary);
+  }
+  .hero .unit {
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .hero .delta {
+    margin-top: 10px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: "Manrope", sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--positive);
+  }
+  .hero .delta .arrow {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 400;
+  }
+  .hero .delta .from {
+    color: var(--text-tertiary);
+    font-weight: 400;
+  }
+  .hero .spark {
+    margin-top: 18px;
+    width: 100%; height: 36px;
+    display: block;
+  }
+  .hero .spark-axis {
+    margin-top: 4px;
+    display: flex; justify-content: space-between;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.08em;
+  }
+
+  /* Status row */
+  .status-row {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .stat {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 14px 12px 14px;
+    min-height: 92px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .stat .k {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 300;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .stat .v {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-top: 6px;
+  }
+  .stat .t {
+    margin-top: 8px;
+    font-family: "Manrope", sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.3;
+  }
+  .stat .t .up   { color: var(--positive); font-weight: 500; }
+  .stat .t .flat { color: var(--text-tertiary); }
+
+  /* Active context — hairline above & below */
+  .context {
+    margin-top: 28px;
+    padding: 18px 0 18px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px;
+    cursor: pointer;
+    position: relative;
+  }
+  .context::before {
+    /* subtle accent tick on left */
+    content: "";
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 28px;
+    background: var(--accent-soft);
+    border-radius: 2px;
+  }
+  .context .body {
+    padding-left: 14px;
+    flex: 1;
+  }
+  .context .label {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .context .copy {
+    margin-top: 6px;
+    font-family: "Manrope", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--text-primary);
+    text-wrap: pretty;
+  }
+  .context .copy strong {
+    font-weight: 600;
+  }
+  .context .chev {
+    color: var(--text-tertiary);
+  }
+  .context .chev svg { width: 14px; height: 14px; }
+
+  /* Agent message preview */
+  .msg {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    cursor: pointer;
+  }
+  .msg .a {
+    flex: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #C6D5D0, #6FA796 55%, #2E5145);
+    margin-top: 2px;
+  }
+  .msg .bubble {
+    flex: 1;
+    background: var(--bg-secondary);
+    border-radius: 4px 16px 16px 16px;
+    padding: 12px 14px;
+    position: relative;
+  }
+  .msg .who {
+    font-family: "Manrope", sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .msg .who .ts {
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 300;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
+  }
+  .msg .text {
+    margin-top: 4px;
+    font-family: "Manrope", sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Recommendation */
+  .rec {
+    margin-top: 24px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: var(--bg-tertiary);
+    border-radius: 14px;
+    cursor: pointer;
+  }
+  .rec .ico {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: var(--accent);
+    background: rgba(134,200,184,0.18);
+  }
+  .rec .ico svg { width: 18px; height: 18px; }
+  .rec .body { flex: 1; }
+  .rec .title {
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 17px;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+  .rec .sub {
+    margin-top: 3px;
+    font-family: "Manrope", sans-serif;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.35;
+  }
+  .rec .chev { color: var(--text-tertiary); }
+  .rec .chev svg { width: 14px; height: 14px; }
+
+  .scroll-pad { height: 84px; }
+
+  /* Tab bar */
+  .tabbar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 4;
+    height: 76px;
+    padding: 8px 16px 24px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: linear-gradient(180deg, rgba(221,226,226,0) 0%, rgba(221,226,226,0.96) 35%, var(--bg-primary) 70%);
+    backdrop-filter: blur(8px);
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px;
+    color: var(--text-tertiary);
+    font-family: "Manrope", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    position: relative;
+  }
+  .tab svg { width: 22px; height: 22px; stroke-width: 1.6; }
+  .tab.active { color: var(--text-primary); }
+  .tab.active svg { stroke-width: 2; }
+  .tab .badge {
+    position: absolute;
+    top: 4px; right: 50%; margin-right: -16px;
+    min-width: 8px; height: 8px;
+    background: var(--accent-soft);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--bg-primary);
+  }
+
+</style>
+</head>
+<body>
+
+  <div class="device" data-screen-label="01 Dashboard · light">
+    <div class="screen">
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <div class="time">6:42</div>
+        <div class="island"></div>
+        <div class="right">
+          <!-- signal -->
+          <svg viewBox="0 0 18 12" fill="currentColor" aria-hidden="true">
+            <rect x="0" y="8"  width="3" height="4" rx="0.5"/>
+            <rect x="5" y="6"  width="3" height="6" rx="0.5"/>
+            <rect x="10" y="3" width="3" height="9" rx="0.5"/>
+            <rect x="15" y="0" width="3" height="12" rx="0.5"/>
+          </svg>
+          <!-- wifi -->
+          <svg viewBox="0 0 16 12" fill="currentColor" aria-hidden="true" style="width:15px;height:11px;">
+            <path d="M8 11.2a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8Z"/>
+            <path d="M8 7.5c1.4 0 2.7.5 3.7 1.4l1.5-1.5A8 8 0 0 0 8 5.3a8 8 0 0 0-5.2 2.1l1.5 1.5A5.4 5.4 0 0 1 8 7.5Z"/>
+            <path d="M8 3.6a10.4 10.4 0 0 1 7.4 3l-1.5 1.5A8.4 8.4 0 0 0 8 5.6a8.4 8.4 0 0 0-5.9 2.5L0.6 6.6A10.4 10.4 0 0 1 8 3.6Z"/>
+          </svg>
+          <!-- battery -->
+          <svg viewBox="0 0 26 12" fill="none" aria-hidden="true" style="width:24px;height:11px;">
+            <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" opacity="0.4"/>
+            <rect x="2"   y="2"   width="16" height="8"  rx="1.5" fill="currentColor"/>
+            <rect x="23"  y="4"   width="2"  height="4"  rx="1"   fill="currentColor" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Scrollable content -->
+      <div class="content">
+
+        <!-- Top bar -->
+        <div class="topbar">
+          <div class="avatar" title="Dr. Sommers"></div>
+          <div class="icon-btn" title="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="m20 20-3.5-3.5"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Greeting -->
+        <div class="greeting">
+          <h1>Good morning, <span class="name">Matt.</span></h1>
+          <div class="date">Tuesday · May 5</div>
+        </div>
+
+        <!-- Hero -->
+        <div class="hero" role="button" tabindex="0" data-href="08-detailed-night.html">
+          <div class="label">Last Night</div>
+          <div class="num-row">
+            <div class="num">42</div>
+            <div class="unit">snores</div>
+          </div>
+          <div class="delta">
+            <span class="arrow">↓</span>
+            <span>38%</span>
+            <span class="from">from baseline</span>
+          </div>
+          <!-- 14-night sparkline, hairline accent stroke -->
+          <svg class="spark" viewBox="0 0 360 36" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"  stop-color="#86C8B8" stop-opacity="0.22"/>
+                <stop offset="100%" stop-color="#86C8B8" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,8 L25,11 L50,7 L75,15 L100,12 L125,18 L150,14 L175,20 L200,17 L225,22 L250,19 L275,25 L300,22 L325,28 L360,30 L360,36 L0,36 Z" fill="url(#sparkFill)"/>
+            <polyline fill="none" stroke="#3E7565" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"
+              points="0,8 25,11 50,7 75,15 100,12 125,18 150,14 175,20 200,17 225,22 250,19 275,25 300,22 325,28 360,30" />
+            <!-- last-point dot -->
+            <circle cx="360" cy="30" r="2.2" fill="#3E7565"/>
+          </svg>
+          <div class="spark-axis">
+            <span>14 NIGHTS AGO</span>
+            <span>TONIGHT</span>
+          </div>
+        </div>
+
+        <!-- Status row -->
+        <div class="status-row">
+          <div class="stat">
+            <div>
+              <div class="k">Sleep</div>
+              <div class="v">7:12</div>
+            </div>
+            <div class="t"><span class="up">↑</span> from avg</div>
+          </div>
+          <div class="stat">
+            <div>
+              <div class="k">Efficiency</div>
+              <div class="v">89%</div>
+            </div>
+            <div class="t"><span class="flat">→</span> stable</div>
+          </div>
+          <div class="stat">
+            <div>
+              <div class="k">Streak</div>
+              <div class="v">12</div>
+            </div>
+            <div class="t">nights with device</div>
+          </div>
+        </div>
+
+        <!-- Active context -->
+        <div class="context" role="button" tabindex="0" data-href="10-device-overview.html">
+          <div class="body">
+            <div class="label">Where you are</div>
+            <div class="copy">Day 3 of <strong>strap position 3</strong>. I'll check in tomorrow morning to see how the new position is feeling.</div>
+          </div>
+          <div class="chev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m9 6 6 6-6 6"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Agent message preview -->
+        <div class="msg" role="button" tabindex="0" data-href="04-chat.html">
+          <div class="a"></div>
+          <div class="bubble">
+            <div class="who">
+              <span>Dr. Sommers</span>
+              <span class="ts">10:42 AM</span>
+            </div>
+            <div class="text">Quietest night in two weeks. Want me to walk you through what changed at hour three? It's worth a look before tonight.</div>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="rec" role="button" tabindex="0" data-href="13-reorder.html">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 3h6l-1 4h-4z"/>
+              <path d="M8 7h8l-1 13H9z"/>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="title">Try magnesium glycinate</div>
+            <div class="sub">Based on your deep-sleep patterns this month.</div>
+          </div>
+          <div class="chev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m9 6 6 6-6 6"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="scroll-pad"></div>
+      </div>
+
+      <!-- Tab bar -->
+      <nav class="tabbar">
+        <div class="tab active">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 3.2 3.5 10v10A1.5 1.5 0 0 0 5 21.5h4.5V15h5v6.5H19a1.5 1.5 0 0 0 1.5-1.5V10Z"/>
+          </svg>
+          Home
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 19V5"/>
+            <path d="M4 19h16"/>
+            <path d="M7 16V11"/>
+            <path d="M11 16V8"/>
+            <path d="M15 16v-3"/>
+            <path d="M19 16V6"/>
+          </svg>
+          Trends
+        </div>
+        <div class="tab">
+          <span class="badge"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4Z"/>
+          </svg>
+          Chat
+        </div>
+        <div class="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.6"/>
+            <path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>
+          </svg>
+          Profile
+        </div>
+      </nav>
+
+    </div>
+  </div>
+
+  <div class="caption">Screen 01 · Dashboard · Light</div>
+  <script src="_router.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Science · Anchorage</title>
+<!-- Screen 14 — Science of YOUR snore. CoreML correlations beyond the mouthpiece: acoustics, lifestyle, seasonality. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_anchorage.css">
+<style>
+  .nav { position: relative; z-index: 2; height: 44px; padding: 0 12px 0 8px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .back { color: var(--text-secondary); padding: 6px 8px; display: flex; align-items: center; gap: 4px; font-family: "Instrument Serif", serif; font-style: italic; font-size: 14px; }
+  .nav .back svg { width: 22px; height: 22px; }
+  .nav .badge { font-family: "JetBrains Mono", monospace; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); padding: 6px 10px; border: 1px solid var(--hairline); border-radius: 100px; display: flex; align-items: center; gap: 6px; }
+  .nav .badge::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .content { padding: 4px 24px 36px; height: calc(100% - 47px - 44px); overflow-y: auto; }
+  .content::-webkit-scrollbar { display: none; }
+
+  .label-mono { color: var(--text-tertiary); }
+  h1 { margin-top: 4px; font-family: "Instrument Serif", serif; font-size: 30px; line-height: 1.05; }
+  h1 .it { font-style: italic; }
+  .lede { margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); max-width: 34ch; text-wrap: pretty; }
+  .lede .em { font-family: "Instrument Serif", serif; font-style: italic; color: var(--text-primary); }
+
+  /* Acoustic fingerprint hero */
+  .finger { margin-top: 24px; background: var(--bg-secondary); border-radius: 22px; padding: 22px 22px 24px; }
+  .finger .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .finger .k { font-family: "JetBrains Mono", monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
+  .finger .ts { font-family: "JetBrains Mono", monospace; font-size: 9.5px; color: var(--text-tertiary); }
+
+  .finger .v { margin-top: 10px; font-family: "Instrument Serif", serif; font-size: 26px; line-height: 1.1; color: var(--text-primary); }
+  .finger .v .it { font-style: italic; }
+  .finger .v .pct { font-family: "JetBrains Mono", monospace; font-style: normal; font-weight: 300; font-size: 26px; color: var(--accent); margin-right: 4px; }
+
+  /* spectrogram-ish visual */
+  .spec { margin-top: 18px; height: 120px; position: relative; border-radius: 10px; overflow: hidden; background: rgba(11,20,22,0.04); }
+  .spec svg { width: 100%; height: 100%; display: block; }
+  .spec .legend { position: absolute; left: 10px; bottom: 8px; font-family: "JetBrains Mono", monospace; font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.04em; }
+  .spec .freq { position: absolute; right: 10px; top: 8px; font-family: "JetBrains Mono", monospace; font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.04em; }
+
+  .finger .breakdown { margin-top: 16px; display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(11,20,22,0.08); border-radius: 10px; overflow: hidden; }
+  .finger .b { background: var(--bg-secondary); padding: 12px 10px; }
+  .finger .b .nm { font-family: "JetBrains Mono", monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-tertiary); }
+  .finger .b .pc { margin-top: 6px; font-family: "JetBrains Mono", monospace; font-weight: 300; font-size: 22px; letter-spacing: -0.03em; color: var(--text-primary); }
+  .finger .b .desc { margin-top: 4px; font-size: 11.5px; color: var(--text-secondary); font-family: "Instrument Serif", serif; font-style: italic; line-height: 1.3; }
+
+  .finger .reason {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(11,20,22,0.08);
+    font-size: 13.5px; line-height: 1.55; color: var(--text-secondary); text-wrap: pretty;
+  }
+  .finger .reason .em { font-family: "Instrument Serif", serif; font-style: italic; color: var(--text-primary); }
+
+  /* Section header */
+  .h2 { margin-top: 36px; font-family: "Instrument Serif", serif; font-size: 22px; line-height: 1.15; color: var(--text-primary); }
+  .h2 .it { font-style: italic; }
+  .h2-sub { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); max-width: 34ch; }
+
+  /* Correlation finding */
+  .find { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+  .find:first-of-type { border-top: 1px solid var(--hairline); }
+  .find .meta { display: flex; justify-content: space-between; align-items: baseline; }
+  .find .meta .nm { font-family: "Instrument Serif", serif; font-size: 17px; color: var(--text-primary); line-height: 1.2; }
+  .find .meta .nm .it { font-style: italic; }
+  .find .meta .conf { font-family: "JetBrains Mono", monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); }
+  .find .meta .conf.med { color: var(--text-tertiary); }
+
+  .find .scatter { margin-top: 14px; height: 64px; position: relative; }
+  .find .scatter svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+  .find .insight {
+    margin-top: 12px;
+    border-left: 1px solid var(--accent);
+    padding-left: 12px;
+    font-size: 13px; line-height: 1.5; color: var(--text-secondary); text-wrap: pretty;
+  }
+  .find .insight .em { font-family: "Instrument Serif", serif; font-style: italic; color: var(--text-primary); }
+  .find .insight .data { font-family: "JetBrains Mono", monospace; color: var(--text-primary); }
+
+  .find.flag .meta .conf { color: #C2A862; }
+  .find.flag .insight { border-left-color: #C2A862; }
+
+  /* monthly trend */
+  .month { margin-top: 18px; background: var(--bg-secondary); border-radius: 18px; padding: 18px 20px; }
+  .month .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .month .k { font-family: "JetBrains Mono", monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
+  .month .delta { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--positive); }
+  .month svg { width: 100%; height: 80px; margin-top: 14px; display: block; overflow: visible; }
+  .month .x { display: flex; justify-content: space-between; margin-top: 6px; font-family: "JetBrains Mono", monospace; font-size: 9px; color: var(--text-tertiary); }
+
+  .footnote { margin-top: 24px; font-size: 11.5px; color: var(--text-tertiary); line-height: 1.5; font-family: "Instrument Serif", serif; font-style: italic; text-wrap: pretty; padding-left: 12px; border-left: 1px solid var(--hairline); }
+
+  .scroll-pad { height: 12px; }
+</style>
+</head>
+<body>
+  <div class="device" data-screen-label="14 Science">
+    <div class="screen day">
+      <div class="status-bar">
+        <div class="time">9:24</div>
+        <div class="island"></div>
+        <div class="right">
+          <svg viewBox="0 0 18 12" fill="currentColor" style="width:18px;height:12px;"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="5" y="6" width="3" height="6" rx="0.5"/><rect x="10" y="3" width="3" height="9" rx="0.5"/><rect x="15" y="0" width="3" height="12" rx="0.5"/></svg>
+          <svg viewBox="0 0 16 12" fill="currentColor" style="width:15px;height:11px;"><path d="M8 11.2a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8Z"/><path d="M8 7.5c1.4 0 2.7.5 3.7 1.4l1.5-1.5A8 8 0 0 0 8 5.3a8 8 0 0 0-5.2 2.1l1.5 1.5A5.4 5.4 0 0 1 8 7.5Z"/><path d="M8 3.6a10.4 10.4 0 0 1 7.4 3l-1.5 1.5A8.4 8.4 0 0 0 8 5.6a8.4 8.4 0 0 0-5.9 2.5L0.6 6.6A10.4 10.4 0 0 1 8 3.6Z"/></svg>
+          <svg viewBox="0 0 26 12" fill="none" style="width:24px;height:11px;"><rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" opacity="0.4"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="nav">
+        <div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg><span>Trends</span></div>
+        <div class="badge">On-device · 261 nights</div>
+      </div>
+
+      <div class="content">
+        <div class="label-mono">The science</div>
+        <h1>Why <span class="it">you</span> snore.<br/>Specifically you.</h1>
+        <p class="lede">The mouthpiece holds your jaw. <span class="em">Everything else</span> — what you ate, the room, the season, your weight — also moves the dial. After 261 nights I can see your patterns clearly enough to name them.</p>
+
+        <!-- Acoustic fingerprint -->
+        <div class="finger">
+          <div class="top">
+            <div class="k">Your acoustic fingerprint</div>
+            <div class="ts">Last 90 nights</div>
+          </div>
+
+          <div class="v"><span class="pct">71%</span><span class="it">soft palate</span> · low rumble, periodic</div>
+
+          <!-- spectrogram-style band visualization -->
+          <div class="spec">
+            <svg viewBox="0 0 320 120" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="palatal" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stop-color="#3E7565" stop-opacity="0.05"/>
+                  <stop offset="20%" stop-color="#3E7565" stop-opacity="0.55"/>
+                  <stop offset="50%" stop-color="#3E7565" stop-opacity="0.9"/>
+                  <stop offset="80%" stop-color="#3E7565" stop-opacity="0.55"/>
+                  <stop offset="100%" stop-color="#3E7565" stop-opacity="0.05"/>
+                </linearGradient>
+              </defs>
+
+              <!-- frequency band rows: 4 bands stacked, each row is your power at that band -->
+              <!-- band 4 (highest, ~2kHz) — nasal/palatal flutter — small -->
+              <g transform="translate(0,8)">
+                <rect width="320" height="20" fill="rgba(11,20,22,0.04)"/>
+                <g fill="url(#palatal)" opacity="0.35">
+                  <rect x="40"  y="6"  width="8" height="8"/>
+                  <rect x="86"  y="7"  width="6" height="6"/>
+                  <rect x="142" y="5"  width="10" height="10"/>
+                  <rect x="198" y="7"  width="6" height="6"/>
+                  <rect x="244" y="6"  width="8" height="8"/>
+                </g>
+              </g>
+              <!-- band 3 — mid, tongue-base -->
+              <g transform="translate(0,34)">
+                <rect width="320" height="22" fill="rgba(11,20,22,0.04)"/>
+                <g fill="url(#palatal)" opacity="0.55">
+                  <rect x="20"  y="4"  width="14" height="14"/>
+                  <rect x="54"  y="6"  width="10" height="10"/>
+                  <rect x="92"  y="3"  width="16" height="16"/>
+                  <rect x="138" y="5"  width="12" height="12"/>
+                  <rect x="178" y="2"  width="18" height="18"/>
+                  <rect x="222" y="5"  width="12" height="12"/>
+                  <rect x="262" y="3"  width="16" height="16"/>
+                  <rect x="298" y="6"  width="10" height="10"/>
+                </g>
+              </g>
+              <!-- band 2 — primary palatal — biggest energy -->
+              <g transform="translate(0,62)">
+                <rect width="320" height="26" fill="rgba(11,20,22,0.04)"/>
+                <g fill="#3E7565" opacity="0.92">
+                  <rect x="6"   y="4"  width="22" height="18"/>
+                  <rect x="36"  y="2"  width="26" height="22"/>
+                  <rect x="72"  y="3"  width="24" height="20"/>
+                  <rect x="106" y="1"  width="28" height="24"/>
+                  <rect x="146" y="2"  width="26" height="22"/>
+                  <rect x="184" y="3"  width="24" height="20"/>
+                  <rect x="220" y="2"  width="26" height="22"/>
+                  <rect x="258" y="4"  width="22" height="18"/>
+                  <rect x="292" y="3"  width="24" height="20"/>
+                </g>
+              </g>
+              <!-- band 1 — sub-bass rumble -->
+              <g transform="translate(0,94)">
+                <rect width="320" height="22" fill="rgba(11,20,22,0.04)"/>
+                <g fill="url(#palatal)" opacity="0.7">
+                  <rect x="14"  y="5"  width="14" height="12"/>
+                  <rect x="48"  y="6"  width="12" height="10"/>
+                  <rect x="84"  y="4"  width="16" height="14"/>
+                  <rect x="124" y="6"  width="12" height="10"/>
+                  <rect x="160" y="3"  width="18" height="16"/>
+                  <rect x="200" y="5"  width="14" height="12"/>
+                  <rect x="240" y="6"  width="12" height="10"/>
+                  <rect x="276" y="4"  width="16" height="14"/>
+                </g>
+              </g>
+            </svg>
+            <span class="legend">120 → 2000 Hz</span>
+            <span class="freq">Time →</span>
+          </div>
+
+          <div class="breakdown">
+            <div class="b"><div class="nm">Soft palate</div><div class="pc">71%</div><div class="desc">Periodic, low rumble</div></div>
+            <div class="b"><div class="nm">Tongue base</div><div class="pc">22%</div><div class="desc">Wet, irregular</div></div>
+            <div class="b"><div class="nm">Nasal</div><div class="pc">7%</div><div class="desc">High flutter</div></div>
+          </div>
+
+          <div class="reason">
+            Your soft palate vibrates when you exhale through a partly-closed airway. <span class="em">That's the type the mouthpiece treats best</span> — which is why it's working. The 7% nasal share is what flares up in spring.
+          </div>
+        </div>
+
+        <!-- Month over month consistency -->
+        <h2 class="h2">Month over <span class="it">month</span></h2>
+        <p class="h2-sub">How consistent your nights have become — the variance is dropping faster than the mean.</p>
+
+        <div class="month">
+          <div class="top">
+            <div class="k">Snore index · 8 months</div>
+            <div class="delta">↓ 47%, ↓ variance 62%</div>
+          </div>
+          <svg viewBox="0 0 320 80" preserveAspectRatio="none" aria-hidden="true">
+            <!-- range band -->
+            <path d="M0,18 L40,22 L80,28 L120,38 L160,46 L200,52 L240,56 L280,58 L320,60
+                     L320,28 L280,30 L240,34 L200,40 L160,48 L120,56 L80,62 L40,66 L0,70 Z"
+                  fill="#3E7565" fill-opacity="0.12"/>
+            <!-- median line -->
+            <polyline points="0,68 40,64 80,58 120,54 160,52 200,50 240,46 280,42 320,40"
+                      fill="none" stroke="#3E7565" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- now dot -->
+            <circle cx="320" cy="40" r="3.5" fill="#3E7565"/>
+            <circle cx="320" cy="40" r="7"   fill="#86C8B8" opacity="0.35"/>
+          </svg>
+          <div class="x"><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>Now</span></div>
+        </div>
+
+        <!-- Findings: lifestyle correlations from CoreML -->
+        <h2 class="h2">What's <span class="it">moving the needle</span></h2>
+        <p class="h2-sub">Patterns the on-device model has found in your data. None of these are causal proof — they're hypotheses worth testing.</p>
+
+        <div class="find">
+          <div class="meta">
+            <div class="nm">Alcohol within <span class="it">3 hours of sleep</span></div>
+            <div class="conf">Strong · r = 0.71</div>
+          </div>
+          <div class="scatter">
+            <svg viewBox="0 0 320 64" preserveAspectRatio="none" aria-hidden="true">
+              <line x1="0" y1="60" x2="320" y2="60" stroke="rgba(11,20,22,0.12)" stroke-width="0.6"/>
+              <line x1="0" y1="60" x2="0" y2="0" stroke="rgba(11,20,22,0.12)" stroke-width="0.6"/>
+              <!-- scatter dots, low-left to high-right -->
+              <g fill="#3E7565">
+                <circle cx="14" cy="56" r="2"/><circle cx="22" cy="54" r="2"/><circle cx="32" cy="58" r="2"/>
+                <circle cx="46" cy="50" r="2"/><circle cx="58" cy="52" r="2"/><circle cx="74" cy="48" r="2"/>
+                <circle cx="92" cy="44" r="2"/><circle cx="108" cy="46" r="2"/><circle cx="124" cy="38" r="2"/>
+                <circle cx="142" cy="40" r="2"/><circle cx="160" cy="32" r="2"/><circle cx="178" cy="34" r="2"/>
+                <circle cx="198" cy="26" r="2"/><circle cx="216" cy="22" r="2"/><circle cx="234" cy="24" r="2"/>
+                <circle cx="252" cy="14" r="2"/><circle cx="270" cy="18" r="2"/><circle cx="288" cy="10" r="2"/>
+                <circle cx="306" cy="8"  r="2"/>
+              </g>
+              <!-- regression -->
+              <line x1="6" y1="58" x2="312" y2="6" stroke="#3E7565" stroke-width="1" stroke-dasharray="3 3"/>
+            </svg>
+          </div>
+          <div class="insight">On the <span class="data">23 nights</span> you logged a drink within three hours, your snore index averaged <span class="data">2.3×</span> your baseline. <span class="em">Two drinks pushes it to 3.1×.</span> The mouthpiece can't reach this — alcohol relaxes the same muscles the strap is fighting.</div>
+        </div>
+
+        <div class="find">
+          <div class="meta">
+            <div class="nm">Bedroom <span class="it">temperature</span></div>
+            <div class="conf">Moderate · r = 0.54</div>
+          </div>
+          <div class="scatter">
+            <svg viewBox="0 0 320 64" preserveAspectRatio="none" aria-hidden="true">
+              <line x1="0" y1="60" x2="320" y2="60" stroke="rgba(11,20,22,0.12)" stroke-width="0.6"/>
+              <!-- U-curve: bad cold, good ~66°, bad hot -->
+              <path d="M0,12 C40,28 70,48 100,54 C140,60 180,58 220,50 C260,40 290,22 320,8" fill="none" stroke="#3E7565" stroke-width="1.4"/>
+              <!-- dots above/below -->
+              <g fill="#3E7565" opacity="0.6">
+                <circle cx="20" cy="20" r="2"/><circle cx="60" cy="38" r="2"/><circle cx="100" cy="52" r="2"/>
+                <circle cx="140" cy="56" r="2"/><circle cx="180" cy="54" r="2"/><circle cx="220" cy="48" r="2"/>
+                <circle cx="260" cy="34" r="2"/><circle cx="300" cy="14" r="2"/>
+              </g>
+              <!-- sweet spot marker -->
+              <line x1="158" y1="0" x2="158" y2="64" stroke="#3E7565" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
+              <text x="162" y="10" font-family="JetBrains Mono" font-size="8" fill="#3E7565">66°F</text>
+            </svg>
+          </div>
+          <div class="insight">Your sweet spot is <span class="data">65–67°F</span>. Below 62 your nose dries out and you breathe through your mouth more; above 70 you sleep lighter and roll. <span class="em">HomeKit can hold this for you</span> if you'd like.</div>
+        </div>
+
+        <div class="find">
+          <div class="meta">
+            <div class="nm">Exercise <span class="it">that day</span></div>
+            <div class="conf">Moderate · r = -0.48</div>
+          </div>
+          <div class="scatter">
+            <svg viewBox="0 0 320 64" preserveAspectRatio="none" aria-hidden="true">
+              <line x1="0" y1="60" x2="320" y2="60" stroke="rgba(11,20,22,0.12)" stroke-width="0.6"/>
+              <g fill="#3E7565">
+                <circle cx="14" cy="14" r="2"/><circle cx="32" cy="20" r="2"/><circle cx="52" cy="26" r="2"/>
+                <circle cx="74" cy="22" r="2"/><circle cx="96" cy="32" r="2"/><circle cx="118" cy="36" r="2"/>
+                <circle cx="140" cy="34" r="2"/><circle cx="162" cy="42" r="2"/><circle cx="184" cy="44" r="2"/>
+                <circle cx="206" cy="40" r="2"/><circle cx="228" cy="50" r="2"/><circle cx="250" cy="48" r="2"/>
+                <circle cx="272" cy="54" r="2"/><circle cx="294" cy="52" r="2"/><circle cx="312" cy="58" r="2"/>
+              </g>
+              <line x1="6" y1="14" x2="312" y2="58" stroke="#3E7565" stroke-width="1" stroke-dasharray="3 3"/>
+            </svg>
+          </div>
+          <div class="insight">Days you hit <span class="data">8,000+ steps</span> or 30 minutes of cardio, you snore <span class="data">28% less</span> that night. <span class="em">Within reason</span> — workouts after 8 p.m. spike your HR and undo the gain.</div>
+        </div>
+
+        <div class="find">
+          <div class="meta">
+            <div class="nm">Pollen <span class="it">count</span></div>
+            <div class="conf">Strong · r = 0.66</div>
+          </div>
+          <div class="scatter">
+            <svg viewBox="0 0 320 64" preserveAspectRatio="none" aria-hidden="true">
+              <line x1="0" y1="60" x2="320" y2="60" stroke="rgba(11,20,22,0.12)" stroke-width="0.6"/>
+              <!-- two seasonal humps -->
+              <path d="M0,52 C30,46 50,30 80,20 C110,12 130,18 160,30 C190,44 210,50 240,40 C270,28 290,16 320,10"
+                    fill="none" stroke="#3E7565" stroke-width="1.4"/>
+              <g fill="#3E7565" opacity="0.55">
+                <circle cx="40" cy="30" r="2"/><circle cx="80" cy="22" r="2"/><circle cx="120" cy="20" r="2"/>
+                <circle cx="160" cy="32" r="2"/><circle cx="200" cy="44" r="2"/><circle cx="240" cy="40" r="2"/>
+                <circle cx="280" cy="20" r="2"/><circle cx="310" cy="12" r="2"/>
+              </g>
+            </svg>
+          </div>
+          <div class="insight">Your nasal share triples on <span class="data">high-pollen days</span> (oak in spring, ragweed in fall). It's the only signal where the device can't help — you'd want a saline rinse before bed and an antihistamine, if your doctor's onboard.</div>
+        </div>
+
+        <!-- flagged finding -->
+        <div class="find flag">
+          <div class="meta">
+            <div class="nm">Brief <span class="it">silence-then-gasp</span> events</div>
+            <div class="conf">Worth flagging</div>
+          </div>
+          <div class="insight">I've heard <span class="data">14 events</span> across the last 90 nights that look like obstruction, not snoring — silence followed by a sharp inhale. <span class="em">That's not enough to call apnea, but it's enough to mention.</span> If you want, I can package these for your GP or fax them straight to a sleep clinic.</div>
+        </div>
+
+        <p class="footnote">All of this runs on your phone — your audio doesn't leave the device. CoreML 8 finds the patterns; I just translate them into something useful. Tap any finding to see the underlying nights.</p>
+
+        <div class="scroll-pad"></div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">Screen 14 · The Science</div>
+  <script src="_router.js" defer></script>
+</body>
+</html>

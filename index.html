@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dr. Better Sleep — Anchorage · All screens</title>
+<meta name="description" content="Anchorage — the Dr. Better Sleep design direction. Pale verdigris accent, Instrument Serif display, Manrope UI, JetBrains Mono numerals." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #0B1014; color: #DCE6E2; font-family: "Manrope", system-ui, sans-serif; min-height: 100%; }
+  body { padding: 56px 32px 96px; -webkit-font-smoothing: antialiased; }
+
+  header { max-width: 1480px; margin: 0 auto 48px; display: flex; align-items: baseline; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  header h1 { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 44px; letter-spacing: -0.01em; color: #fff; }
+  header h1 .it { font-style: italic; }
+  header p { color: #8B9A98; font-size: 13px; line-height: 1.5; max-width: 520px; }
+  header .meta { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #5C6669; margin-top: 6px; }
+
+  .grid {
+    max-width: 1480px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 28px;
+  }
+  .card {
+    border: 1px solid #1C2628;
+    border-radius: 24px;
+    background: #0F1518;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s;
+    text-decoration: none; color: inherit;
+  }
+  .card:hover { transform: translateY(-2px); border-color: #2A3A3D; }
+  .card:focus-visible { outline: 2px solid #86C8B8; outline-offset: 4px; }
+
+  .frame {
+    aspect-ratio: 393 / 852;
+    background: #14181A;
+    position: relative;
+    overflow: hidden;
+  }
+  .frame iframe {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(0.55);
+    transform-origin: center;
+    width: 393px; height: 852px;
+    border: 0;
+    pointer-events: none;
+  }
+  .meta-row {
+    padding: 18px 20px 22px;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    border-top: 1px solid #1C2628;
+  }
+  .meta-row .num { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.2em; color: #5C6669; }
+  .meta-row .name { font-family: "Instrument Serif", serif; font-size: 22px; color: #fff; }
+  .meta-row .name .it { font-style: italic; }
+  .meta-row .open {
+    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #86C8B8;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: gap 0.3s;
+  }
+  .card:hover .meta-row .open { gap: 10px; }
+
+  footer { max-width: 1480px; margin: 64px auto 0; color: #5C6669; font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  footer a:hover { border-bottom-color: #5C6669; }
+
+  @media (max-width: 480px) {
+    body { padding: 32px 16px 64px; }
+    header h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Dr. Better Sleep — <span class="it">Anchorage</span></h1>
+      <div class="meta">Direction 03 · 14 screens · iPhone 16 Pro</div>
+    </div>
+    <p>Atmosphere as design language. Pale verdigris accent, Instrument Serif display, Manrope UI, JetBrains Mono numerals. Click any tile to open the screen full-size.</p>
+  </header>
+
+  <section class="grid">
+    <a class="card" href="screens/01-dashboard-light.html"><div class="frame"><iframe src="screens/01-dashboard-light.html" loading="lazy" title="Dashboard light"></iframe></div><div class="meta-row"><span class="num">01</span><span class="name">Dashboard · <span class="it">light</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/02-dashboard-dark.html"><div class="frame"><iframe src="screens/02-dashboard-dark.html" loading="lazy" title="Dashboard dark"></iframe></div><div class="meta-row"><span class="num">02</span><span class="name">Dashboard · <span class="it">dark</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/03-morning-reveal.html"><div class="frame"><iframe src="screens/03-morning-reveal.html" loading="lazy" title="Morning reveal"></iframe></div><div class="meta-row"><span class="num">03</span><span class="name">Morning <span class="it">reveal</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/04-chat.html"><div class="frame"><iframe src="screens/04-chat.html" loading="lazy" title="Chat"></iframe></div><div class="meta-row"><span class="num">04</span><span class="name">Chat</span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/05-trends.html"><div class="frame"><iframe src="screens/05-trends.html" loading="lazy" title="Trends"></iframe></div><div class="meta-row"><span class="num">05</span><span class="name">Trends</span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/06-night.html"><div class="frame"><iframe src="screens/06-night.html" loading="lazy" title="Night tracking"></iframe></div><div class="meta-row"><span class="num">06</span><span class="name">Night · <span class="it">tracking</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/07-onboarding-triage.html"><div class="frame"><iframe src="screens/07-onboarding-triage.html" loading="lazy" title="Onboarding triage"></iframe></div><div class="meta-row"><span class="num">07</span><span class="name">Onboarding <span class="it">triage</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/08-detailed-night.html"><div class="frame"><iframe src="screens/08-detailed-night.html" loading="lazy" title="Detailed night"></iframe></div><div class="meta-row"><span class="num">08</span><span class="name">Detailed <span class="it">night</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/09-boil-and-bite.html"><div class="frame"><iframe src="screens/09-boil-and-bite.html" loading="lazy" title="Boil and bite"></iframe></div><div class="meta-row"><span class="num">09</span><span class="name">Boil &amp; <span class="it">bite</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/10-device-overview.html"><div class="frame"><iframe src="screens/10-device-overview.html" loading="lazy" title="Device overview"></iframe></div><div class="meta-row"><span class="num">10</span><span class="name">Device <span class="it">overview</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/11-chat-rich.html"><div class="frame"><iframe src="screens/11-chat-rich.html" loading="lazy" title="Chat rich data"></iframe></div><div class="meta-row"><span class="num">11</span><span class="name">Chat · <span class="it">rich data</span></span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/12-comparisons.html"><div class="frame"><iframe src="screens/12-comparisons.html" loading="lazy" title="Comparisons"></iframe></div><div class="meta-row"><span class="num">12</span><span class="name">Comparisons</span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/13-reorder.html"><div class="frame"><iframe src="screens/13-reorder.html" loading="lazy" title="Reorder"></iframe></div><div class="meta-row"><span class="num">13</span><span class="name">Reorder</span><span class="open">Open →</span></div></a>
+    <a class="card" href="screens/14-science.html"><div class="frame"><iframe src="screens/14-science.html" loading="lazy" title="The science"></iframe></div><div class="meta-row"><span class="num">14</span><span class="name">The <span class="it">science</span></span><span class="open">Open →</span></div></a>
+  </section>
+
+  <footer>
+    <span>Anchorage · Dr. Better Sleep · May 2026</span>
+    <span><a href="directions.html">Compare directions →</a></span>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "dr-better-sleep-anchorage",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Dr. Better Sleep — Anchorage direction. 14 iPhone 16 Pro screens.",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}
