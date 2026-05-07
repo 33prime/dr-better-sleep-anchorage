@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // Boot. Mount the shell, install delegation, react to hash changes.
 
 import { mountShell, renderScreen, installDelegation, syncTabBar } from './shell';
@@ -64,3 +65,13 @@ boot().catch((err) => {
   const boot = document.getElementById('boot');
   if (boot) boot.innerHTML = `<div style="color:#DCE6E2;font-family:monospace;font-size:12px;text-align:center;padding:24px;">Failed to boot.<br/><br/>${String(err)}</div>`;
 });
+
+// Register the service worker (PWA / offline). Only in production builds — Vite
+// dev server already handles HMR and SW caching can confuse local dev.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
