@@ -1,0 +1,42 @@
+.root { padding: 8px 24px 24px; display: flex; flex-direction: column; }
+
+.progress { margin-top: 4px; display: flex; gap: 6px; }
+.progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(11,20,22,0.10); }
+.progress .pipDone { background: var(--accent); }
+
+.whoLine { margin-top: 22px; display: flex; align-items: center; gap: 10px; }
+.whoLine .name { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
+
+h1.h { margin-top: 14px; font-family: var(--serif); font-weight: 400; font-size: 32px; line-height: 1.08; letter-spacing: -0.005em; color: var(--text-primary); text-wrap: balance; }
+.it { font-style: italic; }
+
+.bodyCopy { margin-top: 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-wrap: pretty; max-width: 32ch; }
+.bodyCopy .em { color: var(--text-primary); font-weight: 500; }
+
+.findings { margin-top: 22px; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 4px 0; }
+.finding { padding: 14px 0; display: flex; gap: 14px; align-items: flex-start; border-bottom: 1px solid var(--hairline); }
+.finding:last-child { border-bottom: 0; }
+.finding .num { flex: none; font-family: var(--mono); font-weight: 300; font-size: 11px; letter-spacing: 0.06em; color: var(--text-tertiary); width: 18px; padding-top: 2px; }
+.finding .copy { font-size: 14.5px; line-height: 1.5; color: var(--text-primary); text-wrap: pretty; }
+.finding .copy .em { font-family: var(--serif); font-style: italic; }
+.finding .copy .data { font-family: var(--mono); }
+
+.path { margin-top: 24px; background: var(--bg-secondary); border-radius: 22px; padding: 20px 22px; position: relative; overflow: hidden; }
+.path::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(134,200,184,0.20) 0%, transparent 70%); pointer-events: none; }
+.path .label { color: var(--accent); font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
+.path h2 { margin-top: 8px; font-family: var(--serif); font-size: 24px; font-weight: 400; color: var(--text-primary); line-height: 1.1; }
+.path p { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
+
+.steps { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--hairline); }
+.step:first-child { border-top: 0; padding-top: 4px; }
+.step .dot { width: 22px; height: 22px; flex: none; border-radius: 50%; border: 1px solid var(--accent); display: grid; place-items: center; font-family: var(--mono); font-size: 10px; color: var(--accent); }
+.step .l { flex: 1; font-size: 14px; color: var(--text-primary); }
+.step .when { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); }
+
+.actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+.btn { height: 50px; border-radius: 14px; display: grid; place-items: center; font-size: 15px; font-weight: 500; }
+.btnPrimary { background: var(--text-primary); color: var(--bg-primary); }
+.btnPrimary span { display: inline-flex; align-items: center; gap: 8px; }
+.btnPrimary svg { width: 16px; height: 16px; }
+.btnGhost { color: var(--text-secondary); font-style: italic; font-family: var(--serif); font-size: 16px; background: none; }

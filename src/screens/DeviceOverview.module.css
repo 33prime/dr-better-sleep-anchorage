@@ -1,0 +1,31 @@
+.root { padding-bottom: 36px; }
+.nav { height: 44px; padding: 0 12px 0 8px; display: flex; align-items: center; justify-content: space-between; }
+.nav .back { color: var(--text-secondary); padding: 6px 8px; display: flex; align-items: center; gap: 4px; font-family: var(--serif); font-style: italic; font-size: 14px; background: none; border: 0; }
+.nav .back svg { width: 22px; height: 22px; }
+.nav .more { color: var(--text-secondary); padding: 6px 8px; background: none; border: 0; }
+.body { padding: 4px 24px 28px; }
+.label { color: var(--text-tertiary); font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
+.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 400; }
+.h .it { font-style: italic; }
+
+.diagram { margin-top: 20px; background: var(--bg-secondary); border-radius: 22px; padding: 22px 14px; }
+.diagram svg { width: 100%; height: 220px; display: block; overflow: visible; }
+.diagram .meta { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 8px; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.18em; text-transform: uppercase; }
+
+.callouts { margin-top: 22px; border-top: 1px solid var(--hairline); }
+.co { display: flex; gap: 14px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--hairline); }
+.co .num { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--accent); color: var(--accent); display: grid; place-items: center; font-family: var(--mono); font-size: 10px; margin-top: 1px; }
+.co .body { flex: 1; }
+.co .name { font-family: var(--serif); font-size: 17px; line-height: 1.15; color: var(--text-primary); }
+.co .name .it { font-style: italic; }
+.co .desc { margin-top: 4px; font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); text-wrap: pretty; }
+
+.specs { margin-top: 22px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--hairline); border-radius: 14px; overflow: hidden; }
+.specs .s { background: var(--bg-secondary); padding: 14px; }
+.specs .k { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
+.specs .v { margin-top: 4px; font-family: var(--mono); font-size: 14px; letter-spacing: -0.02em; color: var(--text-primary); }
+
+.cta { margin-top: 24px; }
+.cta .btn { width: 100%; height: 50px; border-radius: 14px; background: var(--text-primary); color: var(--bg-primary); display: grid; place-items: center; font-size: 15px; font-weight: 500; border: 0; }
+.cta .btn span { display: inline-flex; align-items: center; gap: 8px; }
+.cta .btn svg { width: 16px; height: 16px; }

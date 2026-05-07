@@ -3,14 +3,23 @@ import { DeviceFrame } from './components/DeviceFrame';
 import { AnimatedStage } from './components/AnimatedStage';
 import { TabBar } from './components/TabBar';
 import { ToastHost } from './components/Toast';
+import { DemoControls } from './components/DemoControls';
 import { useStore } from './store';
 import { shouldUseDarkDashboard } from './utils/format';
 
 import { Dashboard } from './screens/Dashboard';
 import { Chat } from './screens/Chat';
+import { ChatRich } from './screens/ChatRich';
 import { Trends } from './screens/Trends';
 import { DetailedNight } from './screens/DetailedNight';
 import { MorningReveal } from './screens/MorningReveal';
+import { Onboarding } from './screens/Onboarding';
+import { BoilAndBite } from './screens/BoilAndBite';
+import { DeviceOverview } from './screens/DeviceOverview';
+import { Night } from './screens/Night';
+import { Comparisons } from './screens/Comparisons';
+import { Reorder } from './screens/Reorder';
+import { Science } from './screens/Science';
 import { Stub } from './screens/Stub';
 
 const TABBAR_ROUTES = ['/', '/dashboard/dark', '/trends', '/profile'];
@@ -39,16 +48,16 @@ export function App() {
             <Route path="/dashboard/dark" component={Dashboard} />
             <Route path="/morning" component={MorningReveal} />
             <Route path="/chat" component={Chat} />
-            <Route path="/chat/rich"><Stub title="Chat · rich data" /></Route>
+            <Route path="/chat/rich" component={ChatRich} />
             <Route path="/trends" component={Trends} />
-            <Route path="/trends/compare"><Stub title="Comparisons" /></Route>
-            <Route path="/trends/science"><Stub title="The science" /></Route>
-            <Route path="/night"><Stub title="Live night tracking" /></Route>
+            <Route path="/trends/compare" component={Comparisons} />
+            <Route path="/trends/science" component={Science} />
+            <Route path="/night" component={Night} />
             <Route path="/night/:date" component={DetailedNight} />
-            <Route path="/onboarding"><Stub title="Onboarding triage" /></Route>
-            <Route path="/onboarding/setup"><Stub title="Boil & bite" /></Route>
-            <Route path="/onboarding/device"><Stub title="Device overview" /></Route>
-            <Route path="/profile"><Stub title="Reorder" /></Route>
+            <Route path="/onboarding" component={Onboarding} />
+            <Route path="/onboarding/setup" component={BoilAndBite} />
+            <Route path="/onboarding/device" component={DeviceOverview} />
+            <Route path="/profile" component={Reorder} />
             <Route><Stub title="Not found" /></Route>
           </Switch>
         </AnimatedStage>
@@ -56,6 +65,7 @@ export function App() {
       </DeviceFrame>
 
       <a className="corner-link" href="/gallery.html">All screens →</a>
+      <DemoControls />
       <ToastHost />
     </>
   );

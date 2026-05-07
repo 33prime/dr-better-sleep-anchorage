@@ -1,0 +1,41 @@
+.root { display: flex; flex-direction: column; height: 100%; }
+
+.nav { height: 44px; padding: 0 12px 0 8px; display: flex; align-items: center; justify-content: space-between; flex: none; }
+.nav .x { padding: 6px 8px; color: var(--text-secondary); background: none; border: 0; }
+.nav .x svg { width: 22px; height: 22px; }
+.nav .help { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--text-secondary); padding: 6px 8px; }
+
+.progress { padding: 4px 24px 0; display: flex; gap: 6px; flex: none; }
+.progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(11,20,22,0.10); }
+.progress .pipDone { background: var(--accent); }
+.progress .pipActive { background: var(--text-primary); }
+
+.stage { padding: 18px 24px 28px; flex: 1; display: flex; flex-direction: column; }
+
+.stepMeta { display: flex; align-items: baseline; justify-content: space-between; }
+.stepMeta .num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
+.stepMeta .of { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--text-tertiary); }
+
+.h1 { margin-top: 10px; font-family: var(--serif); font-size: 28px; line-height: 1.1; color: var(--text-primary); font-weight: 400; }
+.h1 .it { font-style: italic; }
+.lede { margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); max-width: 32ch; text-wrap: pretty; }
+
+.ringWrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 0; position: relative; }
+.ring { width: 220px; height: 220px; position: relative; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { fill: none; stroke: rgba(11,20,22,0.08); stroke-width: 2; }
+.ring .arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+.ring .center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+.ring .center .t { font-family: var(--mono); font-weight: 300; font-size: 56px; letter-spacing: -0.04em; color: var(--text-primary); line-height: 0.95; }
+.ring .center .cap { margin-top: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
+
+.tip { margin-top: 8px; border-top: 1px solid var(--hairline); padding-top: 14px; display: flex; gap: 12px; align-items: flex-start; }
+.tip .copy { font-size: 13.5px; line-height: 1.5; color: var(--text-primary); text-wrap: pretty; }
+.tip .copy .em { font-family: var(--serif); font-style: italic; }
+
+.foot { margin-top: 18px; display: flex; gap: 10px; flex: none; }
+.btn { height: 50px; flex: 1; border-radius: 14px; display: grid; place-items: center; font-size: 15px; font-weight: 500; }
+.btnPrimary { background: var(--text-primary); color: var(--bg-primary); }
+.btnPrimary span { display: inline-flex; align-items: center; gap: 8px; }
+.btnPrimary svg { width: 16px; height: 16px; }
+.btnGhost { color: var(--text-secondary); font-style: italic; font-family: var(--serif); font-size: 16px; flex: 0 0 110px; border: 1px solid var(--hairline); background: none; }

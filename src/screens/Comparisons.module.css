@@ -1,0 +1,48 @@
+.root { padding-bottom: 36px; }
+.nav { height: 44px; padding: 0 12px 0 8px; display: flex; align-items: center; justify-content: space-between; }
+.nav .back { color: var(--text-secondary); padding: 6px 8px; display: flex; align-items: center; gap: 4px; font-family: var(--serif); font-style: italic; font-size: 14px; background: none; border: 0; }
+.nav .back svg { width: 22px; height: 22px; }
+.nav .opts { display: flex; gap: 12px; padding: 6px 8px; color: var(--text-tertiary); font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; }
+.nav .opts .on { color: var(--text-primary); border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+
+.body { padding: 4px 24px 36px; }
+.label { color: var(--text-tertiary); font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
+.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 400; }
+.h .it { font-style: italic; }
+.lede { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); max-width: 34ch; text-wrap: pretty; }
+.lede .em { font-family: var(--serif); font-style: italic; color: var(--text-primary); }
+
+.cohort { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 6px 10px; border: 1px solid var(--hairline); border-radius: 100px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em; color: var(--text-secondary); background: none; transition: border-color 200ms, color 200ms; }
+.chip strong { color: var(--text-primary); font-weight: 500; margin-left: 4px; }
+.chip.active { border-color: var(--accent); color: var(--accent); }
+
+.dist { margin-top: 28px; }
+.distHeader { display: flex; justify-content: space-between; align-items: baseline; }
+.ttl { font-family: var(--serif); font-size: 19px; color: var(--text-primary); }
+.ttl .it { font-style: italic; }
+.distSub { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); margin-top: 6px; }
+.pct { font-family: var(--mono); font-weight: 300; font-size: 32px; letter-spacing: -0.04em; color: var(--text-primary); }
+.pct .u { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--text-secondary); margin-left: 6px; }
+
+.distChart svg { width: 100%; height: 110px; margin-top: 14px; display: block; overflow: visible; }
+.axis { margin-top: 6px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9.5px; color: var(--text-tertiary); }
+
+.copy { margin-top: 16px; border-left: 1px solid var(--accent); padding-left: 14px; font-size: 13.5px; line-height: 1.55; color: var(--text-secondary); text-wrap: pretty; }
+.copy .em { font-family: var(--serif); font-style: italic; color: var(--text-primary); }
+
+.strip { margin-top: 32px; border-top: 1px solid var(--hairline); }
+.metric { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+.metric .row { display: flex; align-items: baseline; justify-content: space-between; }
+.metric .nm { font-family: var(--serif); font-size: 17px; color: var(--text-primary); }
+.metric .nm .it { font-style: italic; }
+.metric .nm .pp { font-family: var(--mono); font-size: 11px; color: var(--text-tertiary); margin-left: 8px; letter-spacing: 0.04em; }
+.metric .vals { display: flex; gap: 16px; }
+.metric .vk { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
+.metric .vv { font-family: var(--mono); font-weight: 300; font-size: 18px; color: var(--text-primary); letter-spacing: -0.02em; margin-top: 2px; }
+.metric .vv.you { color: var(--accent); }
+.metric .bar { margin-top: 10px; height: 4px; border-radius: 2px; background: rgba(11,20,22,0.06); position: relative; }
+.metric .bar .avg { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--text-tertiary); }
+.metric .bar .you { position: absolute; top: -2px; height: 8px; width: 8px; border-radius: 50%; background: var(--accent); transform: translateX(-4px); }
+.metric .bar .you::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 16px; height: 16px; border-radius: 50%; background: var(--accent-soft); opacity: 0.5; z-index: -1; }
+.metric .scale { margin-top: 4px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); }
