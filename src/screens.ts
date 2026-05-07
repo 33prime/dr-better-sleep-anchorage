@@ -12,6 +12,7 @@ import { navigate } from './router';
 import { pickReply } from './replies';
 import { spark } from './charts';
 import { showToast } from './toast';
+import { tickNumber, drawPath, installPullToRefresh } from './animate';
 
 type Hydrator = (root: HTMLElement, route: ResolvedRoute) => void | Promise<void>;
 
@@ -26,17 +27,14 @@ const dashboard: Hydrator = (root) => {
   if (!last) return;
   const baseline = baselineSnores(s);
 
-  setText(root, '.greeting h1', `${timeOfDayGreeting()} `);
-  const nameSpan = root.querySelector('.greeting h1');
-  if (nameSpan && !nameSpan.querySelector('.name')) {
-    nameSpan.innerHTML = `${timeOfDayGreeting()} <span class="name">${escapeHtml(s.user.name)}.</span>`;
-  } else if (nameSpan) {
-    nameSpan.innerHTML = `${timeOfDayGreeting()} <span class="name">${escapeHtml(s.user.name)}.</span>`;
+  const greeting = root.querySelector('.greeting h1');
+  if (greeting) {
+    greeting.innerHTML = `${timeOfDayGreeting()} <span class="name">${escapeHtml(s.user.name)}.</span>`;
   }
   setText(root, '.greeting .date', fmtDateLong(new Date()).toUpperCase());
 
-  // Hero number + delta
-  setText(root, '.hero .num', String(last.totalSnores));
+  // Hero number + delta — animate the number on entry
+  tickNumber(root.querySelector('.hero .num'), String(last.totalSnores), 700);
   const delta = fmtDelta(last.totalSnores, baseline);
   const deltaEl = root.querySelector<HTMLElement>('.hero .delta');
   if (deltaEl) {
@@ -71,12 +69,15 @@ const dashboard: Hydrator = (root) => {
       lastDot.setAttribute('cx', lx);
       lastDot.setAttribute('cy', ly);
     }
+    // Draw the line in
+    const polylineEl = sparkSvg.querySelector('polyline') as SVGPolylineElement | null;
+    drawPath(polylineEl, 900);
   }
 
-  // Status row
-  setText(root, '.status-row .stat:nth-child(1) .v', fmtDuration(last.sleepDurationMin));
-  setText(root, '.status-row .stat:nth-child(2) .v', `${Math.round(last.efficiency * 100)}%`);
-  setText(root, '.status-row .stat:nth-child(3) .v', String(streakNights(s)));
+  // Status row — also animate
+  tickNumber(root.querySelector('.status-row .stat:nth-child(1) .v'), fmtDuration(last.sleepDurationMin), 600);
+  tickNumber(root.querySelector('.status-row .stat:nth-child(2) .v'), `${Math.round(last.efficiency * 100)}%`, 600);
+  tickNumber(root.querySelector('.status-row .stat:nth-child(3) .v'), String(streakNights(s)), 600);
 
   // Active context
   setText(root, '.context .copy', '');
@@ -96,7 +97,30 @@ const dashboard: Hydrator = (root) => {
     msgBubble.textContent = lastThemMsg.text;
   }
 
-  // Tab bar metadata for the active tab — handled by syncTabBar in router cycle.
+  // Pull-to-refresh on the scroll container — simulates a new night.
+  const content = root.querySelector<HTMLElement>('.content');
+  if (content) {
+    installPullToRefresh(content, () => {
+      const prior = lastNight(s);
+      if (!prior) return;
+      const today = new Date();
+      const next = {
+        ...prior,
+        date: isoDate(today),
+        totalSnores: Math.max(20, Math.round(prior.totalSnores * (0.85 + Math.random() * 0.2))),
+        sleepDurationMin: prior.sleepDurationMin + Math.round((Math.random() - 0.5) * 30),
+        efficiency: Math.min(0.98, prior.efficiency + (Math.random() - 0.4) * 0.04),
+        deepMin: prior.deepMin + Math.round((Math.random() - 0.5) * 20),
+        snoresByHour: prior.snoresByHour.map(v => Math.max(0, Math.round(v * (0.7 + Math.random() * 0.4)))),
+      };
+      store.set(s2 => {
+        s2.nights.push(next);
+        if (s2.nights.length > 90) s2.nights = s2.nights.slice(-90);
+      });
+      showToast('New night logged.');
+      navigate('/morning', { dir: 'fade' });
+    });
+  }
 };
 
 // ============================================================
@@ -192,7 +216,11 @@ const chat: Hydrator = (root) => {
   const composer = root.querySelector<HTMLElement>('.composer');
   if (composer) {
     composer.innerHTML = `
-      <input class="field-input" type="text" placeholder="Ask Dr. Sommers…" autocomplete="off" />
+      <div class="field" style="padding: 0 16px;">
+        <input class="field-input" type="text" placeholder="Ask Dr. Sommers…" autocomplete="off"
+               style="flex:1; background: transparent; border: 0; outline: none; font: inherit;
+                      color: var(--text-primary); padding: 11px 0; min-width: 0;" />
+      </div>
       <div class="send" role="button" tabindex="0">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </div>
@@ -476,6 +504,27 @@ const detailedNight: Hydrator = (root, route) => {
     const bar = card.querySelector<HTMLElement>('.bar > div');
     if (bar) bar.style.width = `${pct}%`;
   });
+
+  // Snore intensity bars — redraw from data
+  const intensitySvg = root.querySelector<SVGSVGElement>('.snore-card svg');
+  if (intensitySvg) {
+    const { width: vbW } = svgViewBox(intensitySvg, 360, 110);
+    const bars = Array.from(intensitySvg.querySelectorAll<SVGRectElement>('g rect'));
+    if (bars.length === n.snoresByHour.length * 2 || bars.length >= 8) {
+      // Original has 21 bars; map our 8 hour buckets to 21 visual bars by interpolation.
+      const max = Math.max(...n.snoresByHour, 1);
+      const visualBars = bars.length;
+      const stepX = vbW / (visualBars + 1);
+      bars.forEach((rect, i) => {
+        const hourIdx = Math.floor((i / visualBars) * n.snoresByHour.length);
+        const v = n.snoresByHour[hourIdx];
+        const h = Math.max(2, Math.round((v / max) * 50));
+        rect.setAttribute('x', String((i + 1) * stepX));
+        rect.setAttribute('y', String(55 - h / 2));
+        rect.setAttribute('height', String(h));
+      });
+    }
+  }
 };
 
 function formatNarrowTime(hhmm: string): string {
@@ -638,7 +687,11 @@ const chatRich: Hydrator = (root) => {
   const composer = root.querySelector<HTMLElement>('.composer');
   if (!composer) return;
   composer.innerHTML = `
-    <input class="field-input" type="text" placeholder="Ask Dr. Sommers…" autocomplete="off" />
+    <div class="field" style="padding: 0 16px;">
+      <input class="field-input" type="text" placeholder="Ask Dr. Sommers…" autocomplete="off"
+             style="flex:1; background: transparent; border: 0; outline: none; font: inherit;
+                    color: var(--text-primary); padding: 11px 0; min-width: 0;" />
+    </div>
     <div class="send" role="button" tabindex="0">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </div>
@@ -743,21 +796,22 @@ const reorder: Hydrator = (root) => {
     }
   }
 
-  // Toggle remind
+  // Toggle remind — replace the .toggle with a real switch we can style.
   const toggle = root.querySelector<HTMLElement>('.toggle');
   if (toggle) {
+    toggle.innerHTML = '';
+    const knob = document.createElement('span');
+    Object.assign(knob.style, {
+      position: 'absolute', top: '3px', width: '18px', height: '18px',
+      borderRadius: '50%', background: 'var(--bg-primary)',
+      transition: 'right 200ms cubic-bezier(0.4, 0, 0.2, 1), background 200ms',
+    });
+    toggle.style.position = 'relative';
+    toggle.appendChild(knob);
     const apply = () => {
       const on = store.get().reorder.remindIn3mo;
-      toggle.style.background = on ? 'var(--accent)' : 'rgba(11,20,22,0.15)';
-      const dot = toggle.querySelector<HTMLElement>(':scope::after') as any;
-      // pseudo can't be styled directly; toggle with a class
-      toggle.classList.toggle('off', !on);
-      if (!on) {
-        // visually move the inner dot via a class — fallback inline style
-        toggle.style.setProperty('--toggle-x', '-22px');
-      } else {
-        toggle.style.removeProperty('--toggle-x');
-      }
+      toggle.style.background = on ? 'var(--accent)' : 'rgba(11,20,22,0.18)';
+      knob.style.right = on ? '3px' : '21px';
     };
     apply();
     toggle.addEventListener('click', () => {
