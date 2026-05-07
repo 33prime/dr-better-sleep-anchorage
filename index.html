@@ -28,16 +28,16 @@
 
   /* ----- Mobile: device frame fills the phone (no desktop matte) ----- */
   @media (max-width: 480px), (display-mode: standalone) {
+    html, body {
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;             /* lock the page; .content owns scroll */
+      overscroll-behavior: none;    /* no rubber-band on the body */
+    }
     body {
       padding: 0;
-      /* iOS safe areas (notch + home indicator) */
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
       align-items: stretch;
       justify-content: stretch;
-      min-height: 100dvh;
     }
     .device {
       width: 100% !important;
@@ -47,11 +47,22 @@
       padding: 0 !important;
       box-shadow: none !important;
       background: var(--bg-page);
+      /* iOS safe areas (notch + home indicator) eat into the device, not the body, so
+         the screen extends edge-to-edge but content is inset to safe areas. */
+      padding-top: env(safe-area-inset-top) !important;
+      padding-bottom: env(safe-area-inset-bottom) !important;
+      padding-left: env(safe-area-inset-left) !important;
+      padding-right: env(safe-area-inset-right) !important;
     }
     .screen {
       border-radius: 0 !important;
     }
-    /* In PWA standalone mode, hide our fake status bar so the real iOS one isn't doubled. */
+    /* Make every screen's primary scroll container actually scroll on iOS. */
+    .content, .convo, .stage {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+    }
   }
 
   @media (display-mode: standalone) {
