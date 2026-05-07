@@ -1,0 +1,57 @@
+.root { padding: 4px 20px 100px; }
+
+.head { padding: 8px 0 12px; display: flex; align-items: baseline; justify-content: space-between; }
+.head h1 { font-family: var(--serif); font-size: 28px; }
+.head .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
+
+.tabs {
+  display: flex; gap: 4px; padding: 4px;
+  background: rgba(11,20,22,0.05); border-radius: 999px;
+  width: fit-content; margin: 6px 0 22px;
+}
+.tabs .t {
+  padding: 6px 14px; border-radius: 999px;
+  font-family: var(--mono); font-weight: 400; font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-tertiary);
+  transition: background 200ms, color 200ms;
+}
+.tabs .on { background: var(--text-primary); color: var(--bg-primary); }
+
+.chartCard { background: var(--bg-secondary); border-radius: 22px; padding: 22px 22px 18px; }
+.chartHead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.chartHead .k { font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
+.legend { display: flex; gap: 14px; align-items: center; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); }
+.legend .sw { display: inline-block; width: 12px; height: 2px; vertical-align: middle; margin-right: 5px; }
+
+.numRow { margin-top: 12px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.big { font-family: var(--mono); font-weight: 300; font-size: 56px; line-height: 0.9; letter-spacing: -0.05em; color: var(--text-primary); }
+.bigUnit { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--text-secondary); }
+.delta { font-family: var(--sans); font-weight: 500; font-size: 13px; color: var(--positive); }
+.delta .from { color: var(--text-tertiary); font-weight: 400; margin-left: 4px; }
+
+.xAxis {
+  display: flex; justify-content: space-between; margin-top: 6px;
+  font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+.annotation { margin-top: 16px; padding: 12px 14px; border-top: 1px solid var(--hairline); display: flex; gap: 12px; align-items: flex-start; }
+.annotation .icon { width: 28px; height: 28px; flex: none; border-radius: 8px; background: rgba(134,200,184,0.18); color: var(--accent); display: grid; place-items: center; }
+.annotation .icon svg { width: 16px; height: 16px; }
+.annotation .body { font-size: 13px; line-height: 1.5; color: var(--text-primary); text-wrap: pretty; }
+.annotation .body .it { font-family: var(--serif); font-style: italic; }
+
+.row2 { margin: 28px 0 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
+
+.miniGrid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.mini {
+  display: flex; align-items: stretch; gap: 14px;
+  background: var(--bg-secondary); border-radius: 16px; padding: 14px 16px;
+}
+.mini .col { flex: 1; }
+.mini .k { font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
+.mini .v { font-family: var(--mono); font-weight: 300; font-size: 26px; letter-spacing: -0.04em; margin-top: 4px; color: var(--text-primary); }
+.mini .d { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.mini .d .pos { color: var(--positive); font-weight: 500; }
+.mini .d .flat { color: var(--text-tertiary); }
+.mini .spark { width: 96px; flex: none; align-self: center; display: flex; align-items: center; }

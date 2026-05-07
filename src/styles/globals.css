@@ -1,0 +1,271 @@
+/* Anchorage tokens, resets, and shell layout. Single global stylesheet. */
+
+:root {
+  --bg-page:        #14181A;
+
+  /* Day */
+  --bg-primary:     #DDE2E2;
+  --bg-secondary:   #D4DAD9;
+  --bg-tertiary:    #CBD2D1;
+  --text-primary:   #0B1416;
+  --text-secondary: #4A5558;
+  --text-tertiary:  #7A8488;
+
+  /* Night */
+  --night-bg-0:     #060B0D;
+  --night-bg-1:     #0B1416;
+  --night-bg-2:     #14242A;
+  --night-text-1:   #DCE6E2;
+  --night-text-2:   #8B9A98;
+  --night-text-3:   #5C6669;
+
+  --accent:         #3E7565;
+  --accent-soft:    #86C8B8;
+  --positive:       #4A7A55;
+  --warn:           #B58A4A;
+
+  --hairline:        rgba(11,20,22,0.10);
+  --hairline-strong: rgba(11,20,22,0.16);
+  --hairline-night:  rgba(220,230,226,0.10);
+
+  --serif: "Instrument Serif", serif;
+  --sans:  "Manrope", system-ui, sans-serif;
+  --mono:  "JetBrains Mono", monospace;
+
+  --safe-top:    env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+html { background: var(--bg-page); color: var(--text-primary); }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 20px;
+  min-height: 100dvh;
+}
+
+button, input { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; outline: none; }
+
+#app { display: contents; }
+
+/* ============================================================
+   Device frame — desktop showcase + mobile fullscreen
+   ============================================================ */
+.device {
+  width: 393px; height: 852px;
+  border-radius: 56px;
+  background: #0B1416;
+  padding: 12px;
+  box-shadow:
+    0 0 0 2px #1C2628,
+    0 30px 80px -20px rgba(0,0,0,0.7),
+    0 8px 24px rgba(0,0,0,0.4);
+  position: relative;
+  flex-shrink: 0;
+}
+.screen {
+  width: 100%; height: 100%;
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+.screen.day {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, #E6EBEA 0%, transparent 60%),
+    linear-gradient(180deg, #DDE2E2 0%, #D6DCDB 100%);
+  color: var(--text-primary);
+}
+.screen.night {
+  background:
+    radial-gradient(ellipse 130% 70% at 50% 110%, #14242A 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 50% -10%, #102023 0%, transparent 70%),
+    linear-gradient(180deg, #0B1416 0%, #060B0D 100%);
+  color: var(--night-text-1);
+}
+.screen.day::before {
+  content: ""; position: absolute; inset: -10% -10% auto -10%; height: 50%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(134,200,184,0.18) 0%, transparent 70%);
+  pointer-events: none; animation: breathe-day 9s ease-in-out infinite; z-index: 0;
+}
+.screen.night::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 100% 60% at 50% 30%, rgba(134,200,184,0.06) 0%, transparent 65%);
+  animation: breathe-night 5s ease-in-out infinite;
+}
+
+@keyframes breathe-day   { 0%,100% { opacity: 0.7;  } 50% { opacity: 1; } }
+@keyframes breathe-night { 0%,100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); } }
+@media (prefers-reduced-motion: reduce) { .screen::before { animation: none; } }
+
+/* Status bar */
+.status-bar {
+  position: relative; z-index: 2;
+  height: 47px; padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--sans);
+  font-weight: 600; font-size: 15px;
+}
+.status-bar .right { display: flex; gap: 6px; align-items: center; }
+.island {
+  position: absolute; left: 50%; transform: translateX(-50%); top: 11px;
+  width: 110px; height: 30px; background: #0B1416; border-radius: 18px; z-index: 3;
+}
+.screen.night .island { background: #000; box-shadow: 0 0 0 1px #1c2628; }
+
+/* ============================================================
+   The route stage — where each screen renders
+   ============================================================ */
+.stage {
+  position: absolute; inset: 47px 0 0 0;
+  overflow: hidden;
+}
+.stage > .page {
+  position: absolute; inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.stage > .page::-webkit-scrollbar { display: none; }
+
+/* ============================================================
+   Tab bar — shared across home/trends/profile
+   ============================================================ */
+.tabbar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+  height: 76px; padding: 8px 16px 24px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: linear-gradient(180deg, rgba(221,226,226,0) 0%, rgba(221,226,226,0.96) 35%, var(--bg-primary) 70%);
+  backdrop-filter: blur(8px);
+}
+.screen.night .tabbar {
+  background: linear-gradient(180deg, rgba(11,20,22,0) 0%, rgba(11,20,22,0.85) 35%, var(--night-bg-1) 70%);
+  border-top: 1px solid var(--hairline-night);
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+  color: var(--text-tertiary);
+  font-family: var(--sans); font-size: 10px; font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.screen.night .tab { color: var(--night-text-3); }
+.tab svg { width: 22px; height: 22px; stroke-width: 1.6; }
+.tab.active { color: var(--text-primary); }
+.tab.active svg { stroke-width: 2; }
+.screen.night .tab.active { color: var(--night-text-1); }
+.tab .badge {
+  position: absolute; top: 4px; right: 50%; margin-right: -16px;
+  width: 8px; height: 8px; background: var(--accent-soft); border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--bg-primary);
+}
+.screen.night .tab .badge { box-shadow: 0 0 0 2px var(--night-bg-1), 0 0 8px rgba(134,200,184,0.6); }
+
+/* ============================================================
+   Mobile / standalone PWA: device fills phone, no matte
+   ============================================================ */
+@media (max-width: 480px), (display-mode: standalone) {
+  html, body {
+    height: 100dvh; max-height: 100dvh;
+    overflow: hidden; overscroll-behavior: none;
+  }
+  body { padding: 0; align-items: stretch; justify-content: stretch; }
+  .device {
+    width: 100% !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    padding: var(--safe-top) 0 var(--safe-bottom) 0 !important;
+    box-shadow: none !important;
+    background: var(--bg-page);
+  }
+  .screen { border-radius: 0 !important; }
+}
+@media (display-mode: standalone) {
+  .status-bar > * { visibility: hidden; }
+  .island { display: none !important; }
+}
+
+/* ============================================================
+   Tap-feedback: scale-on-tap for interactive elements
+   ============================================================ */
+.tap {
+  transition: transform 120ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.tap:active { transform: scale(0.97); }
+
+/* Mono utility */
+.mono { font-family: var(--mono); }
+.serif { font-family: var(--serif); font-weight: 400; }
+.serif-it { font-family: var(--serif); font-style: italic; font-weight: 400; }
+.label-mono {
+  font-family: var(--mono); font-weight: 300;
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+}
+
+/* ============================================================
+   Toast
+   ============================================================ */
+.toast {
+  position: fixed; left: 50%; bottom: 96px;
+  transform: translateX(-50%) translateY(40px);
+  background: #0F1518; color: #DCE6E2; border: 1px solid #2A3A3D;
+  padding: 12px 18px; border-radius: 100px;
+  font-family: var(--sans); font-size: 13px;
+  opacity: 0; transition: opacity 240ms, transform 240ms cubic-bezier(0.22,1,0.36,1);
+  z-index: 60; pointer-events: none;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Demo control panel */
+.demo-fab {
+  position: fixed; bottom: 16px; right: 16px; z-index: 50;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(15,21,24,0.7); color: #5C6669;
+  border: 1px solid #1C2628; backdrop-filter: blur(8px);
+  display: grid; place-items: center;
+  transition: color 0.2s, transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
+}
+.demo-fab:hover { color: #86C8B8; transform: rotate(60deg); }
+.demo-fab svg { width: 18px; height: 18px; }
+.demo-panel {
+  position: fixed; bottom: 60px; right: 16px; z-index: 50;
+  background: #0F1518; border: 1px solid #1C2628; border-radius: 16px;
+  padding: 14px; min-width: 240px;
+  color: #DCE6E2; font-family: var(--sans); font-size: 13px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+.demo-panel h3 { font-family: var(--serif); font-size: 16px; margin-bottom: 10px; color: #fff; font-weight: 400; }
+.demo-panel button {
+  display: block; width: 100%; text-align: left;
+  background: rgba(255,255,255,0.04); border: 1px solid #1C2628; border-radius: 8px;
+  padding: 8px 10px; margin-bottom: 6px; color: #DCE6E2;
+  transition: background 0.15s, border-color 0.15s;
+}
+.demo-panel button:hover { background: rgba(134,200,184,0.08); border-color: #2A3A3D; }
+.demo-panel .row { display: flex; gap: 6px; margin-bottom: 6px; }
+.demo-panel .row button { margin-bottom: 0; }
+.demo-panel .label-mono { color: #5C6669; margin-top: 8px; margin-bottom: 4px; }
+
+/* Corner link to gallery */
+.corner-link {
+  position: fixed; top: 16px; right: 16px; z-index: 50;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #5C6669; text-decoration: none;
+  padding: 6px 10px; border: 1px solid #1C2628; border-radius: 100px;
+  background: rgba(15,21,24,0.5); backdrop-filter: blur(8px);
+}
+.corner-link:hover { color: #86C8B8; border-color: #2A3A3D; }
+@media (max-width: 480px), (display-mode: standalone) {
+  .corner-link { display: none; }
+}

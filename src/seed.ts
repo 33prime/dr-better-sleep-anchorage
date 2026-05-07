@@ -1,7 +1,7 @@
 // Mock data seed. 30 nights ending today (2026-05-06), with a clear "device fitted"
 // inflection 21 days ago. Snore counts decline; deep sleep & efficiency drift up.
 
-import { isoDate, pad2 } from './format';
+import { isoDate, pad2 } from './utils/format';
 
 export interface Night {
   date: string;          // ISO YYYY-MM-DD

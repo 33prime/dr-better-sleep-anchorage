@@ -1,5 +1,6 @@
 // Reactive store with localStorage persistence. Tiny pub/sub.
 
+import { useSyncExternalStore } from 'react';
 import { buildSeedState, type AppState } from './seed';
 
 const KEY = 'dr-better-sleep:v1';
@@ -66,6 +67,15 @@ class Store {
 }
 
 export const store = new Store();
+
+/** React hook: subscribe to the store and re-render when state changes. */
+export function useStore<T = AppState>(selector: (s: AppState) => T = (s => s as unknown as T)): T {
+  return useSyncExternalStore(
+    (cb) => store.subscribe(cb),
+    () => selector(store.get()),
+    () => selector(store.get()),
+  );
+}
 
 // ---------- derived helpers ----------
 
