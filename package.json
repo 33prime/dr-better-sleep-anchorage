@@ -1,13 +1,16 @@
 {
   "name": "dr-better-sleep-anchorage",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Dr. Better Sleep — Anchorage direction. 14 iPhone 16 Pro screens.",
+  "description": "Dr. Better Sleep — Anchorage direction. Functional demo web app.",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
+    "typescript": "^5.4.0",
     "vite": "^7.0.0"
   }
 }

@@ -2,17 +2,146 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Dr. Better Sleep</title>
-<meta http-equiv="refresh" content="0; url=screens/01-dashboard-light.html" />
-<link rel="canonical" href="screens/01-dashboard-light.html" />
+<meta name="description" content="Dr. Better Sleep — quiet, attentive sleep coach. Anchorage direction." />
+<meta name="theme-color" content="#0B1416" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/screens/_anchorage.css">
 <style>
-  html, body { background: #14181A; color: #DCE6E2; font-family: system-ui, -apple-system, sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; }
-  a { color: #86C8B8; text-decoration: none; border-bottom: 1px solid rgba(134,200,184,0.4); }
+  /* Shell-only layout. Every screen renders inside #screen-root. */
+  body { background: var(--bg-page); padding: 40px 20px; }
+  #app { display: contents; }
+
+  /* Active-screen styles get injected here at route enter. */
+  #screen-styles {}
+
+  /* Gallery link in the corner, low-key. */
+  .corner-link {
+    position: fixed; top: 16px; right: 16px; z-index: 50;
+    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #5C6669; text-decoration: none;
+    padding: 6px 10px; border: 1px solid #1C2628; border-radius: 100px;
+    background: rgba(15,21,24,0.5); backdrop-filter: blur(8px);
+  }
+  .corner-link:hover { color: #86C8B8; border-color: #2A3A3D; }
+
+  /* Demo control panel */
+  .demo-fab {
+    position: fixed; bottom: 16px; right: 16px; z-index: 50;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(15,21,24,0.7); color: #5C6669;
+    border: 1px solid #1C2628; backdrop-filter: blur(8px);
+    display: grid; place-items: center; cursor: pointer;
+    transition: color 0.2s, transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  }
+  .demo-fab:hover { color: #86C8B8; transform: rotate(60deg); }
+  .demo-fab svg { width: 18px; height: 18px; }
+  .demo-panel {
+    position: fixed; bottom: 60px; right: 16px; z-index: 50;
+    background: #0F1518; border: 1px solid #1C2628; border-radius: 16px;
+    padding: 14px; min-width: 240px;
+    color: #DCE6E2; font-family: "Manrope", sans-serif; font-size: 13px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    display: none;
+  }
+  .demo-panel.open { display: block; }
+  .demo-panel h3 { font-family: "Instrument Serif", serif; font-size: 16px; margin-bottom: 10px; color: #fff; font-weight: 400; }
+  .demo-panel button {
+    display: block; width: 100%; text-align: left;
+    background: rgba(255,255,255,0.04); border: 1px solid #1C2628; border-radius: 8px;
+    padding: 8px 10px; margin-bottom: 6px; color: #DCE6E2;
+    font: inherit; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .demo-panel button:hover { background: rgba(134,200,184,0.08); border-color: #2A3A3D; }
+  .demo-panel button .hint { color: #5C6669; font-size: 11px; margin-left: 8px; }
+  .demo-panel .row { display: flex; gap: 6px; margin-bottom: 6px; }
+  .demo-panel .row button { margin-bottom: 0; }
+  .demo-panel .label-mono {
+    font-family: "JetBrains Mono", monospace; font-size: 9px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #5C6669; margin-top: 8px; margin-bottom: 4px;
+  }
+
+  /* View Transitions: per-screen content slide */
+  .screen { view-transition-name: screen-content; }
+  ::view-transition-old(screen-content), ::view-transition-new(screen-content) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  [data-vt-dir="forward"]::view-transition-old(screen-content) { animation-name: vt-slide-out-left; }
+  [data-vt-dir="forward"]::view-transition-new(screen-content) { animation-name: vt-slide-in-right; }
+  [data-vt-dir="back"]::view-transition-old(screen-content) { animation-name: vt-slide-out-right; }
+  [data-vt-dir="back"]::view-transition-new(screen-content) { animation-name: vt-slide-in-left; }
+  [data-vt-dir="up"]::view-transition-old(screen-content) { animation-name: vt-fade-out; }
+  [data-vt-dir="up"]::view-transition-new(screen-content) { animation-name: vt-slide-in-up; }
+  [data-vt-dir="fade"]::view-transition-old(screen-content) { animation-name: vt-fade-out; }
+  [data-vt-dir="fade"]::view-transition-new(screen-content) { animation-name: vt-fade-in; }
+
+  @keyframes vt-slide-in-right { from { transform: translateX(28px); opacity: 0; } }
+  @keyframes vt-slide-out-left { to { transform: translateX(-28px); opacity: 0; } }
+  @keyframes vt-slide-in-left { from { transform: translateX(-28px); opacity: 0; } }
+  @keyframes vt-slide-out-right { to { transform: translateX(28px); opacity: 0; } }
+  @keyframes vt-slide-in-up { from { transform: translateY(40px); opacity: 0; } }
+  @keyframes vt-fade-in { from { opacity: 0; } }
+  @keyframes vt-fade-out { to { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(screen-content), ::view-transition-new(screen-content) { animation: none; }
+  }
+
+  /* Spring on tap — applied via .tap-active class for ms */
+  [data-href], .tab, .back, .end, .device-pill, .btn, .chip, .rec, .hero, .context, .msg,
+  .stat, .chart-card, .mini, .pos, .tip, .toggle, .ship, .reorder-btn {
+    transition: transform 120ms cubic-bezier(0.34,1.2,0.64,1);
+  }
+  .tap-active { transform: scale(0.97); }
+
+  /* Toast */
+  .toast {
+    position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%) translateY(40px);
+    background: #0F1518; color: #DCE6E2; border: 1px solid #2A3A3D;
+    padding: 12px 18px; border-radius: 100px;
+    font-family: "Manrope", sans-serif; font-size: 13px;
+    opacity: 0; transition: opacity 240ms, transform 240ms cubic-bezier(0.22,1,0.36,1);
+    z-index: 60; pointer-events: none;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Loading state for first paint */
+  .boot-spinner {
+    position: fixed; inset: 0; display: grid; place-items: center;
+    background: var(--bg-page); z-index: 100;
+    transition: opacity 200ms;
+  }
+  .boot-spinner.hide { opacity: 0; pointer-events: none; }
+  .boot-spinner .pulse {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent-soft);
+    animation: boot-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes boot-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.9); }
+    50%      { opacity: 1;   transform: scale(1.2); }
+  }
 </style>
 </head>
 <body>
-<noscript><p>Opening Dr. Better Sleep… <a href="screens/01-dashboard-light.html">Tap here if you aren't redirected</a>.</p></noscript>
-<script>location.replace('screens/01-dashboard-light.html');</script>
+  <div class="boot-spinner" id="boot"><div class="pulse"></div></div>
+  <div id="app"></div>
+
+  <a class="corner-link" href="/gallery.html" id="corner-link">All screens →</a>
+
+  <button class="demo-fab" id="demo-fab" aria-label="Demo controls">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+  </button>
+  <div class="demo-panel" id="demo-panel"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

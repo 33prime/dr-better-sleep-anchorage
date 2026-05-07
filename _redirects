@@ -1,3 +1,0 @@
-# Land users in the app, not on the gallery.
-# 302 (not 200) so the URL becomes the screen path — relative resources resolve correctly.
-/                  /screens/01-dashboard-light.html   302
