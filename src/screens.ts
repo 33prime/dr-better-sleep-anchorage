@@ -464,7 +464,8 @@ const onboardingTriage: Hydrator = (root) => {
 
 const detailedNight: Hydrator = (root, route) => {
   const s = store.get();
-  const date = route.params.date || lastNight(s)?.date;
+  const param = route.params.date;
+  const date = !param || param === 'today' ? lastNight(s)?.date : param;
   const n = date ? findNight(s, date) : lastNight(s);
   if (!n) return;
 
@@ -659,8 +660,28 @@ function completeBoil() {
     s.device.fittedAt = isoDate(new Date());
     s.device.strapPosition = 1;
   });
+  playChime();
   showToast('Fitted! Welcome to the dashboard.');
   navigate('/onboarding/device', { dir: 'forward' });
+}
+
+/** Brief chime via Web Audio API — used for boil-and-bite step completion. */
+function playChime() {
+  try {
+    const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain).connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.18);
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.55);
+  } catch { /* ignore */ }
 }
 
 // ============================================================

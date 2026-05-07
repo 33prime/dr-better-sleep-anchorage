@@ -77,8 +77,33 @@ export async function renderScreen(
   shell.content.innerHTML = sourceScreen.innerHTML;
   shell.content.dataset.screen = screenName;
 
+  // Rewrite legacy data-href filename values into SPA routes.
+  shell.content.querySelectorAll<HTMLElement>('[data-href]').forEach((el) => {
+    const v = el.dataset.href || '';
+    const mapped = FILE_TO_ROUTE[v];
+    if (mapped) el.dataset.href = mapped;
+  });
+
   return shell.content;
 }
+
+/** Map legacy file-based data-hrefs to SPA routes. */
+const FILE_TO_ROUTE: Record<string, string> = {
+  '01-dashboard-light.html': '/',
+  '02-dashboard-dark.html':  '/',
+  '03-morning-reveal.html':  '/morning',
+  '04-chat.html':            '/chat',
+  '05-trends.html':          '/trends',
+  '06-night.html':           '/night',
+  '07-onboarding-triage.html':'/onboarding',
+  '08-detailed-night.html':  '/night/today',
+  '09-boil-and-bite.html':   '/onboarding/setup',
+  '10-device-overview.html': '/onboarding/device',
+  '11-chat-rich.html':       '/chat/rich',
+  '12-comparisons.html':     '/trends/compare',
+  '13-reorder.html':         '/profile',
+  '14-science.html':         '/trends/science',
+};
 
 /**
  * Wire global click/keyboard delegation. Lives on document so it survives
