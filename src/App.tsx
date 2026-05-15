@@ -64,7 +64,6 @@ export function App() {
         {showTabBar && <TabBar />}
       </DeviceFrame>
 
-      <a className="corner-link" href="/gallery.html">All screens →</a>
       <DemoControls />
       <ToastHost />
     </>

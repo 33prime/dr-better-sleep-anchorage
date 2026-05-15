@@ -5,7 +5,7 @@ import { useStore, store } from '../store';
 import { Avatar } from '../components/Avatar';
 import { ChevronLeft, ArrowRight, DotsIcon } from '../components/icons';
 import { fmtClockHM } from '../utils/format';
-import { pickReply } from '../utils/replies';
+import { streamChatReply } from '../utils/chatApi';
 import s from './Chat.module.css';
 
 export function Chat() {
@@ -23,21 +23,53 @@ export function Chat() {
     el.scrollTop = el.scrollHeight;
   }, [messages, typing]);
 
-  const send = () => {
+  const send = async () => {
     const text = draft.trim();
     if (!text) return;
     setDraft('');
+
+    const userId = `m${Date.now()}`;
+    const replyId = `m${Date.now() + 1}`;
+
+    // Push user message + an empty reply placeholder we'll stream into.
     store.set(s2 => {
-      s2.chat.push({ id: `m${Date.now()}`, who: 'me', text, ts: Date.now() });
+      s2.chat.push({ id: userId, who: 'me', text, ts: Date.now() });
     });
     setTyping(true);
-    window.setTimeout(() => {
-      const reply = pickReply(text);
+
+    try {
+      const history = [...store.get().chat];
+      const stream = streamChatReply(text, history, store.get());
+      let first = true;
+      for await (const chunk of stream) {
+        if (first) {
+          // Add the reply bubble as soon as the first token arrives.
+          store.set(s2 => {
+            s2.chat.push({ id: replyId, who: 'them', text: chunk, ts: Date.now() });
+          });
+          setTyping(false);
+          first = false;
+        } else {
+          store.set(s2 => {
+            const m = s2.chat.find(x => x.id === replyId);
+            if (m) m.text = (m.text ?? '') + chunk;
+          });
+        }
+      }
+      if (first) {
+        // Stream ended with no content — surface a graceful message.
+        store.set(s2 => {
+          s2.chat.push({ id: replyId, who: 'them', text: '…', ts: Date.now() });
+        });
+        setTyping(false);
+      }
+    } catch (err) {
+      console.error('Chat error:', err);
       store.set(s2 => {
-        s2.chat.push({ id: `m${Date.now() + 1}`, who: 'them', text: reply, ts: Date.now() });
+        s2.chat.push({ id: replyId, who: 'them', text: "lost you for a second — try that again?", ts: Date.now() });
       });
       setTyping(false);
-    }, 900 + Math.random() * 700);
+    }
   };
 
   return (

@@ -1,5 +1,8 @@
 import { useLocation } from 'wouter';
-import { useStore, baselineSnores, lastNight, daysSince, streakNights } from '../store';
+import {
+  useStore, baselineSnores, lastNight, daysSince, streakNights,
+  partnerSleptThroughLastN, partnerSleptThroughPrevWeek, wineMultiplier,
+} from '../store';
 import { Avatar } from '../components/Avatar';
 import { Sparkline } from '../components/Sparkline';
 import { TickNumber } from '../components/TickNumber';
@@ -8,6 +11,18 @@ import {
   fmtDateLong, fmtDelta, fmtDuration, timeOfDayGreeting, fmtClockHM, shouldUseDarkDashboard,
 } from '../utils/format';
 import s from './Dashboard.module.css';
+
+// Evening hours — when the predictive nudge appears.
+function isEvening(d: Date = new Date()): boolean {
+  const h = d.getHours();
+  return h >= 16 && h < 23;
+}
+
+// Saturday = the night a wine-drinker is most likely to drink. Tweak as needed.
+function isWineDay(d: Date = new Date()): boolean {
+  const dow = d.getDay();
+  return dow === 5 || dow === 6 || dow === 0;
+}
 
 export function Dashboard() {
   const state = useStore();
@@ -22,6 +37,14 @@ export function Dashboard() {
     location === '/dashboard/dark' ||
     (location === '/' && (state.uiTheme === 'dark' || (state.uiTheme === 'auto' && shouldUseDarkDashboard())));
   const lastThemMsg = [...state.chat].reverse().find(m => m.who === 'them' && m.text);
+
+  const partner = state.partner;
+  const partnerWeek = partnerSleptThroughLastN(state, 7);
+  const partnerPrev = partnerSleptThroughPrevWeek(state, 7);
+  const partnerDelta = partnerWeek.slept - partnerPrev.slept;
+
+  const wineMult = wineMultiplier(state);
+  const showWineNudge = isEvening() && isWineDay() && wineMult !== null && wineMult > 1.25;
 
   return (
     <div className={`${s.root} ${isNight ? s.night : ''}`}>
@@ -40,6 +63,51 @@ export function Dashboard() {
         </h1>
         <div className={s.date}>{fmtDateLong(new Date())}</div>
       </div>
+
+      {/* partner card — the emotional anchor */}
+      <div className={s.partner}>
+        <div
+          className={s.partnerAvatar}
+          aria-label={`${partner.name} avatar`}
+        />
+        <div className={s.partnerBody}>
+          <div className={s.partnerLine}>
+            <span className="serif" style={{ fontStyle: 'italic' }}>{partner.name}</span>
+            {' slept through '}
+            <strong>{partnerWeek.slept} of {partnerWeek.total}</strong>
+            {' nights this week.'}
+          </div>
+          {partnerDelta !== 0 && (
+            <div className={s.partnerSub}>
+              <span className={partnerDelta > 0 ? s.up : s.down}>
+                {partnerDelta > 0 ? '↑' : '↓'} {Math.abs(partnerDelta)}
+              </span>
+              {' from last week'}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* predictive wine nudge — only appears on weekend evenings when pattern is real */}
+      {showWineNudge && wineMult && (
+        <div
+          className={`${s.nudge} tap`}
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate('/chat')}
+        >
+          <div className={s.nudgeIcon}>🍷</div>
+          <div className={s.nudgeBody}>
+            <div className={s.nudgeTitle}>
+              Wine tonight? You snored <strong>{wineMult.toFixed(1)}×</strong> more on past wine nights.
+            </div>
+            <div className={s.nudgeSub}>
+              Want me to give {partner.name} a heads-up?
+            </div>
+          </div>
+          <div className={s.chev}><ChevronRight /></div>
+        </div>
+      )}
 
       {/* hero */}
       <div

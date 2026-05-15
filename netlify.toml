@@ -2,20 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/screens/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=86400"
-
-[[headers]]
-  for = "/screens/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=300, must-revalidate"
 
 [[headers]]
   for = "/assets/*"

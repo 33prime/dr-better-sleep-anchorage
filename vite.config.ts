@@ -41,8 +41,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: resolve(here, 'index.html'),
-        gallery: resolve(here, 'gallery.html'),
-        directions: resolve(here, 'directions.html'),
       },
     },
   },

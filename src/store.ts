@@ -105,3 +105,35 @@ export function daysSince(iso: string, ref: Date = new Date()): number {
 export function findNight(s: AppState, isoDate: string) {
   return s.nights.find(n => n.date === isoDate);
 }
+
+/** Partner slept-through stat over the last `n` nights. */
+export function partnerSleptThroughLastN(s: AppState, n = 7): { slept: number; total: number } {
+  const window = s.nights.slice(-n);
+  return {
+    slept: window.filter(x => x.partnerSleptThrough).length,
+    total: window.length,
+  };
+}
+
+/** Same stat but for the week before the last week — for week-over-week delta. */
+export function partnerSleptThroughPrevWeek(s: AppState, n = 7): { slept: number; total: number } {
+  const window = s.nights.slice(-2 * n, -n);
+  return {
+    slept: window.filter(x => x.partnerSleptThrough).length,
+    total: window.length,
+  };
+}
+
+/**
+ * Ratio of average snores on alcohol nights vs. non-alcohol nights, post-device.
+ * Returns null if either bucket is empty.
+ */
+export function wineMultiplier(s: AppState): number | null {
+  const fitDate = s.device.fittedAt;
+  const post = s.nights.filter(n => n.date >= fitDate);
+  const wine = post.filter(n => n.alcohol);
+  const sober = post.filter(n => !n.alcohol);
+  if (wine.length === 0 || sober.length === 0) return null;
+  const avg = (xs: typeof post) => xs.reduce((a, n) => a + n.totalSnores, 0) / xs.length;
+  return avg(wine) / avg(sober);
+}

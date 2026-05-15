@@ -21,6 +21,8 @@ export interface Night {
   strapPosition: number; // 1..5
   startedAt: string;     // HH:MM (the prior evening)
   endedAt: string;       // HH:MM
+  alcohol: boolean;          // user logged drinks before bed
+  partnerSleptThrough: boolean; // partner slept through the night without being woken
 }
 
 export interface ChatMessage {
@@ -56,6 +58,12 @@ export interface UserProfile {
   shipTo: string;
 }
 
+export interface Partner {
+  name: string;
+  relation: 'spouse' | 'partner' | 'roommate';
+  notifyAtMorning: boolean;
+}
+
 export interface DeviceState {
   fittedAt: string;       // ISO date
   strapPosition: number;
@@ -82,6 +90,7 @@ export interface OnboardingState {
 
 export interface AppState {
   user: UserProfile;
+  partner: Partner;
   device: DeviceState;
   onboarding: OnboardingState;
   nights: Night[];           // chronologically sorted, oldest first
@@ -111,11 +120,16 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
     date.setDate(today.getDate() - i);
     const daysSinceFit = (count - 1 - i) - (count - 1 - fitDaysAgo);
     const isPostFit = daysSinceFit >= 0;
+    const dow = date.getDay(); // 0=Sun, 5=Fri, 6=Sat
+    // Alcohol logged: more likely on Fri/Sat; deterministic for clean demo patterns.
+    const alcohol = (dow === 5 || dow === 6) && r() < 0.7;
     // baseline ~110 snores → drops to ~42 by today
     const t = isPostFit ? daysSinceFit / fitDaysAgo : 0;
     const trend = isPostFit ? 110 - 70 * Math.min(1, t) : 110 + (r() - 0.5) * 20;
     const noise = (r() - 0.5) * 22;
-    const totalSnores = Math.max(28, Math.round(trend + noise));
+    // Alcohol amplifies snoring meaningfully — the demo wants this pattern visible.
+    const alcoholMult = alcohol ? (isPostFit ? 1.7 : 1.5) : 1;
+    const totalSnores = Math.max(28, Math.round((trend + noise) * alcoholMult));
 
     const sleepDurationMin = 6 * 60 + Math.round(40 + (r() - 0.5) * 60);
     const efficiency = 0.82 + (isPostFit ? 0.06 * t : 0) + (r() - 0.5) * 0.04;
@@ -150,6 +164,10 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
 
     const startHour = 22 + (r() < 0.5 ? 0 : 1);
     const startMin = Math.round(r() * 50);
+    // Partner slept through when snore intensity stayed below a wake threshold.
+    // Threshold scales with whether the device is fitted (post-fit nights are quieter).
+    const wakeThreshold = isPostFit ? 70 : 95;
+    const partnerSleptThrough = totalSnores < wakeThreshold && r() < 0.92;
     out.push({
       date: isoDate(date),
       totalSnores,
@@ -168,6 +186,8 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
       strapPosition: isPostFit ? Math.min(5, 1 + Math.floor(daysSinceFit / 7)) : 0,
       startedAt: `${pad2(startHour)}:${pad2(startMin)}`,
       endedAt: '06:42',
+      alcohol,
+      partnerSleptThrough,
     });
   }
   return out;
@@ -243,6 +263,11 @@ export function buildSeedState(today: Date = new Date()): AppState {
       sex: 'M',
       bmiRange: '24–27',
       shipTo: 'Matt Lassiter · 1410 Folsom St, Apt 4',
+    },
+    partner: {
+      name: 'Sarah',
+      relation: 'spouse',
+      notifyAtMorning: true,
     },
     device: {
       fittedAt: isoDate(fitted),
