@@ -1,18 +1,21 @@
-// Streaming proxy for the Anthropic Messages API.
-// Hides ANTHROPIC_API_KEY server-side so the deployed bundle ships no secrets.
+// Streaming proxy for the Anthropic Messages API — Netlify Edge Function.
 //
-// Netlify Functions v2: web-standard Request/Response, streaming via ReadableStream.
-// `config.path` registers the URL; no netlify.toml redirect needed.
+// Runs at the edge on Deno runtime. Unlike regular Functions, Edge Functions
+// stream response bodies through to the client without CDN buffering — the SSE
+// chunks from Anthropic arrive at the browser token-by-token.
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
-const MAX_TOKENS_CAP = 600;
+const MAX_TOKENS_CAP = 800;
+
+// Deno is the Edge Functions runtime; declare the global for our TS view.
+declare const Deno: { env: { get(key: string): string | undefined } };
 
 export default async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!apiKey) {
     return json({ error: 'Server missing ANTHROPIC_API_KEY' }, 500);
   }
@@ -24,7 +27,7 @@ export default async (req: Request): Promise<Response> => {
     return new Response('Invalid JSON', { status: 400 });
   }
 
-  // Cap max_tokens so a scraped endpoint can't run up a bill.
+  // Cap max_tokens to bound exposure if the endpoint is abused.
   const requested = typeof body.max_tokens === 'number' ? body.max_tokens : 400;
   body.max_tokens = Math.min(requested, MAX_TOKENS_CAP);
   body.stream = true;
@@ -41,14 +44,20 @@ export default async (req: Request): Promise<Response> => {
 
   if (!upstream.ok || !upstream.body) {
     const detail = await upstream.text().catch(() => '');
-    return json({ error: 'Upstream error', status: upstream.status, detail: detail.slice(0, 500) }, upstream.status);
+    return json(
+      { error: 'Upstream error', status: upstream.status, detail: detail.slice(0, 500) },
+      upstream.status,
+    );
   }
 
+  // Pass the upstream SSE stream straight through. no-transform tells any
+  // intermediary not to coalesce chunks.
   return new Response(upstream.body, {
     status: 200,
     headers: {
       'content-type': 'text/event-stream',
-      'cache-control': 'no-cache',
+      'cache-control': 'no-cache, no-transform',
+      'x-accel-buffering': 'no',
     },
   });
 };
