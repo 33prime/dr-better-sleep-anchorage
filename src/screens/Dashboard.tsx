@@ -134,8 +134,8 @@ export function Dashboard() {
             values={last14}
             width={360}
             height={36}
-            stroke={isNight ? '#86C8B8' : '#3E7565'}
-            fill="#86C8B8"
+            stroke={isNight ? '#7FD1DE' : '#43BACA'}
+            fill="#7FD1DE"
           />
         </div>
         <div className={s.sparkAxis}>

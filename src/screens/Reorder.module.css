@@ -8,7 +8,7 @@
 
 .body { padding: 4px 24px 36px; }
 .label { color: var(--text-tertiary); font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
-.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 400; }
+.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 800; }
 .h .it { font-style: italic; }
 
 .wear { margin-top: 22px; background: var(--bg-secondary); border-radius: 22px; padding: 22px 22px 24px; }
@@ -17,11 +17,11 @@
 .wear .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
 .wear .v { margin-top: 6px; font-family: var(--serif); font-size: 22px; line-height: 1.15; color: var(--text-primary); }
 .wear .icon { width: 64px; height: 48px; flex: none; opacity: 0.85; }
-.wear .meter { margin-top: 18px; height: 4px; border-radius: 2px; background: rgba(11,20,22,0.08); position: relative; overflow: hidden; }
-.wear .meter > i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--accent), #C2A862); border-radius: 2px; }
+.wear .meter { margin-top: 18px; height: 4px; border-radius: 2px; background: rgba(30,37,68,0.08); position: relative; overflow: hidden; }
+.wear .meter > i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--accent), #E5898B); border-radius: 2px; }
 .wear .metaRow { margin-top: 8px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.04em; }
 .wear .metaRow .now { color: var(--text-primary); }
-.wear .reason { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(11,20,22,0.08); font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); text-wrap: pretty; }
+.wear .reason { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(30,37,68,0.08); font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); text-wrap: pretty; }
 .wear .reason .em { font-family: var(--serif); font-style: italic; color: var(--text-primary); }
 
 .primary { margin-top: 18px; }
@@ -33,7 +33,7 @@
   padding: 0 22px;
   border: 0;
 }
-.btn.ordered { background: var(--accent); }
+.btn.ordered { background: var(--accent); color: var(--text-primary); }
 .btn .lab { font-size: 15px; font-weight: 500; text-align: left; }
 .btn .lab .sub { display: block; font-family: var(--mono); font-size: 10px; opacity: 0.6; letter-spacing: 0.04em; margin-top: 2px; font-weight: 400; }
 .btn .price { font-family: var(--mono); font-size: 14px; font-weight: 300; }
@@ -41,7 +41,7 @@
 .toggleRow { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; padding: 14px 4px; border-bottom: 1px solid var(--hairline); }
 .toggleRow .ttl { font-size: 14px; color: var(--text-primary); }
 .toggleRow .sub { margin-top: 3px; font-size: 12px; color: var(--text-tertiary); font-family: var(--serif); font-style: italic; }
-.switch { position: relative; width: 42px; height: 24px; border-radius: 13px; background: rgba(11,20,22,0.18); transition: background 200ms; flex: none; border: 0; padding: 0; }
+.switch { position: relative; width: 42px; height: 24px; border-radius: 13px; background: rgba(30,37,68,0.18); transition: background 200ms; flex: none; border: 0; padding: 0; }
 .switch.on { background: var(--accent); }
 .switch .knob { position: absolute; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg-primary); transition: right 200ms cubic-bezier(0.4, 0, 0.2, 1); }
 .switch.on .knob { right: 3px; }
@@ -53,7 +53,7 @@
 .ship .edit { color: var(--text-secondary); font-family: var(--serif); font-style: italic; font-size: 14px; background: none; border: 0; }
 
 .shelf { margin-top: 36px; }
-.shelf .h2 { font-family: var(--serif); font-size: 22px; line-height: 1.15; color: var(--text-primary); font-weight: 400; }
+.shelf .h2 { font-family: var(--serif); font-size: 22px; line-height: 1.15; color: var(--text-primary); font-weight: 800; }
 .shelf .h2 .it { font-style: italic; }
 .shelf .lede { margin-top: 8px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); max-width: 32ch; text-wrap: pretty; }
 

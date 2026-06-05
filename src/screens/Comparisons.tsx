@@ -78,23 +78,23 @@ export function Comparisons() {
             <svg viewBox="0 0 320 110" preserveAspectRatio="none" aria-hidden>
               <defs>
                 <linearGradient id="cohortFill" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#3E7565" stopOpacity="0.18" />
-                  <stop offset="100%" stopColor="#3E7565" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#43BACA" stopOpacity="0.18" />
+                  <stop offset="100%" stopColor="#43BACA" stopOpacity="0" />
                 </linearGradient>
               </defs>
-              <line x1="0" y1="100" x2="320" y2="100" stroke="rgba(11,20,22,0.15)" strokeWidth={0.6} />
+              <line x1="0" y1="100" x2="320" y2="100" stroke="rgba(30,37,68,0.15)" strokeWidth={0.6} />
               <path
                 d="M0,100 C 40,100 70,90 90,75 C 110,60 130,30 160,20 C 190,30 210,60 230,75 C 250,90 280,100 320,100 Z"
-                fill="url(#cohortFill)" stroke="#3E7565" strokeWidth={1.1}
+                fill="url(#cohortFill)" stroke="#43BACA" strokeWidth={1.1}
               />
-              <line x1="160" y1="14" x2="160" y2="100" stroke="#0B1416" strokeWidth={0.5} strokeDasharray="2 3" opacity="0.45" />
-              <text x="164" y="18" fontFamily="JetBrains Mono" fontSize="8" fill="#5C6669">Median 31</text>
+              <line x1="160" y1="14" x2="160" y2="100" stroke="#1E2544" strokeWidth={0.5} strokeDasharray="2 3" opacity="0.45" />
+              <text x="164" y="18" fontFamily="Nunito" fontSize="8" fill="#6E7596">Median 31</text>
 
               <g>
-                <line x1={86} y1="20" x2={86} y2="100" stroke="#3E7565" strokeWidth={1} />
-                <circle cx={86} cy={76} r="6" fill="#3E7565" />
-                <circle cx={86} cy={76} r="11" fill="#86C8B8" opacity="0.25" />
-                <text x={86} y="14" fontFamily="Instrument Serif" fontStyle="italic" fontSize="14" fill="#0B1416" textAnchor="middle">You · 18</text>
+                <line x1={86} y1="20" x2={86} y2="100" stroke="#43BACA" strokeWidth={1} />
+                <circle cx={86} cy={76} r="6" fill="#43BACA" />
+                <circle cx={86} cy={76} r="11" fill="#7FD1DE" opacity="0.25" />
+                <text x={86} y="14" fontFamily="Nunito" fontStyle="italic" fontSize="14" fill="#1E2544" textAnchor="middle">You · 18</text>
               </g>
             </svg>
           </div>

@@ -7,7 +7,7 @@
 
 .body { padding: 4px 24px 36px; }
 .label { color: var(--text-tertiary); font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
-.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 400; }
+.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 800; }
 .h .it { font-style: italic; }
 .lede { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); max-width: 34ch; text-wrap: pretty; }
 .lede .em { font-family: var(--serif); font-style: italic; color: var(--text-primary); }
@@ -41,7 +41,7 @@
 .metric .vk { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
 .metric .vv { font-family: var(--mono); font-weight: 300; font-size: 18px; color: var(--text-primary); letter-spacing: -0.02em; margin-top: 2px; }
 .metric .vv.you { color: var(--accent); }
-.metric .bar { margin-top: 10px; height: 4px; border-radius: 2px; background: rgba(11,20,22,0.06); position: relative; }
+.metric .bar { margin-top: 10px; height: 4px; border-radius: 2px; background: rgba(30,37,68,0.06); position: relative; }
 .metric .bar .avg { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--text-tertiary); }
 .metric .bar .you { position: absolute; top: -2px; height: 8px; width: 8px; border-radius: 50%; background: var(--accent); transform: translateX(-4px); }
 .metric .bar .you::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 16px; height: 16px; border-radius: 50%; background: var(--accent-soft); opacity: 0.5; z-index: -1; }

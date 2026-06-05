@@ -9,36 +9,36 @@
 .top .moon { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; }
 .top .moon::before {
   content: ""; width: 9px; height: 9px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #B5D6CB, #6FA796 60%, #325447);
+  background: radial-gradient(circle at 35% 35%, #9BDCE6, #2E8C9E 60%, #1E5560);
 }
 
 .center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
 
-.verb { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 36px; color: var(--night-text-1); letter-spacing: -0.01em; opacity: 0.92; }
+.verb { font-family: var(--serif); font-style: italic; font-weight: 800; font-size: 36px; color: var(--night-text-1); letter-spacing: -0.01em; opacity: 0.92; }
 
 .orb { width: 220px; height: 220px; margin: 32px 0 28px; border-radius: 50%; position: relative;
-  background: radial-gradient(circle at 38% 36%, rgba(181,214,203,0.55) 0%, rgba(111,167,150,0.18) 38%, rgba(11,20,22,0) 70%);
+  background: radial-gradient(circle at 38% 36%, rgba(155,220,230,0.55) 0%, rgba(67,186,202,0.18) 38%, rgba(30,37,68,0) 70%);
   animation: orbBreath 5s ease-in-out infinite;
 }
 .orb::before {
   content: ""; position: absolute; inset: 18%; border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, rgba(220,230,226,0.18), rgba(20,36,42,0.6) 60%, rgba(6,11,13,0.9));
-  box-shadow: inset 0 0 60px rgba(134,200,184,0.10), 0 0 80px rgba(134,200,184,0.10);
+  box-shadow: inset 0 0 60px rgba(67,186,202,0.10), 0 0 80px rgba(67,186,202,0.10);
 }
 .orb::after {
   content: ""; position: absolute; inset: -6%; border-radius: 50%;
-  border: 1px solid rgba(134,200,184,0.18);
+  border: 1px solid rgba(67,186,202,0.18);
   animation: ring 5s ease-in-out infinite;
 }
 @keyframes orbBreath { 0%,100% { transform: scale(1); filter: brightness(0.95); } 50% { transform: scale(1.04); filter: brightness(1.1); } }
 @keyframes ring { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.06); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .orb, .orb::after { animation: none; } }
 
-.clock { font-family: var(--mono); font-weight: 300; font-size: 56px; letter-spacing: -0.04em; color: var(--night-text-1); text-shadow: 0 0 40px rgba(134,200,184,0.12); }
+.clock { font-family: var(--mono); font-weight: 300; font-size: 56px; letter-spacing: -0.04em; color: var(--night-text-1); text-shadow: 0 0 40px rgba(67,186,202,0.12); }
 .clockCap { margin-top: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--night-text-3); }
 
 .signals { margin-top: 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hairline-night); border-radius: 14px; overflow: hidden; }
-.signals .s { background: rgba(11,20,22,0.4); padding: 14px 12px; text-align: left; }
+.signals .s { background: rgba(30,37,68,0.4); padding: 14px 12px; text-align: left; }
 .signals .k { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--night-text-3); }
 .signals .v { font-family: var(--mono); font-weight: 300; font-size: 22px; letter-spacing: -0.04em; color: var(--night-text-1); margin-top: 4px; }
 .signals .t { font-size: 10px; color: var(--night-text-2); margin-top: 4px; }
@@ -57,11 +57,11 @@
 .devicePill {
   flex: none;
   padding: 10px 14px; border-radius: 999px;
-  background: rgba(134,200,184,0.08);
-  border: 1px solid rgba(134,200,184,0.18);
+  background: rgba(67,186,202,0.08);
+  border: 1px solid rgba(67,186,202,0.18);
   font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--accent-soft);
   display: inline-flex; align-items: center; gap: 6px;
 }
-.devicePill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-soft); box-shadow: 0 0 8px rgba(134,200,184,0.6); animation: pulse 2.5s infinite; }
+.devicePill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-soft); box-shadow: 0 0 8px rgba(67,186,202,0.6); animation: pulse 2.5s infinite; }
 @keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }

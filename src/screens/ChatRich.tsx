@@ -53,22 +53,22 @@ export function ChatRich() {
             <div className={s.card}>
               <div className={s.k}>Sleep stages · {last.startedAt} → {last.endedAt}</div>
               <svg viewBox="0 0 320 70" preserveAspectRatio="none" style={{ width: '100%', height: 70, marginTop: 10 }}>
-                <g stroke="rgba(11,20,22,0.06)" strokeWidth={0.8}>
+                <g stroke="rgba(30,37,68,0.06)" strokeWidth={0.8}>
                   <line x1="0" y1="14" x2="320" y2="14" />
                   <line x1="0" y1="32" x2="320" y2="32" />
                   <line x1="0" y1="50" x2="320" y2="50" />
                 </g>
                 <polyline
-                  fill="none" stroke="#3E7565" strokeWidth={1.4}
+                  fill="none" stroke="#43BACA" strokeWidth={1.4}
                   strokeLinejoin="round" strokeLinecap="round"
                   points="0,14 18,32 36,54 56,54 72,32 90,32 108,54 128,54 142,14 156,32 174,32 188,54 206,32 220,14 236,32 252,32 268,54 282,32 296,14 310,32 320,32"
                 />
-                <line x1="166" y1="4" x2="166" y2="66" stroke="#3E7565" strokeWidth={0.6} strokeDasharray="2 2" />
-                <text x="170" y="10" fontFamily="JetBrains Mono" fontSize="7" fill="#3E7565">2:40 — rolled to back</text>
+                <line x1="166" y1="4" x2="166" y2="66" stroke="#43BACA" strokeWidth={0.6} strokeDasharray="2 2" />
+                <text x="170" y="10" fontFamily="Nunito" fontSize="7" fill="#43BACA">2:40 — rolled to back</text>
               </svg>
               <div style={{ marginTop: 8, display: 'flex', gap: 14, fontFamily: 'var(--mono)', fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
-                <span><i style={{ display: 'inline-block', width: 8, height: 2, background: '#3E7565', verticalAlign: 'middle', marginRight: 5 }} />Stages</span>
-                <span><i style={{ display: 'inline-block', width: 8, height: 2, background: '#0B1416', opacity: 0.45, verticalAlign: 'middle', marginRight: 5 }} />Snore events</span>
+                <span><i style={{ display: 'inline-block', width: 8, height: 2, background: '#43BACA', verticalAlign: 'middle', marginRight: 5 }} />Stages</span>
+                <span><i style={{ display: 'inline-block', width: 8, height: 2, background: '#1E2544', opacity: 0.45, verticalAlign: 'middle', marginRight: 5 }} />Snore events</span>
               </div>
             </div>
             <div className={`${s.bubble} ${s.bubbleThem}`}>
@@ -88,7 +88,7 @@ export function ChatRich() {
                   const max = Math.max(...last.snoresByHour, 1);
                   const pct = (v / max) * 100;
                   return (
-                    <div key={i} style={{ height: `${pct}%`, background: 'rgba(62,117,101,0.16)', borderRadius: '2px 2px 0 0', position: 'relative' }}>
+                    <div key={i} style={{ height: `${pct}%`, background: 'rgba(67,186,202,0.16)', borderRadius: '2px 2px 0 0', position: 'relative' }}>
                       <i style={{ position: 'absolute', inset: 0, background: 'var(--accent)', borderRadius: '2px 2px 0 0' }} />
                     </div>
                   );
@@ -117,7 +117,7 @@ export function ChatRich() {
             <div className={s.card} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <button
                 className="tap"
-                style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent)', color: '#E8F2EE', display: 'grid', placeItems: 'center', flex: 'none', border: 0 }}
+                style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent)', color: '#1E2544', display: 'grid', placeItems: 'center', flex: 'none', border: 0 }}
                 aria-label="Play"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 14, height: 14, marginLeft: 2 }}>

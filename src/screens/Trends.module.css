@@ -6,7 +6,7 @@
 
 .tabs {
   display: flex; gap: 4px; padding: 4px;
-  background: rgba(11,20,22,0.05); border-radius: 999px;
+  background: rgba(30,37,68,0.05); border-radius: 999px;
   width: fit-content; margin: 6px 0 22px;
 }
 .tabs .t {
@@ -36,7 +36,7 @@
 }
 
 .annotation { margin-top: 16px; padding: 12px 14px; border-top: 1px solid var(--hairline); display: flex; gap: 12px; align-items: flex-start; }
-.annotation .icon { width: 28px; height: 28px; flex: none; border-radius: 8px; background: rgba(134,200,184,0.18); color: var(--accent); display: grid; place-items: center; }
+.annotation .icon { width: 28px; height: 28px; flex: none; border-radius: 8px; background: rgba(67,186,202,0.18); color: var(--accent); display: grid; place-items: center; }
 .annotation .icon svg { width: 16px; height: 16px; }
 .annotation .body { font-size: 13px; line-height: 1.5; color: var(--text-primary); text-wrap: pretty; }
 .annotation .body .it { font-family: var(--serif); font-style: italic; }

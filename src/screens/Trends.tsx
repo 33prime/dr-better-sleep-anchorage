@@ -48,8 +48,8 @@ export function Trends() {
         <div className={s.chartHead}>
           <div className={s.k}>Snoring · {slice.length} nights</div>
           <div className={s.legend}>
-            <span><span className={s.sw} style={{ background: '#3E7565' }} />Nightly</span>
-            <span><span className={s.sw} style={{ background: '#86C8B8' }} />7-day avg</span>
+            <span><span className={s.sw} style={{ background: '#43BACA' }} />Nightly</span>
+            <span><span className={s.sw} style={{ background: '#7FD1DE' }} />7-day avg</span>
           </div>
         </div>
 
@@ -68,8 +68,8 @@ export function Trends() {
             values={slice.map(n => n.totalSnores)}
             width={360}
             height={180}
-            stroke="#3E7565"
-            fill="#3E7565"
+            stroke="#43BACA"
+            fill="#43BACA"
             strokeWidth={1.4}
           />
         </div>
@@ -89,7 +89,7 @@ export function Trends() {
       <div className={s.miniGrid}>
         <MiniCard label="Sleep efficiency" value={`${Math.round((last?.efficiency ?? 0) * 100)}`} unit="%" deltaText="↑ 3pt from last month" deltaClass="pos" trend={state.nights.slice(-14).map(n => n.efficiency)} />
         <MiniCard label="HRV (overnight)" value={String(last?.hrv ?? 0)} unit=" ms" deltaText="↑ 6 ms from baseline" deltaClass="pos" trend={state.nights.slice(-14).map(n => n.hrv)} />
-        <MiniCard label="Resting HR" value={String(last?.restingHr ?? 0)} unit=" bpm" deltaText="→ stable" deltaClass="flat" trend={state.nights.slice(-14).map(n => n.restingHr)} stroke="#7A8488" />
+        <MiniCard label="Resting HR" value={String(last?.restingHr ?? 0)} unit=" bpm" deltaText="→ stable" deltaClass="flat" trend={state.nights.slice(-14).map(n => n.restingHr)} stroke="#8A90A6" />
       </div>
     </div>
   );
@@ -104,7 +104,7 @@ interface MiniProps {
   trend: number[];
   stroke?: string;
 }
-function MiniCard({ label, value, unit, deltaText, deltaClass, trend, stroke = '#3E7565' }: MiniProps) {
+function MiniCard({ label, value, unit, deltaText, deltaClass, trend, stroke = '#43BACA' }: MiniProps) {
   return (
     <div className={s.mini}>
       <div className={s.col}>

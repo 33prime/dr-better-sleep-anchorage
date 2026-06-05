@@ -5,7 +5,7 @@
 .nav .more { color: var(--text-secondary); padding: 6px 8px; background: none; border: 0; }
 .body { padding: 4px 24px 28px; }
 .label { color: var(--text-tertiary); font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
-.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 400; }
+.h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 800; }
 .h .it { font-style: italic; }
 
 .diagram { margin-top: 20px; background: var(--bg-secondary); border-radius: 22px; padding: 22px 14px; }

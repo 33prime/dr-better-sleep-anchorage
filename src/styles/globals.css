@@ -1,36 +1,40 @@
-/* Anchorage tokens, resets, and shell layout. Single global stylesheet. */
+/* Dr. Never Snore — brand tokens, resets, and shell layout. Single global stylesheet.
+   Brand: Midnight Blue #1E2544 · Clean White #FFFFFF · Restful Teal #43BACA · Soft Salmon #E5898B
+   Typeface: Nunito (rounded sans-serif). */
 
 :root {
-  --bg-page:        #14181A;
+  --bg-page:        #141A33;   /* deep midnight matte behind the device */
 
-  /* Day */
-  --bg-primary:     #DDE2E2;
-  --bg-secondary:   #D4DAD9;
-  --bg-tertiary:    #CBD2D1;
-  --text-primary:   #0B1416;
-  --text-secondary: #4A5558;
-  --text-tertiary:  #7A8488;
+  /* Day — "Dr. Better Sleep on Clean White" (secondary brand usage) */
+  --bg-primary:     #FFFFFF;
+  --bg-secondary:   #F0F2F7;
+  --bg-tertiary:    #E6E9F2;
+  --text-primary:   #1E2544;   /* Midnight Blue */
+  --text-secondary: #4A5270;
+  --text-tertiary:  #8A90A6;
 
-  /* Night */
-  --night-bg-0:     #060B0D;
-  --night-bg-1:     #0B1416;
-  --night-bg-2:     #14242A;
-  --night-text-1:   #DCE6E2;
-  --night-text-2:   #8B9A98;
-  --night-text-3:   #5C6669;
+  /* Night — "Dr. Never Snore: Teal on Midnight Blue" (primary brand usage) */
+  --night-bg-0:     #141A33;
+  --night-bg-1:     #1E2544;   /* Midnight Blue */
+  --night-bg-2:     #2A3358;
+  --night-text-1:   #FFFFFF;   /* Clean White */
+  --night-text-2:   #AEB4CC;
+  --night-text-3:   #6E7596;
 
-  --accent:         #3E7565;
-  --accent-soft:    #86C8B8;
-  --positive:       #4A7A55;
-  --warn:           #B58A4A;
+  --accent:         #43BACA;   /* Restful Teal */
+  --accent-soft:    #7FD1DE;
+  --positive:       #43BACA;   /* on-palette positive trend */
+  --warn:           #E5898B;   /* Soft Salmon — on-palette attention */
 
-  --hairline:        rgba(11,20,22,0.10);
-  --hairline-strong: rgba(11,20,22,0.16);
-  --hairline-night:  rgba(220,230,226,0.10);
+  --hairline:        rgba(30,37,68,0.10);
+  --hairline-strong: rgba(30,37,68,0.16);
+  --hairline-night:  rgba(255,255,255,0.10);
 
-  --serif: "Instrument Serif", serif;
-  --sans:  "Manrope", system-ui, sans-serif;
-  --mono:  "JetBrains Mono", monospace;
+  /* Nunito is the single brand typeface. The serif/mono slots are kept as
+     semantic aliases (display / data) so existing rules keep working. */
+  --sans:  "Nunito", system-ui, -apple-system, sans-serif;
+  --serif: "Nunito", system-ui, -apple-system, sans-serif;
+  --mono:  "Nunito", ui-monospace, "SFMono-Regular", monospace;
 
   --safe-top:    env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
@@ -42,6 +46,7 @@ html { background: var(--bg-page); color: var(--text-primary); }
 
 body {
   font-family: var(--sans);
+  font-variant-numeric: tabular-nums;
   background: var(--bg-page);
   -webkit-font-smoothing: antialiased;
   display: flex; align-items: center; justify-content: center;
@@ -59,10 +64,10 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
 .device {
   width: 393px; height: 852px;
   border-radius: 56px;
-  background: #0B1416;
+  background: #1E2544;
   padding: 12px;
   box-shadow:
-    0 0 0 2px #1C2628,
+    0 0 0 2px #2E3760,
     0 30px 80px -20px rgba(0,0,0,0.7),
     0 8px 24px rgba(0,0,0,0.4);
   position: relative;
@@ -77,25 +82,25 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
 }
 .screen.day {
   background:
-    radial-gradient(ellipse 120% 80% at 50% -20%, #E6EBEA 0%, transparent 60%),
-    linear-gradient(180deg, #DDE2E2 0%, #D6DCDB 100%);
+    radial-gradient(ellipse 120% 80% at 50% -20%, #FFFFFF 0%, transparent 60%),
+    linear-gradient(180deg, #FFFFFF 0%, #F0F2F7 100%);
   color: var(--text-primary);
 }
 .screen.night {
   background:
-    radial-gradient(ellipse 130% 70% at 50% 110%, #14242A 0%, transparent 60%),
-    radial-gradient(ellipse 80% 50% at 50% -10%, #102023 0%, transparent 70%),
-    linear-gradient(180deg, #0B1416 0%, #060B0D 100%);
+    radial-gradient(ellipse 130% 70% at 50% 110%, #2A3358 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 50% -10%, #232A4D 0%, transparent 70%),
+    linear-gradient(180deg, #1E2544 0%, #141A33 100%);
   color: var(--night-text-1);
 }
 .screen.day::before {
   content: ""; position: absolute; inset: -10% -10% auto -10%; height: 50%;
-  background: radial-gradient(ellipse at 50% 0%, rgba(134,200,184,0.18) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(67,186,202,0.16) 0%, transparent 70%);
   pointer-events: none; animation: breathe-day 9s ease-in-out infinite; z-index: 0;
 }
 .screen.night::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(ellipse 100% 60% at 50% 30%, rgba(134,200,184,0.06) 0%, transparent 65%);
+  background: radial-gradient(ellipse 100% 60% at 50% 30%, rgba(67,186,202,0.07) 0%, transparent 65%);
   animation: breathe-night 5s ease-in-out infinite;
 }
 
@@ -109,14 +114,14 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
   height: 47px; padding: 0 28px;
   display: flex; align-items: center; justify-content: space-between;
   font-family: var(--sans);
-  font-weight: 600; font-size: 15px;
+  font-weight: 700; font-size: 15px;
 }
 .status-bar .right { display: flex; gap: 6px; align-items: center; }
 .island {
   position: absolute; left: 50%; transform: translateX(-50%); top: 11px;
-  width: 110px; height: 30px; background: #0B1416; border-radius: 18px; z-index: 3;
+  width: 110px; height: 30px; background: #1E2544; border-radius: 18px; z-index: 3;
 }
-.screen.night .island { background: #000; box-shadow: 0 0 0 1px #1c2628; }
+.screen.night .island { background: #000; box-shadow: 0 0 0 1px #2E3760; }
 
 /* ============================================================
    The route stage — where each screen renders
@@ -142,18 +147,18 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
   height: 76px; padding: 8px 16px 24px;
   display: grid; grid-template-columns: repeat(4, 1fr);
-  background: linear-gradient(180deg, rgba(221,226,226,0) 0%, rgba(221,226,226,0.96) 35%, var(--bg-primary) 70%);
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.96) 35%, var(--bg-primary) 70%);
   backdrop-filter: blur(8px);
 }
 .screen.night .tabbar {
-  background: linear-gradient(180deg, rgba(11,20,22,0) 0%, rgba(11,20,22,0.85) 35%, var(--night-bg-1) 70%);
+  background: linear-gradient(180deg, rgba(30,37,68,0) 0%, rgba(30,37,68,0.85) 35%, var(--night-bg-1) 70%);
   border-top: 1px solid var(--hairline-night);
 }
 .tab {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px;
   color: var(--text-tertiary);
-  font-family: var(--sans); font-size: 10px; font-weight: 500;
+  font-family: var(--sans); font-size: 10px; font-weight: 700;
   cursor: pointer;
   position: relative;
   -webkit-tap-highlight-color: transparent;
@@ -165,10 +170,10 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
 .screen.night .tab.active { color: var(--night-text-1); }
 .tab .badge {
   position: absolute; top: 4px; right: 50%; margin-right: -16px;
-  width: 8px; height: 8px; background: var(--accent-soft); border-radius: 50%;
+  width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
   box-shadow: 0 0 0 2px var(--bg-primary);
 }
-.screen.night .tab .badge { box-shadow: 0 0 0 2px var(--night-bg-1), 0 0 8px rgba(134,200,184,0.6); }
+.screen.night .tab .badge { box-shadow: 0 0 0 2px var(--night-bg-1), 0 0 8px rgba(67,186,202,0.6); }
 
 /* ============================================================
    Mobile / standalone PWA: device fills phone, no matte
@@ -203,13 +208,14 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
 }
 .tap:active { transform: scale(0.97); }
 
-/* Mono utility */
-.mono { font-family: var(--mono); }
-.serif { font-family: var(--serif); font-weight: 400; }
-.serif-it { font-family: var(--serif); font-style: italic; font-weight: 400; }
+/* Type utilities. Nunito throughout — display uses heavy weights,
+   data uses tabular figures. */
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.serif { font-family: var(--serif); font-weight: 800; letter-spacing: -0.01em; }
+.serif-it { font-family: var(--serif); font-style: italic; font-weight: 700; }
 .label-mono {
-  font-family: var(--mono); font-weight: 300;
-  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  font-family: var(--mono); font-weight: 700;
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
 }
 
 /* ============================================================
@@ -218,7 +224,7 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
 .toast {
   position: fixed; left: 50%; bottom: 96px;
   transform: translateX(-50%) translateY(40px);
-  background: #0F1518; color: #DCE6E2; border: 1px solid #2A3A3D;
+  background: #1A2140; color: #FFFFFF; border: 1px solid #3A4470;
   padding: 12px 18px; border-radius: 100px;
   font-family: var(--sans); font-size: 13px;
   opacity: 0; transition: opacity 240ms, transform 240ms cubic-bezier(0.22,1,0.36,1);
@@ -231,41 +237,41 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
 .demo-fab {
   position: fixed; bottom: 16px; right: 16px; z-index: 50;
   width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(15,21,24,0.7); color: #5C6669;
-  border: 1px solid #1C2628; backdrop-filter: blur(8px);
+  background: rgba(20,26,51,0.7); color: #6E7596;
+  border: 1px solid #2E3760; backdrop-filter: blur(8px);
   display: grid; place-items: center;
   transition: color 0.2s, transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
 }
-.demo-fab:hover { color: #86C8B8; transform: rotate(60deg); }
+.demo-fab:hover { color: var(--accent); transform: rotate(60deg); }
 .demo-fab svg { width: 18px; height: 18px; }
 .demo-panel {
   position: fixed; bottom: 60px; right: 16px; z-index: 50;
-  background: #0F1518; border: 1px solid #1C2628; border-radius: 16px;
+  background: #1A2140; border: 1px solid #2E3760; border-radius: 16px;
   padding: 14px; min-width: 240px;
-  color: #DCE6E2; font-family: var(--sans); font-size: 13px;
+  color: #FFFFFF; font-family: var(--sans); font-size: 13px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.6);
 }
-.demo-panel h3 { font-family: var(--serif); font-size: 16px; margin-bottom: 10px; color: #fff; font-weight: 400; }
+.demo-panel h3 { font-family: var(--serif); font-size: 16px; margin-bottom: 10px; color: #fff; font-weight: 800; }
 .demo-panel button {
   display: block; width: 100%; text-align: left;
-  background: rgba(255,255,255,0.04); border: 1px solid #1C2628; border-radius: 8px;
-  padding: 8px 10px; margin-bottom: 6px; color: #DCE6E2;
+  background: rgba(255,255,255,0.04); border: 1px solid #2E3760; border-radius: 8px;
+  padding: 8px 10px; margin-bottom: 6px; color: #FFFFFF;
   transition: background 0.15s, border-color 0.15s;
 }
-.demo-panel button:hover { background: rgba(134,200,184,0.08); border-color: #2A3A3D; }
+.demo-panel button:hover { background: rgba(67,186,202,0.10); border-color: #3A4470; }
 .demo-panel .row { display: flex; gap: 6px; margin-bottom: 6px; }
 .demo-panel .row button { margin-bottom: 0; }
-.demo-panel .label-mono { color: #5C6669; margin-top: 8px; margin-bottom: 4px; }
+.demo-panel .label-mono { color: #6E7596; margin-top: 8px; margin-bottom: 4px; }
 
 /* Corner link to gallery */
 .corner-link {
   position: fixed; top: 16px; right: 16px; z-index: 50;
   font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
-  text-transform: uppercase; color: #5C6669; text-decoration: none;
-  padding: 6px 10px; border: 1px solid #1C2628; border-radius: 100px;
-  background: rgba(15,21,24,0.5); backdrop-filter: blur(8px);
+  text-transform: uppercase; color: #6E7596; text-decoration: none;
+  padding: 6px 10px; border: 1px solid #2E3760; border-radius: 100px;
+  background: rgba(20,26,51,0.5); backdrop-filter: blur(8px);
 }
-.corner-link:hover { color: #86C8B8; border-color: #2A3A3D; }
+.corner-link:hover { color: var(--accent); border-color: #3A4470; }
 @media (max-width: 480px), (display-mode: standalone) {
   .corner-link { display: none; }
 }

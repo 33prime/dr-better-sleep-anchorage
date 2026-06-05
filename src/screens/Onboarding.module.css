@@ -1,13 +1,13 @@
 .root { padding: 8px 24px 24px; display: flex; flex-direction: column; }
 
 .progress { margin-top: 4px; display: flex; gap: 6px; }
-.progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(11,20,22,0.10); }
+.progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(30,37,68,0.10); }
 .progress .pipDone { background: var(--accent); }
 
 .whoLine { margin-top: 22px; display: flex; align-items: center; gap: 10px; }
 .whoLine .name { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
 
-h1.h { margin-top: 14px; font-family: var(--serif); font-weight: 400; font-size: 32px; line-height: 1.08; letter-spacing: -0.005em; color: var(--text-primary); text-wrap: balance; }
+h1.h { margin-top: 14px; font-family: var(--serif); font-weight: 800; font-size: 32px; line-height: 1.08; letter-spacing: -0.005em; color: var(--text-primary); text-wrap: balance; }
 .it { font-style: italic; }
 
 .bodyCopy { margin-top: 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-wrap: pretty; max-width: 32ch; }
@@ -22,9 +22,9 @@ h1.h { margin-top: 14px; font-family: var(--serif); font-weight: 400; font-size:
 .finding .copy .data { font-family: var(--mono); }
 
 .path { margin-top: 24px; background: var(--bg-secondary); border-radius: 22px; padding: 20px 22px; position: relative; overflow: hidden; }
-.path::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(134,200,184,0.20) 0%, transparent 70%); pointer-events: none; }
+.path::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(67,186,202,0.20) 0%, transparent 70%); pointer-events: none; }
 .path .label { color: var(--accent); font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
-.path h2 { margin-top: 8px; font-family: var(--serif); font-size: 24px; font-weight: 400; color: var(--text-primary); line-height: 1.1; }
+.path h2 { margin-top: 8px; font-family: var(--serif); font-size: 24px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
 .path p { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
 
 .steps { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
