@@ -2,6 +2,7 @@ import { useLocation } from 'wouter';
 import { useStore } from '../store';
 import { Avatar } from '../components/Avatar';
 import { ArrowRight } from '../components/icons';
+import { Wordmark } from '../components/Wordmark';
 import s from './Onboarding.module.css';
 
 export function Onboarding() {
@@ -10,6 +11,9 @@ export function Onboarding() {
 
   return (
     <div className={s.root}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 16px' }}>
+        <Wordmark size={19} tone="onLight" />
+      </div>
       <div className={s.progress}>
         {[0, 1, 2, 3, 4, 5, 6].map(i => (
           <div key={i} className={`${s.pip} ${i < 6 ? s.pipDone : ''}`} />

@@ -41,7 +41,7 @@ const STEPS: Step[] = [
   {
     name: 'Bite & hold',
     headline: <>Press evenly. Hold<br /><span style={{ fontStyle: 'italic' }}>for two full minutes.</span></>,
-    lede: <>Two minutes is the cure time. Set the timer and don't talk — moving your jaw distorts the impression.</>,
+    lede: <>Two minutes is all it takes to set. Start the timer and don't talk — moving your jaw distorts the impression.</>,
     tip: <>Bite straight down — don't shift side to side. The impression sets in the first 30 seconds; the rest is just for stability.</>,
     duration: 120,
   },

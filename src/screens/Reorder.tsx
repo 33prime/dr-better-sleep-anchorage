@@ -58,11 +58,11 @@ export function Reorder() {
               </div>
             </div>
             <svg className={s.icon} viewBox="0 0 64 48" aria-hidden>
-              <ellipse cx="32" cy="40" rx="24" ry="3" fill="rgba(11,20,22,0.06)" />
-              <path d="M10,20 Q32,4 54,20 Q53,28 46,32 Q32,24 18,32 Q11,28 10,20 Z" fill="rgba(134,200,184,0.2)" stroke="#3E7565" strokeWidth={0.9} />
-              <path d="M14,28 Q32,42 50,28 Q51,36 44,38 Q32,42 20,38 Q13,36 14,28 Z" fill="rgba(255,255,255,0.7)" stroke="#0B1416" strokeWidth={0.7} />
-              <rect x="2" y="26" width="6" height="3" rx="1" fill="#D4DAD9" stroke="#0B1416" strokeWidth={0.5} />
-              <rect x="56" y="26" width="6" height="3" rx="1" fill="#D4DAD9" stroke="#0B1416" strokeWidth={0.5} />
+              <ellipse cx="32" cy="40" rx="24" ry="3" fill="rgba(30,37,68,0.06)" />
+              <path d="M10,20 Q32,4 54,20 Q53,28 46,32 Q32,24 18,32 Q11,28 10,20 Z" fill="rgba(67,186,202,0.2)" stroke="#43BACA" strokeWidth={0.9} />
+              <path d="M14,28 Q32,42 50,28 Q51,36 44,38 Q32,42 20,38 Q13,36 14,28 Z" fill="rgba(255,255,255,0.7)" stroke="#1E2544" strokeWidth={0.7} />
+              <rect x="2" y="26" width="6" height="3" rx="1" fill="#F0F2F7" stroke="#1E2544" strokeWidth={0.5} />
+              <rect x="56" y="26" width="6" height="3" rx="1" fill="#F0F2F7" stroke="#1E2544" strokeWidth={0.5} />
             </svg>
           </div>
           <div className={s.meter}><i style={{ width: `${pctUsed}%` }} /></div>

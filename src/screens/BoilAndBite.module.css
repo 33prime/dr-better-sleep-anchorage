@@ -6,7 +6,7 @@
 .nav .help { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--text-secondary); padding: 6px 8px; }
 
 .progress { padding: 4px 24px 0; display: flex; gap: 6px; flex: none; }
-.progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(11,20,22,0.10); }
+.progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(30,37,68,0.10); }
 .progress .pipDone { background: var(--accent); }
 .progress .pipActive { background: var(--text-primary); }
 
@@ -16,14 +16,14 @@
 .stepMeta .num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
 .stepMeta .of { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--text-tertiary); }
 
-.h1 { margin-top: 10px; font-family: var(--serif); font-size: 28px; line-height: 1.1; color: var(--text-primary); font-weight: 400; }
+.h1 { margin-top: 10px; font-family: var(--serif); font-size: 28px; line-height: 1.1; color: var(--text-primary); font-weight: 800; }
 .h1 .it { font-style: italic; }
 .lede { margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); max-width: 32ch; text-wrap: pretty; }
 
 .ringWrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 0; position: relative; }
 .ring { width: 220px; height: 220px; position: relative; }
 .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.ring .track { fill: none; stroke: rgba(11,20,22,0.08); stroke-width: 2; }
+.ring .track { fill: none; stroke: rgba(30,37,68,0.08); stroke-width: 2; }
 .ring .arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
 .ring .center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
 .ring .center .t { font-family: var(--mono); font-weight: 300; font-size: 56px; letter-spacing: -0.04em; color: var(--text-primary); line-height: 0.95; }

@@ -1,13 +1,13 @@
 {
-  "name": "Dr. Better Sleep",
-  "short_name": "Dr. Sleep",
-  "description": "Quiet, attentive sleep coach. Anchorage edition.",
+  "name": "Dr. Never Snore",
+  "short_name": "Never Snore",
+  "description": "Your clinically-inspired sleep coach — reduce snoring and wake up genuinely refreshed.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0B1416",
-  "theme_color": "#0B1416",
+  "background_color": "#1E2544",
+  "theme_color": "#1E2544",
   "categories": ["health", "lifestyle", "medical"],
   "icons": [
     {

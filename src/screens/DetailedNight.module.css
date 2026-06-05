@@ -44,7 +44,7 @@
 
 .section { margin-top: 28px; }
 .section .h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-.section h2 { font-family: var(--serif); font-size: 20px; font-weight: 400; }
+.section h2 { font-family: var(--serif); font-size: 20px; font-weight: 800; }
 .section .meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
 
 .snore { background: var(--bg-secondary); border-radius: 22px; padding: 20px; }
@@ -68,7 +68,7 @@
 .pos .bar {
   margin-top: 10px;
   height: 4px; border-radius: 2px;
-  background: rgba(11,20,22,0.08);
+  background: rgba(30,37,68,0.08);
   position: relative; overflow: hidden;
 }
 .pos .bar > div { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 2px; }

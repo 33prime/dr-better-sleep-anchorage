@@ -141,24 +141,24 @@ function fmtTime(hhmm: string): string {
 function Hypnogram() {
   return (
     <svg viewBox="0 0 360 132" preserveAspectRatio="none" style={{ width: '100%', height: 132, display: 'block' }}>
-      <g stroke="rgba(11,20,22,0.06)" strokeWidth={1}>
+      <g stroke="rgba(30,37,68,0.06)" strokeWidth={1}>
         <line x1="0" y1="20" x2="360" y2="20" />
         <line x1="0" y1="50" x2="360" y2="50" />
         <line x1="0" y1="80" x2="360" y2="80" />
         <line x1="0" y1="110" x2="360" y2="110" />
       </g>
-      <g fontFamily="JetBrains Mono" fontSize="9" fill="#7A8488">
+      <g fontFamily="Nunito" fontSize="9" fill="#8A90A6">
         <text x="0" y="17">AWAKE</text>
         <text x="0" y="47">REM</text>
         <text x="0" y="77">LIGHT</text>
         <text x="0" y="107">DEEP</text>
       </g>
       <polyline
-        fill="none" stroke="#3E7565" strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round"
+        fill="none" stroke="#43BACA" strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round"
         points="40,20 40,80 60,80 60,110 95,110 95,80 130,80 130,110 165,110 165,50 195,50 195,80 225,80 225,110 250,110 250,80 280,80 280,50 305,50 305,80 325,80 325,20 360,20"
       />
-      <line x1="155" y1="0" x2="155" y2="132" stroke="rgba(62,117,101,0.35)" strokeWidth="1" strokeDasharray="2 3" />
-      <text x="158" y="11" fontFamily="JetBrains Mono" fontSize="9" fill="#3E7565" letterSpacing="1">2:40 — back</text>
+      <line x1="155" y1="0" x2="155" y2="132" stroke="rgba(67,186,202,0.35)" strokeWidth="1" strokeDasharray="2 3" />
+      <text x="158" y="11" fontFamily="Nunito" fontSize="9" fill="#43BACA" letterSpacing="1">2:40 — back</text>
     </svg>
   );
 }
@@ -169,7 +169,7 @@ function SnoreBars({ hourlyValues }: { hourlyValues: number[] }) {
   const visualCount = 21;
   return (
     <svg viewBox="0 0 360 110" preserveAspectRatio="none" style={{ width: '100%', height: 110, display: 'block' }}>
-      <g fill="#3E7565">
+      <g fill="#43BACA">
         {Array.from({ length: visualCount }, (_, i) => {
           const hourIdx = Math.floor((i / visualCount) * hourlyValues.length);
           const v = hourlyValues[hourIdx];
@@ -179,7 +179,7 @@ function SnoreBars({ hourlyValues }: { hourlyValues: number[] }) {
           return <rect key={i} x={x} y={y} width={1.5} height={h} rx={0.5} />;
         })}
       </g>
-      <line x1="0" y1="55" x2="360" y2="55" stroke="rgba(11,20,22,0.18)" strokeWidth="0.75" />
+      <line x1="0" y1="55" x2="360" y2="55" stroke="rgba(30,37,68,0.18)" strokeWidth="0.75" />
     </svg>
   );
 }
