@@ -1,52 +1,74 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useStore, store, lastNight } from '../store';
+import { useSnoreDetector } from '../hooks/useSnoreDetector';
 import { fmtClockHM, isoDate, parseIsoDate, pad2 } from '../utils/format';
 import s from './Night.module.css';
+
+const DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function Night() {
   const state = useStore();
   const [, navigate] = useLocation();
+  const det = useSnoreDetector();
 
-  // Initialize the live night session if it doesn't exist.
+  // Initialize the live-night session if it doesn't exist.
   useEffect(() => {
     if (!state.liveNight?.tracking) {
       store.set(s2 => {
-        s2.liveNight = {
-          tracking: true,
-          startedAt: Date.now() - 3600_000 * 4 - 21 * 60_000,
-        };
+        s2.liveNight = { tracking: true, startedAt: Date.now() - 3600_000 * 4 - 21 * 60_000 };
       });
     }
   }, [state.liveNight?.tracking]);
 
+  // 1s heartbeat so the clock and "last snore" age stay fresh even when silent.
   const [, force] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => force(n => n + 1), 30_000);
+    const id = setInterval(() => force(n => n + 1), 1000);
     return () => clearInterval(id);
   }, []);
 
-  const live = state.liveNight;
-  if (!live?.startedAt) return null;
-  const elapsed = Date.now() - live.startedAt;
+  const live = det.status === 'listening' || det.status === 'simulated';
+  const blocked = det.status === 'denied' || det.status === 'unsupported';
+
+  const liveNight = state.liveNight;
+  if (!liveNight?.startedAt) return null;
+  const elapsed = Date.now() - liveNight.startedAt;
   const h = Math.floor(elapsed / 3_600_000);
   const m = Math.floor((elapsed % 3_600_000) / 60_000);
-  const startedDate = new Date(live.startedAt);
+  const startedDate = new Date(liveNight.startedAt);
   const startedAt = `${startedDate.getHours() % 12 || 12}:${pad2(startedDate.getMinutes())} ${startedDate.getHours() >= 12 ? 'pm' : 'am'}`;
+  const now = new Date();
+
+  const flashing = det.lastEventTs > 0 && Date.now() - det.lastEventTs < 450;
+  const lastAgo = det.lastEventTs > 0 ? Math.max(0, Math.round((Date.now() - det.lastEventTs) / 1000)) : null;
+
+  const verb = live ? 'Listening.'
+    : det.status === 'requesting' ? 'One moment.'
+    : blocked ? 'No mic — no problem.'
+    : 'Ready when you are.';
 
   const endNight = () => {
+    det.stop();
     const prior = lastNight(state);
-    if (!prior) return;
+    if (!prior) { navigate('/'); return; }
+    const count = det.snoreCount;
+    const baseSum = prior.snoresByHour.reduce((a, b) => a + b, 0) || 1;
+    const scale = count / (prior.totalSnores || 1);
     const nextDate = parseIsoDate(prior.date);
     nextDate.setDate(nextDate.getDate() + 1);
     const newNight = {
       ...prior,
       date: isoDate(nextDate),
-      totalSnores: Math.max(20, Math.round(prior.totalSnores * (0.85 + Math.random() * 0.2))),
-      sleepDurationMin: prior.sleepDurationMin + Math.round((Math.random() - 0.5) * 30),
-      efficiency: Math.min(0.98, prior.efficiency + (Math.random() - 0.4) * 0.04),
-      deepMin: prior.deepMin + Math.round((Math.random() - 0.5) * 20),
-      snoresByHour: prior.snoresByHour.map(v => Math.max(0, Math.round(v * (0.7 + Math.random() * 0.4)))),
+      totalSnores: count,
+      snoresByHour: prior.snoresByHour.map(v => Math.round((v / baseSum) * count)),
+      positionSnores: {
+        side_left: Math.round(prior.positionSnores.side_left * scale),
+        side_right: Math.round(prior.positionSnores.side_right * scale),
+        back: Math.round(prior.positionSnores.back * scale),
+        stomach: Math.round(prior.positionSnores.stomach * scale),
+      },
+      peakDb: det.peakDb > 0 ? Math.round(det.peakDb) : prior.peakDb,
       startedAt: '23:14',
       endedAt: fmtClockHM(new Date()),
     };
@@ -61,32 +83,59 @@ export function Night() {
   return (
     <div className={s.root}>
       <div className={s.top}>
-        <div className="label-mono" style={{ color: 'var(--night-text-3)' }}>Tracking</div>
-        <div className={s.moon}>Tue · {pad2(new Date().getHours())}:{pad2(new Date().getMinutes())}</div>
+        <div className="label-mono" style={{ color: 'var(--night-text-3)' }}>{live ? 'Listening' : 'Tracking'}</div>
+        <div className={s.moon}>{DAY_SHORT[now.getDay()]} · {pad2(now.getHours())}:{pad2(now.getMinutes())}</div>
       </div>
 
       <div className={s.center}>
-        <div className={s.verb}>Sleeping.</div>
-        <div className={s.orb} />
+        <div className={s.verb}>{verb}</div>
+
+        <div
+          className={`${s.orb} ${live ? s.live : ''}`}
+          style={live ? { transform: `scale(${1 + det.level * 0.3})`, filter: `brightness(${1 + det.level * 0.6})` } : undefined}
+        >
+          {det.lastEventTs > 0 && <span key={det.lastEventTs} className={s.ripple} />}
+        </div>
+
         <div className={s.clock}>{pad2(h)}:{pad2(m)}</div>
-        <div className={s.clockCap}>Asleep · Since {startedAt}</div>
+        <div className={s.clockCap}>{live ? `Asleep · since ${startedAt}` : 'Place me on the nightstand'}</div>
+
+        {!live && det.status !== 'requesting' && (
+          <button className={`${s.startBtn} tap`} onClick={det.start}>
+            {blocked ? 'Try the microphone again' : 'Start listening'}
+          </button>
+        )}
+        {det.status === 'requesting' && <div className={s.hint}>Allow microphone access…</div>}
+        {blocked && (
+          <button className={`${s.simLink} tap`} onClick={det.startSimulated}>or continue in demo mode</button>
+        )}
+        {det.status === 'idle' && (
+          <div className={s.hint}>Your audio never leaves the phone</div>
+        )}
+      </div>
+
+      {/* Live loudness waveform — driven by the mic in real time */}
+      <div className={s.wave} aria-hidden>
+        {det.levels.map((l, i) => (
+          <i key={i} style={{ transform: `scaleY(${0.06 + Math.min(1, l)})` }} />
+        ))}
       </div>
 
       <div className={s.signals}>
         <div className={s.s}>
-          <div className={s.k}>Stage</div>
-          <div className={s.v}>Deep</div>
-          <div className={s.t}>22 min in</div>
-        </div>
-        <div className={s.s}>
           <div className={s.k}>Snores</div>
-          <div className={s.v}>8</div>
-          <div className={s.t}>last hour</div>
+          <div className={`${s.v} ${flashing ? s.flash : ''}`}>{det.snoreCount}</div>
+          <div className={s.t}>tonight</div>
         </div>
         <div className={s.s}>
-          <div className={s.k}>Pulse</div>
-          <div className={s.v}>52</div>
-          <div className={s.t}>↓ from 58</div>
+          <div className={s.k}>Peak</div>
+          <div className={s.v}>{det.peakDb > 0 ? det.peakDb : '—'}</div>
+          <div className={s.t}>{det.peakDb > 0 ? 'dB' : 'quiet'}</div>
+        </div>
+        <div className={s.s}>
+          <div className={s.k}>Last snore</div>
+          <div className={s.v}>{lastAgo !== null ? `${lastAgo}s` : '—'}</div>
+          <div className={s.t}>{lastAgo !== null ? 'ago' : 'none yet'}</div>
         </div>
       </div>
 
