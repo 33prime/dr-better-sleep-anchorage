@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
-import { useStore, lastNight, daysSince } from '../store';
+import { useStore, lastNight, baselineSnores, daysSince } from '../store';
 import { TickNumber } from '../components/TickNumber';
 import { ArrowRight } from '../components/icons';
-import { fmtDateLong, fmtDuration, parseIsoDate } from '../utils/format';
+import { fmtDateLong, fmtDelta, fmtDuration, parseIsoDate } from '../utils/format';
 import s from './MorningReveal.module.css';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -19,6 +19,25 @@ export function MorningReveal() {
   const last = lastNight(state);
   if (!last) return null;
 
+  // The previous 14 nights, excluding the night being revealed.
+  const prev14 = state.nights.slice(-15, -1);
+  const mean = (xs: number[]) =>
+    xs.length ? xs.reduce((a, v) => a + v, 0) / xs.length : 0;
+
+  // Snores vs. the rolling baseline.
+  const snoreDelta = fmtDelta(last.totalSnores, baselineSnores(state));
+
+  // Sleep duration & deep sleep vs. the mean of the previous 14 nights.
+  const avgSleep = mean(prev14.map(n => n.sleepDurationMin));
+  const avgDeep = mean(prev14.map(n => n.deepMin));
+  const sleepDiff = avgSleep ? Math.round(last.sleepDurationMin - avgSleep) : 0;
+  const deepDiff = avgDeep ? Math.round(last.deepMin - avgDeep) : 0;
+  const fmtMinDelta = (diff: number) =>
+    `${diff > 0 ? '↑' : diff < 0 ? '↓' : '→'} ${Math.abs(diff)}m`;
+
+  // How many of the previous 14 nights were louder than last night.
+  const quieterThan = prev14.filter(n => n.totalSnores > last.totalSnores).length;
+
   return (
     <div className={s.root}>
       <motion.div className={s.eyebrow} {...fadeUp(0.2)}>
@@ -31,13 +50,13 @@ export function MorningReveal() {
       </motion.h1>
 
       <motion.p className={s.sub} {...fadeUp(0.48)}>
-        You were quieter than 9 of the last 14 nights. Here's what stood out.
+        You were quieter than {quieterThan} of the last {prev14.length} nights. Here's what stood out.
       </motion.p>
 
       <div className={s.numbers}>
-        <Cell label="Snores" value={String(last.totalSnores)} delta="↓ 38%" deltaSub="vs. baseline" delay={0.62} />
-        <Cell label="Time asleep" value={fmtDuration(last.sleepDurationMin)} delta="↑ 22m" deltaSub="vs. avg" delay={0.72} />
-        <Cell label="Deep sleep" value={fmtDuration(last.deepMin)} delta="↑ 12m" deltaSub="vs. avg" delay={0.82} />
+        <Cell label="Snores" value={String(last.totalSnores)} delta={`${snoreDelta.sign} ${snoreDelta.pct}`} deltaSub="vs. baseline" delay={0.62} />
+        <Cell label="Time asleep" value={fmtDuration(last.sleepDurationMin)} delta={fmtMinDelta(sleepDiff)} deltaSub="vs. avg" delay={0.72} />
+        <Cell label="Deep sleep" value={fmtDuration(last.deepMin)} delta={fmtMinDelta(deepDiff)} deltaSub="vs. avg" delay={0.82} />
         <Cell label="Resting HR" value={String(last.restingHr)} unit="bpm" delta="→ stable" deltaClass="muted" delay={0.92} />
       </div>
 

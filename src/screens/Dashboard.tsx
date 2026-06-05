@@ -6,7 +6,7 @@ import {
 import { Avatar } from '../components/Avatar';
 import { Sparkline } from '../components/Sparkline';
 import { TickNumber } from '../components/TickNumber';
-import { SearchIcon, ChevronRight, PillIcon } from '../components/icons';
+import { ChevronRight, PillIcon } from '../components/icons';
 import {
   fmtDateLong, fmtDelta, fmtDuration, timeOfDayGreeting, fmtClockHM, shouldUseDarkDashboard,
 } from '../utils/format';
@@ -50,9 +50,13 @@ export function Dashboard() {
     <div className={`${s.root} ${isNight ? s.night : ''}`}>
       {/* top bar */}
       <div className={s.topbar}>
-        <Avatar withDot={!isNight} glow={isNight} />
-        <button className={`${s.iconBtn} tap`} aria-label="Search">
-          <SearchIcon />
+        <button
+          className="tap"
+          onClick={() => navigate('/profile')}
+          aria-label="Your profile"
+          style={{ display: 'grid', placeItems: 'center', background: 'none', border: 0, padding: 0 }}
+        >
+          <Avatar withDot={!isNight} glow={isNight} />
         </button>
       </div>
 
@@ -146,21 +150,39 @@ export function Dashboard() {
 
       {/* status row */}
       <div className={s.statusRow}>
-        <div className={`${s.stat} tap`}>
+        <div
+          className={`${s.stat} tap`}
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate('/trends')}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/trends'); }}
+        >
           <div>
             <div className={s.k}>Sleep</div>
             <div className={s.v}>{fmtDuration(last.sleepDurationMin)}</div>
           </div>
           <div className={s.t}><span className={s.up}>↑</span> from avg</div>
         </div>
-        <div className={`${s.stat} tap`}>
+        <div
+          className={`${s.stat} tap`}
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate('/trends')}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/trends'); }}
+        >
           <div>
             <div className={s.k}>Efficiency</div>
             <div className={s.v}>{Math.round(last.efficiency * 100)}%</div>
           </div>
           <div className={s.t}><span className={s.flat}>→</span> stable</div>
         </div>
-        <div className={`${s.stat} tap`}>
+        <div
+          className={`${s.stat} tap`}
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate('/trends')}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/trends'); }}
+        >
           <div>
             <div className={s.k}>Streak</div>
             <div className={s.v}>{streakNights(state)}</div>

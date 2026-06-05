@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { store, lastNight } from '../store';
-import { isoDate } from '../utils/format';
+import { isoDate, parseIsoDate } from '../utils/format';
 import { showToast } from './Toast';
 import { Cog } from './icons';
 
@@ -13,10 +13,11 @@ export function DemoControls() {
     const s = store.get();
     const prior = lastNight(s);
     if (!prior) return;
-    const today = new Date();
+    const nextDate = parseIsoDate(prior.date);
+    nextDate.setDate(nextDate.getDate() + 1);
     const next = {
       ...prior,
-      date: isoDate(today),
+      date: isoDate(nextDate),
       totalSnores: Math.max(20, Math.round(prior.totalSnores * (0.85 + Math.random() * 0.2))),
       sleepDurationMin: prior.sleepDurationMin + Math.round((Math.random() - 0.5) * 30),
       efficiency: Math.min(0.98, prior.efficiency + (Math.random() - 0.4) * 0.04),

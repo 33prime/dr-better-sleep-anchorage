@@ -65,9 +65,14 @@ export function BoilAndBite() {
 
   const step = STEPS[stepIndex];
 
-  // Countdown
+  // Reset the countdown to the full duration only when the step changes.
   useEffect(() => {
     setRemaining(step.duration);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIndex]);
+
+  // Run the 1s tick while not paused, decrementing the preserved remaining value.
+  useEffect(() => {
     if (paused) return;
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = window.setInterval(() => {

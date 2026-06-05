@@ -1,6 +1,7 @@
 import { useLocation } from 'wouter';
 import { useStore, store, daysSince } from '../store';
-import { ChevronLeft, DotsIcon } from '../components/icons';
+import { ChevronLeft } from '../components/icons';
+import { Menu } from '../components/Menu';
 import { isoDate } from '../utils/format';
 import { showToast } from '../components/Toast';
 import s from './Reorder.module.css';
@@ -37,9 +38,10 @@ export function Reorder() {
           <ChevronLeft />
           <span>Settings</span>
         </button>
-        <button className={`${s.more} tap`} aria-label="More">
-          <DotsIcon />
-        </button>
+        <Menu className={s.more} ariaLabel="More" items={[
+          { label: 'Manage subscription', onClick: () => showToast('No subscription — you only order when you need to.') },
+          { label: 'Order history', onClick: () => showToast('No past orders yet.') },
+        ]} />
       </div>
 
       <div className={s.body}>
@@ -108,7 +110,7 @@ export function Reorder() {
             <div className={s.k}>Ship to</div>
             <div className={s.v}>{state.user.shipTo}</div>
           </div>
-          <button className={`${s.edit} tap`}>Edit</button>
+          <button className={`${s.edit} tap`} onClick={() => showToast('We’ll text a secure link to update your address.')}>Edit</button>
         </div>
 
         <div className={s.shelf}>

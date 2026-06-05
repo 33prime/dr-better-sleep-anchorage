@@ -3,7 +3,8 @@ import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { useStore, store } from '../store';
 import { Avatar } from '../components/Avatar';
-import { ChevronLeft, ArrowRight, DotsIcon } from '../components/icons';
+import { ChevronLeft, ArrowRight } from '../components/icons';
+import { Menu } from '../components/Menu';
 import { fmtClockHM } from '../utils/format';
 import { streamChatReply } from '../utils/chatApi';
 import s from './Chat.module.css';
@@ -85,9 +86,9 @@ export function Chat() {
             <div className={s.status}>Listening</div>
           </div>
         </div>
-        <button className={`${s.back} tap`} aria-label="More">
-          <DotsIcon />
-        </button>
+        <Menu className={s.back} ariaLabel="More" items={[
+          { label: 'Detailed night report', onClick: () => navigate('/chat/rich') },
+        ]} />
       </div>
 
       <div className={s.convo} ref={convoRef}>

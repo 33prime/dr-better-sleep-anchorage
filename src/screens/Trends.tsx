@@ -16,9 +16,14 @@ export function Trends() {
   const days = range === '7d' ? 7 : range === '30d' ? 30 : range === '90d' ? 90 : state.nights.length;
   const slice = state.nights.slice(-days);
   const avg = slice.reduce((a, n) => a + n.totalSnores, 0) / Math.max(1, slice.length);
-  const start = slice[0]?.totalSnores ?? 0;
-  const end = slice[slice.length - 1]?.totalSnores ?? 0;
-  const d = fmtDelta(end, start);
+  // Compare the mean of the first half of the range vs. the mean of the second
+  // half, so a single endpoint night can't whipsaw the headline delta.
+  const mid = Math.floor(slice.length / 2);
+  const mean = (xs: typeof slice) =>
+    xs.length ? xs.reduce((a, n) => a + n.totalSnores, 0) / xs.length : 0;
+  const firstHalf = mean(slice.slice(0, mid));
+  const secondHalf = mean(slice.slice(mid));
+  const d = fmtDelta(secondHalf, firstHalf);
   const last = lastNight(state);
 
   return (
@@ -59,7 +64,7 @@ export function Trends() {
           </div>
           <div className={s.bigUnit}>average / night</div>
           <div className={s.delta}>
-            {d.sign} {d.pct} <span className={s.from}>vs. range start</span>
+            {d.sign} {d.pct} <span className={s.from}>vs. range first half</span>
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useStore, store, lastNight } from '../store';
-import { fmtClockHM, isoDate, pad2 } from '../utils/format';
+import { fmtClockHM, isoDate, parseIsoDate, pad2 } from '../utils/format';
 import s from './Night.module.css';
 
 export function Night() {
@@ -37,10 +37,11 @@ export function Night() {
   const endNight = () => {
     const prior = lastNight(state);
     if (!prior) return;
-    const today = new Date();
+    const nextDate = parseIsoDate(prior.date);
+    nextDate.setDate(nextDate.getDate() + 1);
     const newNight = {
       ...prior,
-      date: isoDate(today),
+      date: isoDate(nextDate),
       totalSnores: Math.max(20, Math.round(prior.totalSnores * (0.85 + Math.random() * 0.2))),
       sleepDurationMin: prior.sleepDurationMin + Math.round((Math.random() - 0.5) * 30),
       efficiency: Math.min(0.98, prior.efficiency + (Math.random() - 0.4) * 0.04),
