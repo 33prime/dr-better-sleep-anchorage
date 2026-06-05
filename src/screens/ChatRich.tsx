@@ -2,7 +2,9 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useStore, lastNight } from '../store';
 import { Avatar } from '../components/Avatar';
-import { ChevronLeft, DotsIcon } from '../components/icons';
+import { ChevronLeft } from '../components/icons';
+import { Menu } from '../components/Menu';
+import { showToast } from '../components/Toast';
 import s from './Chat.module.css';
 
 /**
@@ -34,9 +36,9 @@ export function ChatRich() {
             <div className={s.status}>Listening</div>
           </div>
         </div>
-        <button className={`${s.back} tap`} aria-label="More">
-          <DotsIcon />
-        </button>
+        <Menu className={s.back} ariaLabel="More" items={[
+          { label: 'Share with Sarah', onClick: () => showToast('Last night shared with Sarah ✓') },
+        ]} />
       </div>
 
       <div className={s.convo} ref={convoRef}>
@@ -119,6 +121,7 @@ export function ChatRich() {
                 className="tap"
                 style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent)', color: '#1E2544', display: 'grid', placeItems: 'center', flex: 'none', border: 0 }}
                 aria-label="Play"
+                onClick={() => showToast('Playing 2:38–2:43 a.m. · soft snoring')}
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 14, height: 14, marginLeft: 2 }}>
                   <path d="M6 4l14 8-14 8z" />

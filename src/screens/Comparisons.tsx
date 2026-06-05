@@ -14,15 +14,16 @@ const COHORT_CHIPS = [
 export function Comparisons() {
   const [, navigate] = useLocation();
   const [active, setActive] = useState(new Set(['age', 'sex', 'bmi', 'device']));
-  const [percentile, setPercentile] = useState(82);
 
   const toggle = (key: string) => {
     const next = new Set(active);
     if (next.has(key)) next.delete(key); else next.add(key);
     setActive(next);
-    // Re-randomize percentile to feel responsive
-    setPercentile(70 + Math.floor(Math.random() * 24));
   };
+
+  // Narrowing the cohort (more filters) sharpens the comparison in your favour.
+  // Deterministic so the headline number never contradicts the distribution chart.
+  const percentile = 66 + active.size * 4;
 
   return (
     <div className={s.root}>
@@ -69,7 +70,7 @@ export function Comparisons() {
               <div className={s.distSub}>Lower is calmer</div>
             </div>
             <div className={s.pct}>
-              <TickNumber value={percentile} duration={0.5} />
+              <TickNumber key={percentile} value={percentile} duration={0.5} />
               <span className={s.u}>th percentile</span>
             </div>
           </div>

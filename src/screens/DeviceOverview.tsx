@@ -1,6 +1,8 @@
 import { useLocation } from 'wouter';
 import { useStore } from '../store';
-import { ChevronLeft, DotsIcon, ArrowRight } from '../components/icons';
+import { ChevronLeft, ArrowRight } from '../components/icons';
+import { Menu } from '../components/Menu';
+import { showToast } from '../components/Toast';
 import { Wordmark } from '../components/Wordmark';
 import s from './DeviceOverview.module.css';
 
@@ -23,7 +25,10 @@ export function DeviceOverview() {
           <ChevronLeft />
           <span>Setup</span>
         </button>
-        <button className={`${s.more} tap`} aria-label="More"><DotsIcon /></button>
+        <Menu className={s.more} ariaLabel="More" items={[
+          { label: 'Re-run fitting', onClick: () => navigate('/onboarding/setup') },
+          { label: 'Adjustment guide', onClick: () => showToast('Opening your fit guide…') },
+        ]} />
       </div>
 
       <div className={s.body}>

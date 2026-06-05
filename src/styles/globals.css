@@ -219,6 +219,40 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
 }
 
 /* ============================================================
+   Header action menu (Menu.tsx) — gives "⋯" buttons real actions
+   ============================================================ */
+.header-menu {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
+  min-width: 210px; padding: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: 0 16px 44px rgba(30,37,68,0.20);
+  display: flex; flex-direction: column; gap: 2px;
+  transform-origin: top right;
+  animation: menuIn 140ms cubic-bezier(0.22,1,0.36,1);
+}
+.screen.night .header-menu {
+  background: var(--night-bg-2);
+  border-color: var(--hairline-night);
+  box-shadow: 0 16px 44px rgba(0,0,0,0.5);
+}
+@keyframes menuIn { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .header-menu { animation: none; } }
+.header-menu-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 9px;
+  font-family: var(--sans); font-size: 14px; font-weight: 600;
+  color: var(--text-primary); text-align: left; width: 100%;
+  background: none; border: 0; cursor: pointer;
+  transition: background 140ms;
+}
+.header-menu-item:hover { background: var(--bg-secondary); }
+.screen.night .header-menu-item { color: var(--night-text-1); }
+.screen.night .header-menu-item:hover { background: rgba(255,255,255,0.06); }
+.header-menu-item svg { width: 17px; height: 17px; flex: none; color: var(--accent); }
+
+/* ============================================================
    Toast
    ============================================================ */
 .toast {

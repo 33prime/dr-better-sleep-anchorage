@@ -1,7 +1,9 @@
 import { useLocation, useRoute } from 'wouter';
 import { useStore, lastNight, baselineSnores, findNight } from '../store';
-import { ChevronLeft, PlusIcon } from '../components/icons';
+import { ChevronLeft } from '../components/icons';
 import { Avatar } from '../components/Avatar';
+import { Menu } from '../components/Menu';
+import { showToast } from '../components/Toast';
 import { fmtDelta, fmtDuration, parseIsoDate, pad2 } from '../utils/format';
 import s from './DetailedNight.module.css';
 
@@ -40,9 +42,10 @@ export function DetailedNight() {
           <ChevronLeft />
           <span>Home</span>
         </button>
-        <button className={`${s.more} tap`} aria-label="More">
-          <PlusIcon />
-        </button>
+        <Menu className={s.more} ariaLabel="More" items={[
+          { label: 'Share with Sarah', onClick: () => showToast('Last night shared with Sarah ✓') },
+          { label: 'Add a note', onClick: () => showToast('Note saved to this night') },
+        ]} />
       </div>
 
       <div className={s.body}>
