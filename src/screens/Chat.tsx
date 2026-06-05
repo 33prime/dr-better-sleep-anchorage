@@ -32,43 +32,36 @@ export function Chat() {
     const userId = `m${Date.now()}`;
     const replyId = `m${Date.now() + 1}`;
 
-    // Push user message + an empty reply placeholder we'll stream into.
-    store.set(s2 => {
-      s2.chat.push({ id: userId, who: 'me', text, ts: Date.now() });
-    });
+    // IMPORTANT: replace the chat array immutably on every update (new array +
+    // new message object). The store subscriber here selects `s.chat`, so it
+    // only re-renders when that reference changes — mutating in place would
+    // make the whole reply appear at once instead of streaming token-by-token.
+    store.set(s2 => { s2.chat = [...s2.chat, { id: userId, who: 'me', text, ts: Date.now() }]; });
     setTyping(true);
 
     try {
       const history = [...store.get().chat];
       const stream = streamChatReply(text, history, store.get());
-      let first = true;
+      let acc = '';
+      let started = false;
       for await (const chunk of stream) {
-        if (first) {
-          // Add the reply bubble as soon as the first token arrives.
-          store.set(s2 => {
-            s2.chat.push({ id: replyId, who: 'them', text: chunk, ts: Date.now() });
-          });
+        acc += chunk;
+        if (!started) {
+          // First token: drop the typing indicator and add the reply bubble.
+          started = true;
           setTyping(false);
-          first = false;
+          store.set(s2 => { s2.chat = [...s2.chat, { id: replyId, who: 'them', text: acc, ts: Date.now() }]; });
         } else {
-          store.set(s2 => {
-            const m = s2.chat.find(x => x.id === replyId);
-            if (m) m.text = (m.text ?? '') + chunk;
-          });
+          store.set(s2 => { s2.chat = s2.chat.map(x => (x.id === replyId ? { ...x, text: acc } : x)); });
         }
       }
-      if (first) {
-        // Stream ended with no content — surface a graceful message.
-        store.set(s2 => {
-          s2.chat.push({ id: replyId, who: 'them', text: '…', ts: Date.now() });
-        });
+      if (!started) {
+        store.set(s2 => { s2.chat = [...s2.chat, { id: replyId, who: 'them', text: '…', ts: Date.now() }]; });
         setTyping(false);
       }
     } catch (err) {
       console.error('Chat error:', err);
-      store.set(s2 => {
-        s2.chat.push({ id: replyId, who: 'them', text: "lost you for a second — try that again?", ts: Date.now() });
-      });
+      store.set(s2 => { s2.chat = [...s2.chat, { id: replyId, who: 'them', text: "lost you for a second — try that again?", ts: Date.now() }]; });
       setTyping(false);
     }
   };
