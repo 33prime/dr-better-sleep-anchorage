@@ -12,7 +12,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['icons/*.png', 'manifest.webmanifest'],
+      includeAssets: ['icons/*.png'],
       manifest: {
         name: 'Dr. Never Snore',
         short_name: 'Never Snore',
@@ -33,6 +33,12 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,webmanifest,ico}'],
         navigateFallback: '/index.html',
+        // A returning phone may still hold the old hand-written service worker.
+        // Take control immediately and purge stale precaches so it can't serve
+        // missing/old assets (the classic blank-screen-on-mobile after a redeploy).
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
       },
     }),
   ],
