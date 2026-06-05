@@ -64,6 +64,12 @@ export function Dashboard() {
         >
           <Avatar withDot={!isNight} glow={isNight} />
         </button>
+        <button className={`${s.trackBtn} tap`} onClick={() => navigate('/night')} aria-label="Start sleep tracking">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden>
+            <path d="M21 14.5A8.5 8.5 0 1 1 10.9 3.1a6.9 6.9 0 0 0 11.1 11.4Z" fill="currentColor" />
+          </svg>
+          Track sleep
+        </button>
       </div>
 
       {/* greeting */}

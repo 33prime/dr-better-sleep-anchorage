@@ -17,6 +17,17 @@
 }
 .iconBtn svg { width: 20px; height: 20px; }
 
+.trackBtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 15px; border-radius: 999px;
+  background: rgba(67,186,202,0.12);
+  border: 1px solid rgba(67,186,202,0.35);
+  color: var(--accent);
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
+  cursor: pointer;
+}
+.night .trackBtn { background: rgba(67,186,202,0.16); border-color: rgba(67,186,202,0.45); color: var(--accent-soft); }
+
 .greeting { margin-top: 24px; flex: none; }
 .greeting h1 {
   font-family: var(--serif); font-weight: 800;
