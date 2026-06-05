@@ -173,6 +173,7 @@
 }
 .stat .t .up { color: var(--positive); font-weight: 500; }
 .stat .t .flat { color: var(--text-tertiary); }
+.stat .t .down { color: var(--text-secondary); font-weight: 500; }
 
 .context {
   margin-top: 28px;
@@ -319,6 +320,7 @@
 .night .stat .v { color: var(--night-text-1); }
 .night .stat .t { color: var(--night-text-2); }
 .night .stat .t .up { color: #43BACA; }
+.night .stat .t .down { color: var(--night-text-2); }
 .night .context {
   border-top: 1px solid var(--hairline-night);
   border-bottom: 1px solid var(--hairline-night);

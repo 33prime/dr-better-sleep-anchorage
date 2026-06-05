@@ -26,6 +26,24 @@ export function Trends() {
   const d = fmtDelta(secondHalf, firstHalf);
   const last = lastNight(state);
 
+  // Mini-card deltas vs the earliest week (pre-device baseline).
+  const early = state.nights.slice(0, Math.min(7, state.nights.length));
+  const meanOf = (xs: number[]) => (xs.length ? xs.reduce((a, v) => a + v, 0) / xs.length : 0);
+  const effDeltaPts = Math.round(((last?.efficiency ?? 0) - meanOf(early.map(n => n.efficiency))) * 100);
+  const hrvDelta = Math.round((last?.hrv ?? 0) - meanOf(early.map(n => n.hrv)));
+  const rhrDelta = Math.round((last?.restingHr ?? 0) - meanOf(early.map(n => n.restingHr)));
+  const higherBetter = (v: number, unit: string) =>
+    v >= 1 ? { text: `↑ ${v}${unit} from baseline`, cls: 'pos' as const }
+    : v <= -1 ? { text: `↓ ${Math.abs(v)}${unit} from baseline`, cls: 'flat' as const }
+    : { text: '→ stable', cls: 'flat' as const };
+  const lowerBetter = (v: number, unit: string) =>
+    v <= -1 ? { text: `↓ ${Math.abs(v)}${unit} from baseline`, cls: 'pos' as const }
+    : v >= 1 ? { text: `↑ ${v}${unit} from baseline`, cls: 'flat' as const }
+    : { text: '→ stable', cls: 'flat' as const };
+  const effD = higherBetter(effDeltaPts, 'pt');
+  const hrvD = higherBetter(hrvDelta, ' ms');
+  const rhrD = lowerBetter(rhrDelta, ' bpm');
+
   return (
     <div className={s.root}>
       <div className={s.head}>
@@ -92,9 +110,9 @@ export function Trends() {
 
       <div className={s.row2}>Other signals</div>
       <div className={s.miniGrid}>
-        <MiniCard label="Sleep efficiency" value={`${Math.round((last?.efficiency ?? 0) * 100)}`} unit="%" deltaText="↑ 3pt from last month" deltaClass="pos" trend={state.nights.slice(-14).map(n => n.efficiency)} />
-        <MiniCard label="HRV (overnight)" value={String(last?.hrv ?? 0)} unit=" ms" deltaText="↑ 6 ms from baseline" deltaClass="pos" trend={state.nights.slice(-14).map(n => n.hrv)} />
-        <MiniCard label="Resting HR" value={String(last?.restingHr ?? 0)} unit=" bpm" deltaText="→ stable" deltaClass="flat" trend={state.nights.slice(-14).map(n => n.restingHr)} stroke="#8A90A6" />
+        <MiniCard label="Sleep efficiency" value={`${Math.round((last?.efficiency ?? 0) * 100)}`} unit="%" deltaText={effD.text} deltaClass={effD.cls} trend={state.nights.slice(-14).map(n => n.efficiency)} />
+        <MiniCard label="HRV (overnight)" value={String(last?.hrv ?? 0)} unit=" ms" deltaText={hrvD.text} deltaClass={hrvD.cls} trend={state.nights.slice(-14).map(n => n.hrv)} />
+        <MiniCard label="Resting HR" value={String(last?.restingHr ?? 0)} unit=" bpm" deltaText={rhrD.text} deltaClass={rhrD.cls} trend={state.nights.slice(-14).map(n => n.restingHr)} stroke="#8A90A6" />
       </div>
     </div>
   );
