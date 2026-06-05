@@ -1,0 +1,130 @@
+.root { padding: 18px 20px 0; height: 100%; }
+
+.header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 4px 0 8px;
+}
+.id .name {
+  font-family: var(--serif); font-weight: 800;
+  font-size: 28px; line-height: 1.05; color: var(--text-primary);
+}
+.id .meta {
+  margin-top: 4px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--text-tertiary); text-transform: uppercase;
+}
+
+.sectionLabel {
+  margin: 22px 0 8px;
+  font-family: var(--mono); font-weight: 700;
+  font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  padding: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+/* Device card */
+.deviceCard { display: block; cursor: pointer; }
+.deviceTop {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.deviceTop svg { width: 20px; height: 20px; color: var(--text-tertiary); }
+.deviceStats {
+  margin-top: 16px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.deviceStats .k {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--text-tertiary);
+}
+.deviceStats .v {
+  margin-top: 5px;
+  font-family: var(--mono); font-weight: 300; font-size: 24px;
+  letter-spacing: -0.03em; color: var(--text-primary);
+}
+.deviceStats .of { font-size: 12px; color: var(--text-tertiary); letter-spacing: 0; }
+.meter {
+  margin-top: 16px; height: 4px; border-radius: 2px;
+  background: rgba(30,37,68,0.08); position: relative; overflow: hidden;
+}
+.meter > i {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--accent); border-radius: 2px;
+}
+
+.rowLink {
+  margin-top: 10px;
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
+  cursor: pointer;
+}
+.rowLink svg { width: 18px; height: 18px; color: var(--accent); }
+
+/* Toggle row */
+.toggleRow { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.toggleText { min-width: 0; }
+.rowTitle { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.rowSub { margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: var(--text-tertiary); }
+
+.switch {
+  position: relative; width: 46px; height: 26px; flex: none;
+  border-radius: 14px; background: rgba(30,37,68,0.18);
+  transition: background 200ms; border: 0; padding: 0; cursor: pointer;
+}
+.switch.on { background: var(--accent); }
+.knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: left 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.switch.on .knob { left: 23px; }
+
+/* Segmented theme control */
+.seg {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+  background: rgba(30,37,68,0.06); border-radius: 11px; padding: 4px;
+}
+.segBtn {
+  padding: 9px 0; border-radius: 8px;
+  font-size: 13px; font-weight: 700; color: var(--text-secondary);
+  background: none; border: 0; cursor: pointer;
+  transition: background 160ms, color 160ms, box-shadow 160ms;
+}
+.segOn {
+  background: var(--bg-primary); color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(30,37,68,0.12);
+}
+
+/* List rows */
+.listRow {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 14px 2px;
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
+  background: none; border: 0; cursor: pointer;
+  border-bottom: 1px solid var(--hairline);
+}
+.listRow:last-child { border-bottom: 0; }
+.listRow svg { width: 18px; height: 18px; color: var(--text-tertiary); }
+
+.signout {
+  margin-top: 24px; width: 100%;
+  padding: 14px; border-radius: 14px;
+  background: none; border: 1px solid var(--hairline);
+  font-size: 14px; font-weight: 700; color: var(--warn);
+  cursor: pointer;
+}
+
+.scrollPad { height: 96px; }

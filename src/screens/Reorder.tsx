@@ -34,9 +34,9 @@ export function Reorder() {
   return (
     <div className={s.root}>
       <div className={s.nav}>
-        <button className={`${s.back} tap`} onClick={() => navigate('/')}>
+        <button className={`${s.back} tap`} onClick={() => navigate('/profile')}>
           <ChevronLeft />
-          <span>Settings</span>
+          <span>Profile</span>
         </button>
         <Menu className={s.more} ariaLabel="More" items={[
           { label: 'Manage subscription', onClick: () => showToast('No subscription — you only order when you need to.') },

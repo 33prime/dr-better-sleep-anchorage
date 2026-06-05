@@ -33,6 +33,12 @@ export function Dashboard() {
   const baseline = baselineSnores(state);
   const delta = fmtDelta(last.totalSnores, baseline);
   const last14 = state.nights.slice(-14).map(n => n.totalSnores);
+
+  // Stat-tile deltas, derived vs the prior 14 nights (excluding last night).
+  const prior14 = state.nights.slice(-15, -1);
+  const meanOf = (xs: number[]) => (xs.length ? xs.reduce((a, v) => a + v, 0) / xs.length : 0);
+  const sleepDiff = last.sleepDurationMin - meanOf(prior14.map(n => n.sleepDurationMin));
+  const effDiffPts = Math.round((last.efficiency - meanOf(prior14.map(n => n.efficiency))) * 100);
   const isNight =
     location === '/dashboard/dark' ||
     (location === '/' && (state.uiTheme === 'dark' || (state.uiTheme === 'auto' && shouldUseDarkDashboard())));
@@ -161,7 +167,13 @@ export function Dashboard() {
             <div className={s.k}>Sleep</div>
             <div className={s.v}>{fmtDuration(last.sleepDurationMin)}</div>
           </div>
-          <div className={s.t}><span className={s.up}>↑</span> from avg</div>
+          <div className={s.t}>
+            {sleepDiff > 6
+              ? <><span className={s.up}>↑</span> from avg</>
+              : sleepDiff < -6
+                ? <><span className={s.down}>↓</span> from avg</>
+                : <><span className={s.flat}>→</span> on avg</>}
+          </div>
         </div>
         <div
           className={`${s.stat} tap`}
@@ -174,7 +186,13 @@ export function Dashboard() {
             <div className={s.k}>Efficiency</div>
             <div className={s.v}>{Math.round(last.efficiency * 100)}%</div>
           </div>
-          <div className={s.t}><span className={s.flat}>→</span> stable</div>
+          <div className={s.t}>
+            {effDiffPts >= 1
+              ? <><span className={s.up}>↑</span> {effDiffPts}pt vs avg</>
+              : effDiffPts <= -1
+                ? <><span className={s.down}>↓</span> {Math.abs(effDiffPts)}pt vs avg</>
+                : <><span className={s.flat}>→</span> stable</>}
+          </div>
         </div>
         <div
           className={`${s.stat} tap`}
@@ -222,7 +240,7 @@ export function Dashboard() {
       )}
 
       {/* recommendation */}
-      <div className={`${s.rec} tap`} role="button" tabIndex={0} onClick={() => navigate('/profile')}>
+      <div className={`${s.rec} tap`} role="button" tabIndex={0} onClick={() => navigate('/reorder')}>
         <div className={s.ico}><PillIcon /></div>
         <div className={s.body}>
           <div className={s.title}>Try magnesium glycinate</div>

@@ -1,4 +1,5 @@
-import { Route, Switch, useLocation } from 'wouter';
+import { useEffect } from 'react';
+import { Route, Switch, useLocation, Redirect } from 'wouter';
 import { DeviceFrame } from './components/DeviceFrame';
 import { AnimatedStage } from './components/AnimatedStage';
 import { TabBar } from './components/TabBar';
@@ -19,14 +20,22 @@ import { DeviceOverview } from './screens/DeviceOverview';
 import { Night } from './screens/Night';
 import { Comparisons } from './screens/Comparisons';
 import { Reorder } from './screens/Reorder';
+import { Profile } from './screens/Profile';
 import { Science } from './screens/Science';
-import { Stub } from './screens/Stub';
 
 const TABBAR_ROUTES = ['/', '/dashboard/dark', '/trends', '/profile'];
 
 export function App() {
   const uiTheme = useStore(s => s.uiTheme);
-  const [location] = useLocation();
+  const onboardingComplete = useStore(s => s.onboarding.complete);
+  const [location, navigate] = useLocation();
+
+  // First-run gate: route new users through onboarding until it's complete.
+  useEffect(() => {
+    if (!onboardingComplete && !location.startsWith('/onboarding')) {
+      navigate('/onboarding', { replace: true });
+    }
+  }, [onboardingComplete, location, navigate]);
 
   const themeForRoute = ((): 'day' | 'night' => {
     if (location === '/night') return 'night';
@@ -57,8 +66,9 @@ export function App() {
             <Route path="/onboarding" component={Onboarding} />
             <Route path="/onboarding/setup" component={BoilAndBite} />
             <Route path="/onboarding/device" component={DeviceOverview} />
-            <Route path="/profile" component={Reorder} />
-            <Route><Stub title="Not found" /></Route>
+            <Route path="/profile" component={Profile} />
+            <Route path="/reorder" component={Reorder} />
+            <Route><Redirect to="/" /></Route>
           </Switch>
         </AnimatedStage>
         {showTabBar && <TabBar />}
