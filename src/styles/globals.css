@@ -183,16 +183,30 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
     height: 100dvh; max-height: 100dvh;
     overflow: hidden; overscroll-behavior: none;
   }
-  body { padding: 0; align-items: stretch; justify-content: stretch; }
+  body { padding: 0; align-items: stretch; justify-content: stretch; background: var(--bg-primary); }
+  /* Edge-to-edge: the screen fills the viewport, so its OWN background covers the
+     safe areas — no navy "bezel" bands top or bottom. */
   .device {
     width: 100% !important;
     height: 100dvh !important;
     border-radius: 0 !important;
-    padding: var(--safe-top) 0 var(--safe-bottom) 0 !important;
+    padding: 0 !important;
     box-shadow: none !important;
-    background: var(--bg-page);
+    background: transparent !important;
   }
   .screen { border-radius: 0 !important; }
+  /* Tab bar extends into the home-indicator area with its own (light) background
+     and keeps the labels above the indicator. */
+  .tabbar {
+    height: calc(76px + var(--safe-bottom));
+    padding-bottom: calc(24px + var(--safe-bottom));
+  }
+  /* Demo gear sits top-right (next to Track sleep), not floating over the bottom. */
+  .demo-fab { top: calc(var(--safe-top) + 8px); right: 14px; bottom: auto; }
+  .demo-panel {
+    top: calc(var(--safe-top) + 52px); right: 14px; bottom: auto;
+    max-height: 72dvh; overflow-y: auto;
+  }
 }
 @media (display-mode: standalone) {
   .status-bar > * { visibility: hidden; }
