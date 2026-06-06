@@ -3,7 +3,10 @@
 import { useSyncExternalStore } from 'react';
 import { buildSeedState, type AppState } from './seed';
 
-const KEY = 'dr-better-sleep:v1';
+// Bump this when the persisted shape changes so stale state from an older
+// deploy is discarded instead of crashing on a missing field (e.g. a phone
+// that cached state from before `partner` existed).
+const KEY = 'dr-better-sleep:v2';
 
 type Listener = (state: AppState) => void;
 
@@ -12,7 +15,10 @@ class Store {
   private listeners = new Set<Listener>();
 
   constructor() {
-    this.state = this.load() ?? buildSeedState();
+    const loaded = this.load();
+    // Merge over a fresh seed so any field missing from an older persisted
+    // shape is backfilled with a default rather than being undefined at access.
+    this.state = loaded ? { ...buildSeedState(), ...loaded } : buildSeedState();
     this.persist();
   }
 
