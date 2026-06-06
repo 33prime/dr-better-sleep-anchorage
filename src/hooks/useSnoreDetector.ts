@@ -19,12 +19,16 @@ interface DetectorState {
   peakDb: number;
   lastEventTs: number; // ms timestamp of the last detected snore (drives the flash)
   levels: number[];    // recent loudness history, for the waveform
+  // Live snore-type mix (fractions) classified from the spectral band where each
+  // event's energy sits: palatal (low rumble), tongue base (mid), nasal (high).
+  typeMix: { palatal: number; tongue: number; nasal: number };
 }
 
 const HISTORY = 48;
 const initial = (): DetectorState => ({
   status: 'idle', level: 0, db: 0, snoreCount: 0, peakDb: 0,
   lastEventTs: 0, levels: new Array(HISTORY).fill(0),
+  typeMix: { palatal: 0, tongue: 0, nasal: 0 },
 });
 
 export function useSnoreDetector() {
@@ -47,6 +51,7 @@ export function useSnoreDetector() {
     smooth: 0,
     levels: new Array(HISTORY).fill(0) as number[],
     frame: 0,
+    typeAccum: { palatal: 0, tongue: 0, nasal: 0 },
   });
 
   const stop = useCallback(() => {
@@ -95,6 +100,17 @@ export function useSnoreDetector() {
         c.snoreCount += 1;
         c.refractoryUntil = now + 1300;
         c.loudSince = 0;
+        // Classify this snore by the band where its energy sits (vibration site).
+        const band = (loHz: number, hiHz: number) => {
+          const lo = Math.max(1, Math.floor(loHz / binHz));
+          const hi = Math.min(c.fd!.length - 1, Math.ceil(hiHz / binHz));
+          let sum = 0;
+          for (let i = lo; i <= hi; i++) sum += c.fd![i];
+          return sum;
+        };
+        c.typeAccum.palatal += band(60, 300);   // soft palate — low rumble
+        c.typeAccum.tongue += band(300, 1000);  // tongue base — mid, broadband
+        c.typeAccum.nasal += band(1000, 3000);  // nasal — high flutter
       }
     } else {
       c.loudSince = 0;
@@ -108,6 +124,11 @@ export function useSnoreDetector() {
     }
 
     if (event || c.frame % 3 === 0) {
+      const acc = c.typeAccum;
+      const accSum = acc.palatal + acc.tongue + acc.nasal;
+      const typeMix = accSum > 0
+        ? { palatal: acc.palatal / accSum, tongue: acc.tongue / accSum, nasal: acc.nasal / accSum }
+        : { palatal: 0, tongue: 0, nasal: 0 };
       setState(s => ({
         status: 'listening',
         level,
@@ -116,6 +137,7 @@ export function useSnoreDetector() {
         peakDb: c.peakDb,
         lastEventTs: event ? Date.now() : s.lastEventTs,
         levels: c.levels.slice(),
+        typeMix,
       }));
     }
     c.raf = requestAnimationFrame(tick);
@@ -148,6 +170,7 @@ export function useSnoreDetector() {
       c.noiseFloor = 0.005;
       c.loudSince = 0;
       c.refractoryUntil = 0;
+      c.typeAccum = { palatal: 0, tongue: 0, nasal: 0 };
       c.running = true;
       setState(s => ({ ...s, status: 'listening' }));
       c.raf = requestAnimationFrame(tick);
@@ -169,7 +192,15 @@ export function useSnoreDetector() {
       if (event) {
         c.snoreCount += 1;
         c.peakDb = Math.max(c.peakDb, 42 + Math.round(Math.random() * 12));
+        c.typeAccum.palatal += 50 + Math.random() * 40;
+        c.typeAccum.tongue += 15 + Math.random() * 22;
+        c.typeAccum.nasal += 5 + Math.random() * 12;
       }
+      const acc = c.typeAccum;
+      const accSum = acc.palatal + acc.tongue + acc.nasal;
+      const typeMix = accSum > 0
+        ? { palatal: acc.palatal / accSum, tongue: acc.tongue / accSum, nasal: acc.nasal / accSum }
+        : { palatal: 0, tongue: 0, nasal: 0 };
       setState(s => ({
         ...s,
         level: lvl,
@@ -178,6 +209,7 @@ export function useSnoreDetector() {
         peakDb: c.peakDb,
         lastEventTs: event ? Date.now() : s.lastEventTs,
         levels: c.levels.slice(),
+        typeMix,
       }));
     }, 650);
   }, []);

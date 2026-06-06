@@ -23,6 +23,9 @@ export interface Night {
   endedAt: string;       // HH:MM
   alcohol: boolean;          // user logged drinks before bed
   partnerSleptThrough: boolean; // partner slept through the night without being woken
+  // Acoustic snore-type mix (fractions, sum ~1). Vibration site:
+  // palatal (soft palate, low rumble), tongue (tongue base, broadband), nasal (high flutter).
+  snoreTypes: { palatal: number; tongue: number; nasal: number };
 }
 
 export interface ChatMessage {
@@ -168,6 +171,22 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
     // Threshold scales with whether the device is fitted (post-fit nights are quieter).
     const wakeThreshold = isPostFit ? 70 : 95;
     const partnerSleptThrough = totalSnores < wakeThreshold && r() < 0.92;
+
+    // Snore-type mix. The mandibular advancement device treats PALATAL snoring
+    // best, so its share declines after the fit; tongue-base is the holdout and
+    // its share rises. Nasal drifts with a mild seasonal (pollen) bump.
+    let palatal = (isPostFit ? 0.72 - 0.20 * Math.min(1, t) : 0.72) + (r() - 0.5) * 0.06;
+    let nasal = 0.07 + (r() - 0.5) * 0.04 + ((dow === 0 || dow === 3) ? 0.05 : 0);
+    palatal = Math.max(0.35, Math.min(0.80, palatal));
+    nasal = Math.max(0.03, Math.min(0.22, nasal));
+    const tongue = Math.max(0.08, 1 - palatal - nasal);
+    const typeSum = palatal + tongue + nasal;
+    const snoreTypes = {
+      palatal: +(palatal / typeSum).toFixed(3),
+      tongue: +(tongue / typeSum).toFixed(3),
+      nasal: +(nasal / typeSum).toFixed(3),
+    };
+
     out.push({
       date: isoDate(date),
       totalSnores,
@@ -188,6 +207,7 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
       endedAt: '06:42',
       alcohol,
       partnerSleptThrough,
+      snoreTypes,
     });
   }
   return out;

@@ -6,7 +6,7 @@ import { buildSeedState, type AppState } from './seed';
 // Bump this when the persisted shape changes so stale state from an older
 // deploy is discarded instead of crashing on a missing field (e.g. a phone
 // that cached state from before `partner` existed).
-const KEY = 'dr-better-sleep:v2';
+const KEY = 'dr-better-sleep:v3';
 
 type Listener = (state: AppState) => void;
 
@@ -142,4 +142,35 @@ export function wineMultiplier(s: AppState): number | null {
   if (wine.length === 0 || sober.length === 0) return null;
   const avg = (xs: typeof post) => xs.reduce((a, n) => a + n.totalSnores, 0) / xs.length;
   return avg(wine) / avg(sober);
+}
+
+type SnoreTypes = { palatal: number; tongue: number; nasal: number };
+
+/** Snore-type mix for the last `n` nights — for the trend ribbon. */
+export function snoreTypeSeries(s: AppState, n = 14): SnoreTypes[] {
+  return s.nights.slice(-n).map(x => x.snoreTypes).filter(Boolean);
+}
+
+/**
+ * Cosine similarity of the latest night's snore fingerprint vs. the prior
+ * two-week mean (0..1). Low similarity flags a night that doesn't match the
+ * user's usual pattern — worth a closer look.
+ */
+export function snoreFingerprintSimilarity(s: AppState): number | null {
+  const nights = s.nights.filter(n => n.snoreTypes);
+  if (nights.length < 4) return null;
+  const last = nights[nights.length - 1].snoreTypes;
+  const prior = nights.slice(-15, -1);
+  if (!prior.length) return null;
+  const mean: SnoreTypes = {
+    palatal: prior.reduce((a, n) => a + n.snoreTypes.palatal, 0) / prior.length,
+    tongue: prior.reduce((a, n) => a + n.snoreTypes.tongue, 0) / prior.length,
+    nasal: prior.reduce((a, n) => a + n.snoreTypes.nasal, 0) / prior.length,
+  };
+  const a = [last.palatal, last.tongue, last.nasal];
+  const b = [mean.palatal, mean.tongue, mean.nasal];
+  const dot = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const ma = Math.hypot(...a), mb = Math.hypot(...b);
+  if (ma === 0 || mb === 0) return null;
+  return dot / (ma * mb);
 }

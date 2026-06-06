@@ -1,11 +1,17 @@
 import { useLocation } from 'wouter';
-import { useStore } from '../store';
+import { useStore, lastNight, snoreTypeSeries, snoreFingerprintSimilarity } from '../store';
 import { ChevronLeft } from '../components/icons';
 import s from './Science.module.css';
 
 export function Science() {
   const state = useStore();
   const [, navigate] = useLocation();
+
+  const last = lastNight(state);
+  const types = last?.snoreTypes ?? { palatal: 0.71, tongue: 0.22, nasal: 0.07 };
+  const pct = (x: number) => Math.round(x * 100);
+  const sim = snoreFingerprintSimilarity(state);
+  const series = snoreTypeSeries(state, 14);
 
   return (
     <div className={s.root}>
@@ -33,7 +39,7 @@ export function Science() {
             <div className={s.ts}>Last 90 nights</div>
           </div>
           <div className={s.v}>
-            <span className={s.pct}>71%</span>
+            <span className={s.pct}>{pct(types.palatal)}%</span>
             <span className={s.it}>soft palate</span> · low rumble, periodic
           </div>
 
@@ -44,10 +50,25 @@ export function Science() {
           </div>
 
           <div className={s.breakdown}>
-            <div className={s.b}><div className={s.nm}>Soft palate</div><div className={s.pc}>71%</div><div className={s.desc}>Periodic, low rumble</div></div>
-            <div className={s.b}><div className={s.nm}>Tongue base</div><div className={s.pc}>22%</div><div className={s.desc}>Wet, irregular</div></div>
-            <div className={s.b}><div className={s.nm}>Nasal</div><div className={s.pc}>7%</div><div className={s.desc}>High flutter</div></div>
+            <div className={s.b}><div className={s.nm}>Soft palate</div><div className={s.pc}>{pct(types.palatal)}%</div><div className={s.desc}>Periodic, low rumble</div></div>
+            <div className={s.b}><div className={s.nm}>Tongue base</div><div className={s.pc}>{pct(types.tongue)}%</div><div className={s.desc}>Wet, irregular</div></div>
+            <div className={s.b}><div className={s.nm}>Nasal</div><div className={s.pc}>{pct(types.nasal)}%</div><div className={s.desc}>High flutter</div></div>
           </div>
+
+          {series.length > 1 && (
+            <div className={s.trendWrap}>
+              <div className={s.trendHead}>
+                <span className={s.trendK}>Type mix · last {series.length} nights</span>
+                {sim !== null && <span className={s.sim}>{pct(sim)}% like your baseline</span>}
+              </div>
+              <TypeTrend series={series} />
+              <div className={s.trendLegend}>
+                <span><i style={{ background: 'var(--accent)' }} />Palatal</span>
+                <span><i style={{ background: 'var(--accent-soft)' }} />Tongue</span>
+                <span><i style={{ background: 'var(--warn)' }} />Nasal</span>
+              </div>
+            </div>
+          )}
 
           <div className={s.reason}>
             Your soft palate vibrates when you exhale through a partly-closed airway. <span className={s.em}>That's the type the mouthpiece treats best</span> — which is why it's working.
@@ -111,6 +132,20 @@ export function Science() {
           All of this runs on your phone — your audio doesn't leave the device. CoreML 8 finds the patterns; I just translate them into something useful.
         </p>
       </div>
+    </div>
+  );
+}
+
+function TypeTrend({ series }: { series: Array<{ palatal: number; tongue: number; nasal: number }> }) {
+  return (
+    <div className={s.trend}>
+      {series.map((t, i) => (
+        <div key={i} className={s.trendBar}>
+          <i style={{ height: `${t.palatal * 100}%`, background: 'var(--accent)' }} />
+          <i style={{ height: `${t.tongue * 100}%`, background: 'var(--accent-soft)' }} />
+          <i style={{ height: `${t.nasal * 100}%`, background: 'var(--warn)' }} />
+        </div>
+      ))}
     </div>
   );
 }

@@ -139,6 +139,19 @@ export function Night() {
         </div>
       </div>
 
+      {live && det.snoreCount > 0 && (
+        <div className={s.types}>
+          <div className={s.typesK}>Snore type · live</div>
+          {([['Palatal', det.typeMix.palatal], ['Tongue', det.typeMix.tongue], ['Nasal', det.typeMix.nasal]] as const).map(([label, frac]) => (
+            <div key={label} className={s.typeRow}>
+              <span className={s.typeLabel}>{label}</span>
+              <span className={s.typeBar}><i style={{ width: `${Math.round(frac * 100)}%` }} /></span>
+              <span className={s.typePct}>{Math.round(frac * 100)}%</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className={s.footerRow}>
         <button className={`${s.end} tap`} onClick={endNight}>End night</button>
         <button className={`${s.devicePill} tap`} onClick={() => navigate('/onboarding/device')}>

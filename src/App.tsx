@@ -14,6 +14,7 @@ import { Trends } from './screens/Trends';
 import { DetailedNight } from './screens/DetailedNight';
 import { MorningReveal } from './screens/MorningReveal';
 import { Onboarding } from './screens/Onboarding';
+import { OnboardingQuestionnaire } from './screens/OnboardingQuestionnaire';
 import { BoilAndBite } from './screens/BoilAndBite';
 import { DeviceOverview } from './screens/DeviceOverview';
 import { Night } from './screens/Night';
@@ -63,7 +64,8 @@ export function App() {
             <Route path="/trends/science" component={Science} />
             <Route path="/night" component={Night} />
             <Route path="/night/:date" component={DetailedNight} />
-            <Route path="/onboarding" component={Onboarding} />
+            <Route path="/onboarding" component={OnboardingQuestionnaire} />
+            <Route path="/onboarding/findings" component={Onboarding} />
             <Route path="/onboarding/setup" component={BoilAndBite} />
             <Route path="/onboarding/device" component={DeviceOverview} />
             <Route path="/profile" component={Profile} />

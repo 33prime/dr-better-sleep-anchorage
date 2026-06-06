@@ -7,6 +7,7 @@ import { ChevronLeft, ArrowRight } from '../components/icons';
 import { Menu } from '../components/Menu';
 import { fmtClockHM } from '../utils/format';
 import { streamChatReply } from '../utils/chatApi';
+import { suggestedPrompts, proactiveOpener } from '../utils/coachPrompts';
 import s from './Chat.module.css';
 
 export function Chat() {
@@ -17,6 +18,10 @@ export function Chat() {
   const convoRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Tappable starter questions, lightly tailored to the data. Recomputed when
+  // the chat changes (so a fresh opener can shift them) — they're cheap.
+  const prompts = suggestedPrompts(store.get());
+
   // Auto-scroll to bottom on new messages.
   useEffect(() => {
     const el = convoRef.current;
@@ -24,9 +29,22 @@ export function Chat() {
     el.scrollTop = el.scrollHeight;
   }, [messages, typing]);
 
-  const send = async () => {
-    const text = draft.trim();
+  // Proactive opener: a local, rule-based Dr. Sommers message appended once on
+  // mount when something's notable. Uses a stable id so a remount can't dupe it
+  // — and we never fire the API for this. Immutable array update so the chat
+  // view re-renders (see the send() note below).
+  useEffect(() => {
+    const text = proactiveOpener(store.get());
     if (!text) return;
+    const id = `proactive-${new Date().toDateString()}`;
+    if (store.get().chat.some(m => m.id === id)) return;
+    store.set(s2 => { s2.chat = [...s2.chat, { id, who: 'them', text, ts: Date.now() }]; });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const send = async (text?: string) => {
+    const body = (text ?? draft).trim();
+    if (!body) return;
     setDraft('');
 
     const userId = `m${Date.now()}`;
@@ -36,12 +54,12 @@ export function Chat() {
     // new message object). The store subscriber here selects `s.chat`, so it
     // only re-renders when that reference changes — mutating in place would
     // make the whole reply appear at once instead of streaming token-by-token.
-    store.set(s2 => { s2.chat = [...s2.chat, { id: userId, who: 'me', text, ts: Date.now() }]; });
+    store.set(s2 => { s2.chat = [...s2.chat, { id: userId, who: 'me', text: body, ts: Date.now() }]; });
     setTyping(true);
 
     try {
       const history = [...store.get().chat];
-      const stream = streamChatReply(text, history, store.get());
+      const stream = streamChatReply(body, history, store.get());
       let acc = '';
       let started = false;
       for await (const chunk of stream) {
@@ -139,6 +157,16 @@ export function Chat() {
         )}
       </div>
 
+      {!typing && !draft.trim() && prompts.length > 0 && (
+        <div className={s.prompts}>
+          {prompts.map(p => (
+            <button key={p} className={`${s.chip} tap`} onClick={() => send(p)}>
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className={s.composer}>
         <div className={s.field}>
           <input
@@ -152,7 +180,7 @@ export function Chat() {
             autoComplete="off"
           />
         </div>
-        <button className={`${s.send} tap`} onClick={send} disabled={!draft.trim()}>
+        <button className={`${s.send} tap`} onClick={() => send()} disabled={!draft.trim()}>
           <ArrowRight />
         </button>
       </div>
