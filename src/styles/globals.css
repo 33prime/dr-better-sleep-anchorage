@@ -145,8 +145,8 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
    ============================================================ */
 .tabbar {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
-  height: 76px; padding: 8px 16px 24px;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  height: 76px; padding: 8px 8px 24px;
+  display: grid; grid-template-columns: repeat(5, 1fr);
   background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.96) 35%, var(--bg-primary) 70%);
   backdrop-filter: blur(8px);
 }
@@ -195,17 +195,11 @@ button, input { font: inherit; color: inherit; background: none; border: 0; curs
     background: transparent !important;
   }
   .screen { border-radius: 0 !important; }
-  /* Tab bar extends into the home-indicator area with its own (light) background
-     and keeps the labels above the indicator. */
+  /* Tab bar sits flush at the bottom: it fills the home-indicator area with its
+     own background and keeps the icons just above the indicator. */
   .tabbar {
-    height: calc(76px + var(--safe-bottom));
-    padding-bottom: calc(24px + var(--safe-bottom));
-  }
-  /* Demo gear sits top-right (next to Track sleep), not floating over the bottom. */
-  .demo-fab { top: calc(var(--safe-top) + 8px); right: 14px; bottom: auto; }
-  .demo-panel {
-    top: calc(var(--safe-top) + 52px); right: 14px; bottom: auto;
-    max-height: 72dvh; overflow-y: auto;
+    height: calc(58px + var(--safe-bottom));
+    padding: 8px 8px calc(6px + var(--safe-bottom));
   }
 }
 @media (display-mode: standalone) {

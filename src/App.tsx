@@ -4,7 +4,6 @@ import { DeviceFrame } from './components/DeviceFrame';
 import { AnimatedStage } from './components/AnimatedStage';
 import { TabBar } from './components/TabBar';
 import { ToastHost } from './components/Toast';
-import { DemoControls } from './components/DemoControls';
 import { useStore } from './store';
 import { shouldUseDarkDashboard } from './utils/format';
 
@@ -22,8 +21,9 @@ import { Comparisons } from './screens/Comparisons';
 import { Reorder } from './screens/Reorder';
 import { Profile } from './screens/Profile';
 import { Science } from './screens/Science';
+import { Demo } from './screens/Demo';
 
-const TABBAR_ROUTES = ['/', '/dashboard/dark', '/trends', '/profile'];
+const TABBAR_ROUTES = ['/', '/dashboard/dark', '/trends', '/profile', '/demo'];
 
 export function App() {
   const uiTheme = useStore(s => s.uiTheme);
@@ -68,13 +68,13 @@ export function App() {
             <Route path="/onboarding/device" component={DeviceOverview} />
             <Route path="/profile" component={Profile} />
             <Route path="/reorder" component={Reorder} />
+            <Route path="/demo" component={Demo} />
             <Route><Redirect to="/" /></Route>
           </Switch>
         </AnimatedStage>
         {showTabBar && <TabBar />}
       </DeviceFrame>
 
-      <DemoControls />
       <ToastHost />
     </>
   );

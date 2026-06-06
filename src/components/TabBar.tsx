@@ -1,5 +1,5 @@
 import { useLocation } from 'wouter';
-import { HomeFilled, TrendsIcon, ChatIcon, ProfileIcon } from './icons';
+import { HomeFilled, TrendsIcon, ChatIcon, ProfileIcon, Cog } from './icons';
 
 interface TabDef {
   key: string;
@@ -14,6 +14,7 @@ const TABS: TabDef[] = [
   { key: 'trends',  path: '/trends',   icon: TrendsIcon,  label: 'Trends',  matches: (p) => p.startsWith('/trends') },
   { key: 'chat',    path: '/chat',     icon: ChatIcon,    label: 'Chat',    matches: (p) => p.startsWith('/chat'), badge: true },
   { key: 'profile', path: '/profile',  icon: ProfileIcon, label: 'Profile', matches: (p) => p.startsWith('/profile') },
+  { key: 'demo',    path: '/demo',     icon: Cog,         label: 'Demo',    matches: (p) => p.startsWith('/demo') },
 ];
 
 export function TabBar() {
