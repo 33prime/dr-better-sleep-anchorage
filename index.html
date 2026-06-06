@@ -22,6 +22,38 @@
 </head>
 <body>
   <div id="app"></div>
+  <!-- Boot-error catcher: surfaces any startup error on screen (incl. a bundle
+       error that would otherwise white-screen before React mounts). Only ever
+       shows if something actually fails. -->
+  <script>
+  (function () {
+    function show(msg) {
+      var host = document.getElementById('app') || document.body;
+      var panel = document.getElementById('boot-error');
+      if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'boot-error';
+        panel.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#1E2544;color:#fff;font:15px/1.5 -apple-system,system-ui,sans-serif;padding:28px;overflow:auto;-webkit-overflow-scrolling:touch';
+        panel.innerHTML = '<div style="max-width:360px;margin:48px auto;text-align:center"><div style="font-size:34px">🌙</div><h2 style="font-weight:800;font-size:22px;margin:14px 0 6px">We hit a snag loading</h2><p style="color:#AEB4CC;margin:0 0 18px">A startup error stopped the app. The detail below helps us fix it.</p><button id="boot-reload" style="background:#43BACA;color:#1E2544;border:0;border-radius:999px;padding:13px 26px;font-weight:800;font-size:15px">Reload</button><pre id="boot-detail" style="white-space:pre-wrap;word-break:break-word;text-align:left;background:rgba(255,255,255,.06);border-radius:10px;padding:12px;margin-top:18px;color:#9BDCE6;font-size:12px"></pre></div>';
+        host.appendChild(panel);
+        document.getElementById('boot-reload').addEventListener('click', function () {
+          if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+            navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).finally(function () { location.reload(); });
+          } else { location.reload(); }
+        });
+      }
+      var detail = document.getElementById('boot-detail');
+      detail.textContent += msg + '\n';
+    }
+    window.addEventListener('error', function (e) {
+      show((e.message || 'Error') + (e.filename ? ' @ ' + String(e.filename).split('/').pop() + ':' + e.lineno + ':' + e.colno : ''));
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+      var r = e.reason;
+      show('Unhandled rejection: ' + (r && (r.message || r) || 'unknown'));
+    });
+  })();
+  </script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
