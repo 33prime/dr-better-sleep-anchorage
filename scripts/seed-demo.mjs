@@ -440,6 +440,38 @@ function buildChatMessages(nights, userId) {
     push(recoverIdx, 'coach', `back on track — ${n(recoverIdx).totalSnores} snores last night, right in line with before the slip.`);
   }
 
+  // Titration check-in — mid-arc, well after the fit has settled and roughly
+  // where the strap-position formula (see device/session inserts below) has
+  // it stepping from position 3 to 4. One clean question-and-answer exchange
+  // so the chat has a real titration beat, distinct from the bad-week/refit
+  // thread above.
+  const titrationIdx = clamp(FIT_IDX + 36, FIT_IDX + 4, TOTAL_NIGHTS - 2);
+  push(titrationIdx, 'user', 'is it time to move the strap forward again?', undefined, 8, 5);
+  push(
+    titrationIdx,
+    'coach',
+    "you've held position 3 for a couple weeks now and snoring's still trending down — one more notch to position 4 makes sense at your next check-in, but there's no rush.",
+    undefined,
+    8,
+    6
+  );
+
+  // "Play my loudest snore" — the clip-card exchange (Lane A/C). Placed near
+  // the end of the arc so it reads naturally as a recent ask; the clip card
+  // itself always renders the latest tracked night's loudest clip regardless
+  // of which chat message it's attached to.
+  const clipIdx = TOTAL_NIGHTS - 4;
+  push(clipIdx, 'user', 'play my loudest snore', undefined, 7, 40);
+  push(
+    clipIdx,
+    'coach',
+    "here's the loudest one — right in the middle of the night, and loud enough that i get why sam brought it up.",
+    undefined,
+    7,
+    41
+  );
+  push(clipIdx, 'coach', undefined, { kind: 'clip' }, 7, 42);
+
   // Recent nights / wrap-up
   const lastWineIdx = [...nights].reverse().find((night) => night.wine)?.idx ?? TOTAL_NIGHTS - 8;
   push(lastWineIdx, 'coach', `heads up — nights with a drink are still running about ${Math.round((1.8 + 0.5 / 2 - 1) * 100)}% louder than the rest, even this far in. nothing dramatic, just something to keep in mind.`);
@@ -570,36 +602,37 @@ async function main() {
   const { error: deviceErr } = await admin.from('devices').insert({
     user_id: user.id,
     fitted_at: isoDate(fitDate),
-    strap_position: clamp(1 + Math.floor((TOTAL_NIGHTS - 1 - FIT_IDX) / 12), 1, 5),
+    strap_position: clamp(1 + Math.floor((TOTAL_NIGHTS - 1 - FIT_IDX) / 18), 1, 3),
     lifespan_nights: 365,
     last_replacement: null,
   });
   if (deviceErr) throw new Error(`device insert failed: ${deviceErr.message}`);
   console.log('  device inserted');
 
-  // sleep_sessions + snore_events for the last N nights
+  // sleep_sessions for EVERY post-fit night (they carry the per-night strap
+  // position, which is what draws the titration journey on DeviceOverview and
+  // gives hydrate() real historical positions) — snore_events only for the
+  // last N nights to keep the row count sane.
   const eventNightsStart = TOTAL_NIGHTS - LAST_N_WITH_EVENTS;
-  const sessionRows = nights.slice(eventNightsStart).map((night) => ({
+  const sessionNights = nights.filter(n => n.idx >= FIT_IDX);
+  const sessionRows = sessionNights.map((night) => ({
     user_id: user.id,
     started_at: night.bedtime.toISOString(),
     ended_at: night.wake.toISOString(),
     status: 'ended',
-    strap_position: clamp(1 + Math.floor((night.idx - FIT_IDX) / 12), 1, 5),
+    strap_position: clamp(1 + Math.floor((night.idx - FIT_IDX) / 18), 1, 3),
     source: 'demo',
   }));
   const insertedSessions = await insertChunked('sleep_sessions', sessionRows);
-  // Supabase doesn't guarantee return order matches insert order across
-  // chunks, but within a single insert() call (<=500 rows, and we only have
-  // 14) order is preserved — LAST_N_WITH_EVENTS is well under the 500 chunk
-  // size so this is a single request.
+  // Within a single insert() call (<=500 rows; we have ~60) return order
+  // matches insert order, so positional zip against sessionNights is safe.
+  sessionNights.forEach((night, i) => { night.sessionId = insertedSessions[i].id; });
   console.log(`  ${insertedSessions.length} sleep_sessions inserted`);
 
   const allEvents = [];
   for (let i = 0; i < LAST_N_WITH_EVENTS; i++) {
     const night = nights[eventNightsStart + i];
-    const session = insertedSessions[i];
-    night.sessionId = session.id;
-    allEvents.push(...buildEventsForNight(night, session.id, user.id, r));
+    allEvents.push(...buildEventsForNight(night, night.sessionId, user.id, r));
   }
   const insertedEvents = await insertChunked('snore_events', allEvents);
   console.log(`  ${insertedEvents.length} snore_events inserted`);

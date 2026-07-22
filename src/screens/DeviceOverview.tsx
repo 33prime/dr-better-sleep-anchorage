@@ -1,10 +1,14 @@
+import { useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useStore } from '../store';
-import { writeOnboarding } from '../lib/sync';
+import { writeOnboarding, writeDevice, writeChatMessage } from '../lib/sync';
 import { ChevronLeft, ArrowRight } from '../components/icons';
 import { Menu } from '../components/Menu';
 import { Wordmark } from '../components/Wordmark';
+import { Avatar } from '../components/Avatar';
+import { showToast } from '../components/Toast';
 import { PaperStar, PaperCloud } from '../components/paper/PaperScene';
+import { positionHistory, journeyStory, titrationAdvice, replacementProjection } from '../utils/titration';
 import s from './DeviceOverview.module.css';
 
 const CALLOUTS = [
@@ -18,6 +22,22 @@ const CALLOUTS = [
 export function DeviceOverview() {
   const state = useStore();
   const [, navigate] = useLocation();
+
+  const segments = useMemo(() => positionHistory(state.nights), [state.nights]);
+  const story = useMemo(() => journeyStory(segments), [segments]);
+  const advice = useMemo(() => titrationAdvice(state.nights, state.device), [state.nights, state.device]);
+  const replacement = useMemo(() => replacementProjection(state.device), [state.device]);
+
+  const dotPosition = Math.min(5, Math.max(1, state.device.strapPosition || 1));
+  const dotOffset = (dotPosition - 1) * 4; // strap track runs cy 113→129 across positions 1..5
+
+  const canApplyAdvice = advice.recommendation !== 'hold' && advice.confidence !== 'insufficient';
+  const applyAdvice = () => {
+    const target = advice.targetPosition;
+    writeDevice({ strapPosition: target });
+    showToast(`Strap moved to position ${target}.`);
+    writeChatMessage({ who: 'them', text: `Strap moved to position ${target}.` });
+  };
 
   return (
     <div className={s.root}>
@@ -60,7 +80,15 @@ export function DeviceOverview() {
             <line className={s.dInk} x1="265" y1="113" x2="265" y2="129" stroke="var(--text-primary)" strokeWidth={0.6} />
             <circle className={s.dPaper} cx="160" cy="92" r="6" fill="#FFFFFF" stroke="#4BAFBA" strokeWidth={1} />
             <circle cx="160" cy="92" r="2" fill="#4BAFBA" />
-            <circle cx="265" cy="121" r="2" fill="#4BAFBA" />
+            {/* Position indicator — animates along the right strap track (cy 113→129) as strapPosition changes */}
+            <circle
+              className={s.posDot}
+              cx="265"
+              cy="113"
+              r="2.6"
+              fill="#4BAFBA"
+              style={{ transform: `translateY(${dotOffset}px)` }}
+            />
 
             {/* Callout lines */}
             <g className={s.dInk} stroke="var(--text-primary)" strokeWidth={0.6} fill="none" opacity="0.5">
@@ -87,6 +115,44 @@ export function DeviceOverview() {
           <div className={s.meta}><span>Top view</span><span>Pos. {state.device.strapPosition} of 5</span></div>
         </div>
 
+        <div className={s.journey}>
+          <div className={s.sectionLabel}>Journey</div>
+          {segments.length > 0 ? (
+            <>
+              <div className={s.segBar}>
+                {segments.map((seg, i) => (
+                  <div
+                    key={`${seg.position}-${seg.startDate}`}
+                    className={`${s.seg} ${seg.position === dotPosition && i === segments.length - 1 ? s.segCurrent : ''}`}
+                    style={{ flexGrow: seg.nightCount }}
+                  >
+                    <div className={s.segLabel}>Pos {seg.position}</div>
+                    <div className={s.segSub}>{Math.round(seg.avgSnores)} avg</div>
+                  </div>
+                ))}
+              </div>
+              {story && <div className={s.story}>{story}</div>}
+            </>
+          ) : (
+            <div className={s.story}>Keep collecting nights — the journey view fills in once titration data comes through.</div>
+          )}
+        </div>
+
+        <div className={s.advice}>
+          <div className={s.sectionLabel}>Next adjustment</div>
+          <div className={s.adviceCard}>
+            <Avatar size={34} />
+            <div className={s.adviceBody}>
+              <div className={s.adviceText}>{advice.sentence}</div>
+              {canApplyAdvice && (
+                <button className={`${s.adviceBtn} tap`} onClick={applyAdvice}>
+                  Move to position {advice.targetPosition}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className={s.callouts}>
           {CALLOUTS.map((c, i) => (
             <div className={s.co} key={i}>
@@ -108,6 +174,28 @@ export function DeviceOverview() {
           <div className={s.s}><div className={s.k}>Adv. range</div><div className={s.v}>0 → 8 mm</div></div>
           <div className={s.s}><div className={s.k}>FDA</div><div className={s.v}>510(k) cleared, OTC</div></div>
           <div className={s.s}><div className={s.k}>Lifespan</div><div className={s.v}>~6 months</div></div>
+        </div>
+
+        <div className={s.care}>
+          <div className={s.sectionLabel}>Care</div>
+          <div className={s.careCard}>
+            <div className={s.careRow}>
+              <div className={s.careK}>Daily rinse</div>
+              <div className={s.careV}>Cool water after every night — never hot, it warps the silicone.</div>
+            </div>
+            <div className={s.careRow}>
+              <div className={s.careK}>Weekly deep-clean</div>
+              <div className={s.careV}>One cleaning tablet dissolved in cold water, once a week.</div>
+            </div>
+            {replacement && (
+              <div className={s.careRow}>
+                <div className={s.careK}>Replacement due</div>
+                <div className={s.careV}>
+                  <strong className={s.emph}>{replacement.label}</strong> — about {state.device.lifespanNights} nights from fitting.
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className={s.cta}>

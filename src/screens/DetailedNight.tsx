@@ -7,7 +7,7 @@ import { Menu } from '../components/Menu';
 import { showToast } from '../components/Toast';
 import { fmtDelta, fmtDuration, parseIsoDate, pad2 } from '../utils/format';
 import { SceneHills } from '../components/paper/PaperScene';
-import { latestClips, clipBlob, type SnoreClip } from '../lib/clipRecorder';
+import { clipsForNight, clipBlob, type SnoreClip } from '../lib/clipRecorder';
 import { shareLastNight } from '../lib/share';
 import s from './DetailedNight.module.css';
 
@@ -23,19 +23,22 @@ export function DetailedNight() {
     return found ?? lastNight(state);
   })();
 
-  // Timeline clip chips — latestClips() only ever holds the newest recorded
-  // night's clips, so this comes back empty for any night that isn't it
-  // (seed/demo nights, older recorded nights). Honest fallback: no chips.
+  // Timeline clip chips. clipsForNight() covers a real captured clip for
+  // this date if one exists (unchanged from before — latestClips() only
+  // ever holds the newest recorded night's clips, so older/seed nights
+  // naturally come back empty there), falling back to sample-backed demo
+  // clips only when this night's source is the server-side demo account.
   const nDate = n?.date;
+  const isDemoSource = n?.source === 'demo';
   const [clips, setClips] = useState<SnoreClip[]>([]);
   useEffect(() => {
     if (!nDate) { setClips([]); return; }
     let cancelled = false;
-    latestClips()
-      .then(all => { if (!cancelled) setClips(all.filter(c => c.nightDate === nDate)); })
+    clipsForNight(nDate, isDemoSource)
+      .then(all => { if (!cancelled) setClips(all); })
       .catch(() => { if (!cancelled) setClips([]); });
     return () => { cancelled = true; };
-  }, [nDate]);
+  }, [nDate, isDemoSource]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const clipUrlRef = useRef<string | null>(null);
@@ -196,6 +199,9 @@ export function DetailedNight() {
                   );
                 })}
               </div>
+            )}
+            {clips.some(c => c.isSample) && (
+              <div className={s.sampleTag}>Sample audio — not tonight's recording</div>
             )}
           </div>
           <div className={s.insight}>

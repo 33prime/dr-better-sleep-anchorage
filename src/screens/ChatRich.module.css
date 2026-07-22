@@ -22,6 +22,14 @@
 .clipTitle { color: var(--text-primary); }
 .clipTime { color: var(--text-tertiary); }
 
+/* Non-negotiable honesty caption — shown whenever the audio card above is
+   playing a sample WAV instead of a real capture (SnoreClip.isSample). */
+.sampleTag {
+  margin-top: 8px;
+  font-family: var(--mono); font-weight: 500; font-size: 9px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary);
+}
+
 /* ============================================================
    NIGHT — the rich chat report on navy (see app/BRAND.md).
    ============================================================ */
@@ -33,3 +41,4 @@
 :global(.screen.night) .noteEm { color: var(--night-text-1); }
 :global(.screen.night) .clipTitle { color: var(--night-text-1); }
 :global(.screen.night) .clipTime { color: var(--night-text-3); }
+:global(.screen.night) .sampleTag { color: var(--night-text-3); }

@@ -473,13 +473,17 @@ import type {
 } from './sync';
 
 /** Raw-row bundle for sync.hydrate() — deliberately bypasses the camelCase
- *  `fetch*` helpers above; sync.ts does its own row->AppState mapping. */
+ *  `fetch*` helpers above; sync.ts does its own row->AppState mapping.
+ *  Nights are embedded with their linked sleep_sessions row (same join
+ *  fetchNights()/fromNightRow() above already use) so sync.ts's
+ *  mapNightRow() can recover each night's real, per-night strap position
+ *  instead of fabricating one from the device's current position. */
 async function fetchAccountData(userId: string): Promise<AccountBundle> {
   const sb = requireSupabase();
   const [profileRes, deviceRes, nightsRes, chatRes, recRes] = await Promise.all([
     sb.from('profiles').select('*').eq('id', userId).maybeSingle(),
     sb.from('devices').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
-    sb.from('nights').select('*').eq('user_id', userId).order('date', { ascending: true }),
+    sb.from('nights').select('*, sleep_sessions(strap_position)').eq('user_id', userId).order('date', { ascending: true }),
     sb.from('chat_messages').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
     sb.from('recommendations').select('*').eq('user_id', userId).order('recommended_on', { ascending: false }),
   ]);
@@ -491,7 +495,9 @@ async function fetchAccountData(userId: string): Promise<AccountBundle> {
   return {
     profile: profileRes.data,
     device: deviceRes.data,
-    nights: nightsRes.data ?? [],
+    // Cast, same as fetchNights() above — the generated client types don't
+    // model the embedded `sleep_sessions(strap_position)` join.
+    nights: (nightsRes.data ?? []) as AccountBundle['nights'],
     chatMessages: chatRes.data ?? [],
     recommendations: recRes.data ?? [],
   };

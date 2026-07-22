@@ -68,6 +68,14 @@
   box-shadow: 0 2px 5px rgba(27,35,64,0.25);
 }
 
+/* Non-negotiable honesty caption — shown whenever any chip above plays a
+   sample WAV instead of a real capture (SnoreClip.isSample). */
+.sampleTag {
+  margin-top: 4px; position: relative; z-index: 1;
+  font-family: var(--mono); font-weight: 500; font-size: 9px;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary);
+}
+
 .section { margin-top: 28px; }
 .section .h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
 .section h2 { font-family: var(--serif); font-size: 20px; font-weight: 800; }
@@ -158,6 +166,7 @@
   color: var(--night-text-2);
   text-shadow: 0 1px 3px rgba(4,8,24,0.7); /* stays readable over the coral dunes */
 }
+:global(.screen.night) .sampleTag { color: var(--night-text-3); }
 :global(.screen.night) .hills { display: block; }
 
 :global(.screen.night) .insight { border-color: var(--hairline-night); }

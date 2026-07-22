@@ -14,6 +14,16 @@
 // store `clips`, keyPath `id`. Blobs live inside the stored record and never
 // enter React state — playback consumers call `clipBlob(id)` and manage
 // their own `URL.createObjectURL` lifecycle.
+//
+// Ownership scoping: IndexedDB is per-*browser*, not per-account — on a
+// shared device, signing out of one account and into another does not clear
+// it. Every stored clip is stamped with the identity active when it was
+// captured (`ownerId`, see currentOwnerId() below) and every read filters to
+// the identity active right now, so a real captured clip can never surface
+// as "your" audio under a different signed-in account (or under local-demo
+// mode) than the one that recorded it.
+
+import { store } from '../store';
 
 /** Public clip metadata — no Blob here by design (see file header). */
 export interface SnoreClip {
@@ -24,11 +34,29 @@ export interface SnoreClip {
   peakDb: number;
   durationMs: number;    // clip audio length
   mime: string;          // actual MediaRecorder mime used
+  /** True only for the offline-rendered public/samples/*.wav clips returned
+   *  by demoClips() below — never set on a real captured clip. Every
+   *  consumer that plays back a clip with this flag set MUST show a "sample
+   *  audio" caption; see PLAN3.md Lane C, the non-negotiable honesty rule. */
+  isSample?: true;
 }
 
-/** What's actually persisted — the public shape plus the Blob. */
+/** What's actually persisted — the public shape plus the Blob and the
+ *  identity that captured it. `ownerId` is internal (never part of the
+ *  public `SnoreClip` shape callers see) — see the "Ownership scoping" note
+ *  above. */
 interface StoredClip extends SnoreClip {
   blob: Blob;
+  ownerId: string;
+}
+
+/** The identity clips are scoped to on this device: the signed-in account's
+ *  user id, or a `'local-demo'` sentinel when signed out. Read at capture
+ *  start (stamped once per session, not re-read per clip) and at every read
+ *  path, so switching accounts on a shared device never surfaces another
+ *  account's real captured audio as "yours." */
+function currentOwnerId(): string {
+  return store.get().auth?.userId ?? 'local-demo';
 }
 
 const DB_NAME = 'dns-sessions';
@@ -139,7 +167,7 @@ async function idbGetAllClips(): Promise<StoredClip[]> {
 }
 
 function stripBlob(clip: StoredClip): SnoreClip {
-  const { blob: _blob, ...meta } = clip;
+  const { blob: _blob, ownerId: _ownerId, ...meta } = clip;
   return meta;
 }
 
@@ -159,6 +187,9 @@ interface PendingEvent { ts: number; peakDb: number; onsetChunkIndex: number; en
 let mediaRecorder: MediaRecorder | null = null;
 let mime = '';
 let activeSessionId = '';
+/** Identity active when this capture session started — stamped onto every
+ *  clip it produces (see currentOwnerId()/StoredClip.ownerId above). */
+let activeOwnerId = '';
 let capturing = false;
 let chunks = new Map<number, ChunkRec>();
 let nextChunkIndex = 0;
@@ -195,7 +226,7 @@ async function storeClipIfTopRanked(meta: SnoreClip, blob: Blob): Promise<void> 
   const write = (async () => {
     if (sessionClips.length < TOP_N) {
       sessionClips.push(meta);
-      await idbPutClip({ ...meta, blob });
+      await idbPutClip({ ...meta, blob, ownerId: activeOwnerId });
       return;
     }
     let minIdx = 0;
@@ -206,7 +237,7 @@ async function storeClipIfTopRanked(meta: SnoreClip, blob: Blob): Promise<void> 
     const evicted = sessionClips[minIdx];
     sessionClips[minIdx] = meta;
     await idbDeleteClip(evicted.id);
-    await idbPutClip({ ...meta, blob });
+    await idbPutClip({ ...meta, blob, ownerId: activeOwnerId });
   })();
   inFlightWrites.push(write);
   try {
@@ -315,6 +346,7 @@ export function startClipCapture(stream: MediaStream, sessionId: string): void {
   mediaRecorder = recorder;
   mime = chosenMime;
   activeSessionId = sessionId;
+  activeOwnerId = currentOwnerId();
   chunks = new Map();
   nextChunkIndex = 0;
   pending = [];
@@ -419,9 +451,14 @@ export async function finalizeClips(sessionId: string, nightDate: string): Promi
   }
 }
 
-/** Newest night that has any finalized clips, loudest first. */
+/** Newest night that has any finalized clips, loudest first — scoped to the
+ *  identity currently signed in (or local-demo). A clip captured under a
+ *  different account (or before signing out, on a shared device) is
+ *  filtered out here rather than in each consumer, so every caller of
+ *  latestClips()/clipsForNight() automatically gets the ownership guarantee. */
 export async function latestClips(): Promise<SnoreClip[]> {
-  const all = await idbGetAllClips();
+  const owner = currentOwnerId();
+  const all = (await idbGetAllClips()).filter(c => c.ownerId === owner);
   let newestDate: string | null = null;
   for (const c of all) {
     if (c.nightDate && (!newestDate || c.nightDate > newestDate)) newestDate = c.nightDate;
@@ -434,6 +471,7 @@ export async function latestClips(): Promise<SnoreClip[]> {
 }
 
 export async function clipBlob(id: string): Promise<Blob | null> {
+  if (id.startsWith(SAMPLE_ID_PREFIX)) return sampleClipBlob(id);
   try {
     const db = await openDb();
     const rec = await new Promise<StoredClip | undefined>((resolve, reject) => {
@@ -464,4 +502,93 @@ export async function deleteAllClips(): Promise<void> {
     // nothing to clear
   }
   sessionClips = [];
+}
+
+// ---------- demo/sample clips (Lane C — PLAN3.md) ----------
+//
+// Real-capture behavior above is untouched by any of this. These are
+// deterministic, sample-backed "clips" for demo/seed nights that never had a
+// mic actually running — the WAVs come from scripts/gen-sample-snores.mjs,
+// offline-rendered into public/samples/. `isSample: true` is load-bearing:
+// every playback surface must show a "sample audio" caption for these (see
+// SnoreClip.isSample doc above) — nothing here is presented as measured.
+
+const SAMPLE_ID_PREFIX = 'sample:';
+
+/** Durations/peakDb here must track scripts/gen-sample-snores.mjs's
+ *  CHAR_SPECS output exactly (durationSec*1000, and the honest 58-64 dB
+ *  demo range) — there's no runtime way to read a WAV's real length without
+ *  decoding it, and re-running the generator regenerates byte-identical
+ *  files anyway (seeded PRNG), so this manifest is safe to hand-keep. */
+const SAMPLE_MANIFEST: { file: string; durationMs: number; peakDb: number }[] = [
+  { file: 'snore-1.wav', durationMs: 4400, peakDb: 64 }, // palatal rumble
+  { file: 'snore-2.wav', durationMs: 5000, peakDb: 58 }, // tongue-base broadband
+  { file: 'snore-3.wav', durationMs: 4700, peakDb: 61 }, // nasal flutter
+];
+
+/** A plausible bedtime→wake span for a night we only know the date of (no
+ *  real startedAt/endedAt exists for a sample-backed night) — 11pm the
+ *  night's calendar date through 6am the next, matching the seed data's
+ *  typical hours. Used only to spread demoClips()'s timestamps sensibly
+ *  across the night; never presented as a measured session boundary. */
+function demoNightSpanMs(nightDate: string): { startMs: number; endMs: number } | null {
+  const [y, m, d] = nightDate.split('-').map(Number);
+  if ([y, m, d].some((v) => Number.isNaN(v))) return null;
+  const start = new Date(y, m - 1, d, 23, 0, 0, 0);
+  let end = new Date(y, m - 1, d, 6, 0, 0, 0);
+  if (end.getTime() <= start.getTime()) end = new Date(end.getTime() + 24 * 3600 * 1000);
+  return { startMs: start.getTime(), endMs: end.getTime() };
+}
+
+/** Deterministic sample-backed clips for a demo/seed night — same 3 clips,
+ *  same timestamps, every call for a given date. Loudest-first, matching
+ *  latestClips()'s ordering, so consumers that assume that shape (e.g. "the
+ *  first clip is the loudest") don't need a special case for the demo path. */
+export function demoClips(nightDate: string): SnoreClip[] {
+  const span = demoNightSpanMs(nightDate);
+  const n = SAMPLE_MANIFEST.length;
+  return SAMPLE_MANIFEST
+    .map((spec, i) => {
+      // Spread across the span at ~25/50/75% rather than clumping them.
+      const frac = (i + 1) / (n + 1);
+      const ts = span ? Math.round(span.startMs + frac * (span.endMs - span.startMs)) : Date.now();
+      const clip: SnoreClip = {
+        id: `${SAMPLE_ID_PREFIX}${nightDate}:${spec.file}`,
+        sessionId: `${SAMPLE_ID_PREFIX}${nightDate}`,
+        nightDate,
+        ts,
+        peakDb: spec.peakDb,
+        durationMs: spec.durationMs,
+        mime: 'audio/wav',
+        isSample: true,
+      };
+      return clip;
+    })
+    .sort((a, b) => b.peakDb - a.peakDb);
+}
+
+async function sampleClipBlob(id: string): Promise<Blob | null> {
+  const file = id.slice(SAMPLE_ID_PREFIX.length).split(':')[1];
+  if (!file) return null;
+  try {
+    const res = await fetch(`/samples/${file}`);
+    if (!res.ok) return null;
+    return await res.blob();
+  } catch {
+    return null; // offline / fetch unsupported — playback just no-ops
+  }
+}
+
+/** The lookup seam demo-aware consumers should use instead of calling
+ *  latestClips() directly: real captured clips for `nightDate` if any exist
+ *  (latestClips() only ever holds the newest recorded night's clips, so this
+ *  naturally comes back empty for any other night — unchanged behavior),
+ *  else deterministic demo-sample clips, but ONLY when the night's `source`
+ *  is the server-side demo account ('demo') — a real account's recorded
+ *  night with no captured clips stays honestly empty instead of getting
+ *  sample audio grafted onto it. */
+export async function clipsForNight(nightDate: string, isDemoSource: boolean): Promise<SnoreClip[]> {
+  const real = (await latestClips()).filter((c) => c.nightDate === nightDate);
+  if (real.length > 0) return real;
+  return isDemoSource ? demoClips(nightDate) : [];
 }

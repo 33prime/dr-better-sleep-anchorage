@@ -11,36 +11,68 @@ import {
   streakNights,
   partnerSleptThroughLastN,
 } from '../store';
+import { wineEffect } from './insights';
 
 /**
  * 3–4 short, tappable starter questions, lightly tailored to the data.
  * Plain and calm — these read as something the user would actually tap.
+ *
+ * `opts.clipsAvailable` is a caller-supplied signal (Chat.tsx does the async
+ * IndexedDB/demo-clip lookup — this file stays synchronous and store-only)
+ * for whether "play my loudest snore" has anything to actually play.
  */
-export function suggestedPrompts(state: AppState): string[] {
-  const prompts: string[] = [];
+export function suggestedPrompts(state: AppState, opts: { clipsAvailable?: boolean } = {}): string[] {
+  const dataDriven: string[] = [];
+  const nights = state.nights;
+
+  // A real, non-insufficient alcohol effect → the cost-of-a-drink question,
+  // ahead of the generic "why does alcohol matter" fallback below.
+  const postFit = nights.filter(n => n.date >= state.device.fittedAt);
+  const wine = wineEffect(postFit.length >= 4 ? postFit : nights);
+  if (wine.confidence !== 'insufficient') {
+    dataDriven.push('How much does wine cost me?');
+  }
+
+  // A clip actually exists for the latest night (real or demo-sample) →
+  // invite a listen.
+  if (opts.clipsAvailable) {
+    dataDriven.push('Play my loudest snore');
+  }
+
+  // Strap position hasn't moved in a full week → ask whether it's working.
+  const recentWindow = nights.slice(-7);
+  const positionsThisWeek = new Set(recentWindow.map(n => n.strapPosition).filter(Boolean));
+  const plateaued = recentWindow.length >= 7 && positionsThisWeek.size === 1;
+  if (plateaued) {
+    dataDriven.push('Is the strap working?');
+  }
+
+  // Fallback to the existing rule-based questions when a data-driven chip
+  // above didn't fire for one of the remaining slots.
+  const fallback: string[] = [];
 
   // Weekend + heavy wine pattern → surface the alcohol question first.
   const mult = wineMultiplier(state);
   const dow = new Date().getDay(); // 0=Sun … 5=Fri, 6=Sat
   const weekend = dow === 5 || dow === 6 || dow === 0;
   if (mult !== null && mult > 1.25 && weekend) {
-    prompts.push('Why does alcohol matter?');
+    fallback.push('Why does alcohol matter?');
   }
 
   // An uptick last night → invite a look at what changed.
   const last = lastNight(state);
   const baseline = baselineSnores(state);
   if (last && baseline > 0 && last.totalSnores > baseline * 1.2) {
-    prompts.push('Why was last night louder?');
+    fallback.push('Why was last night louder?');
   } else {
-    prompts.push("How's my progress?");
+    fallback.push("How's my progress?");
   }
 
-  prompts.push("What's my snore type?");
-  prompts.push('What should I try tonight?');
+  fallback.push("What's my snore type?");
+  fallback.push('What should I try tonight?');
 
-  // Keep it to at most four, de-duped, preserving order.
-  return [...new Set(prompts)].slice(0, 4);
+  // Keep it to at most four, de-duped, preserving order — data-driven chips first.
+  return [...new Set([...dataDriven, ...fallback])].slice(0, 4);
 }
 
 /**

@@ -124,6 +124,15 @@
 .clipFill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 2px; }
 .clipTime { font-family: var(--mono); font-size: 10px; color: var(--text-tertiary); flex: none; }
 
+/* Non-negotiable honesty caption — every sample-backed clip (see
+   SnoreClip.isSample in clipRecorder.ts) must disclose it's not tonight's
+   real recording. */
+.sampleTag {
+  margin-top: 8px;
+  font-family: var(--mono); font-weight: 500; font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary);
+}
+
 .footer {
   margin-top: 40px;
   display: flex; align-items: center; justify-content: space-between;
@@ -167,4 +176,5 @@
 :global(.screen.night) .clipTitle { color: var(--night-text-1); }
 :global(.screen.night) .clipDb { color: var(--night-text-3); }
 :global(.screen.night) .clipTrack { background: var(--night-bg-3); }
+:global(.screen.night) .sampleTag { color: var(--night-text-3); }
 :global(.screen.night) .clipTime { color: var(--night-text-3); }

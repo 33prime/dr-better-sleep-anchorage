@@ -52,7 +52,12 @@ export type ChatCard =
   | { kind: 'snore-summary'; date: string; total: number; baseline: number }
   | { kind: 'hypnogram'; date: string }
   | { kind: 'comparison' }
-  | { kind: 'audio'; window: string; duration: number };
+  | { kind: 'audio'; window: string; duration: number }
+  // Phase 3 Lane A: the playable loudest-clip card for `{{card:clip}}`.
+  // Always refers to the latest night — Chat.tsx resolves which night and
+  // which clip (real capture, or Lane C's demo-sample fallback) at render
+  // time rather than baking a date/id into the token itself.
+  | { kind: 'clip' };
 
 export interface Recommendation {
   id: string;

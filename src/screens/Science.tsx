@@ -1,17 +1,74 @@
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useStore, lastNight, snoreTypeSeries, snoreFingerprintSimilarity } from '../store';
+import { wineEffect } from '../utils/insights';
 import { ChevronLeft } from '../components/icons';
 import s from './Science.module.css';
+
+// The three snore types, their vibration sites, and their acoustic bands —
+// the same band edges the live detector classifies with (useSnoreDetector),
+// grounded in the band→site mapping literature (see SOURCES below).
+const TYPES = [
+  {
+    key: 'palatal' as const,
+    name: 'Palatal',
+    site: 'Soft palate',
+    loHz: 60, hiHz: 300,
+    character: 'A periodic low rumble — the classic snore. The soft palate flutters as air squeezes past on each breath.',
+    device: 'The type the mouthpiece treats best: advancing the jaw tightens the tissue that flutters.',
+    sample: '/samples/snore-1.wav',
+  },
+  {
+    key: 'tongue' as const,
+    name: 'Tongue base',
+    site: 'Back of the tongue',
+    loHz: 300, hiHz: 1000,
+    character: 'Broadband and irregular — a wetter, rougher sound. The tongue falls back and narrows the airway.',
+    device: 'Also squarely in the mouthpiece’s reach — jaw advancement pulls the tongue base forward with it.',
+    sample: '/samples/snore-2.wav',
+  },
+  {
+    key: 'nasal' as const,
+    name: 'Nasal',
+    site: 'Nasal passages',
+    loHz: 1000, hiHz: 3000,
+    character: 'A high, whistling flutter. Air forced through a congested or narrow nose.',
+    device: 'The one the mouthpiece can’t fix — breathing strips or a saline rinse are the right tools here.',
+    sample: '/samples/snore-3.wav',
+  },
+];
+
+const BAND_MAX_HZ = 3000;
 
 export function Science() {
   const state = useStore();
   const [, navigate] = useLocation();
 
   const last = lastNight(state);
-  const types = last?.snoreTypes ?? { palatal: 0.71, tongue: 0.22, nasal: 0.07 };
+  const types = last?.snoreTypes ?? { palatal: 0, tongue: 0, nasal: 0 };
   const pct = (x: number) => Math.round(x * 100);
   const sim = snoreFingerprintSimilarity(state);
   const series = snoreTypeSeries(state, 14);
+  const wine = wineEffect(state.nights);
+
+  const dominant = TYPES.reduce((a, b) => (types[b.key] > types[a.key] ? b : a), TYPES[0]);
+
+  // One shared audio element; tapping a row plays that type's sample.
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState<string | null>(null);
+  useEffect(() => () => { audioRef.current?.pause(); }, []);
+
+  const togglePlay = (key: string, src: string) => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.addEventListener('ended', () => setPlaying(null));
+      audioRef.current.addEventListener('error', () => setPlaying(null));
+    }
+    const a = audioRef.current;
+    if (playing === key) { a.pause(); setPlaying(null); return; }
+    a.src = src;
+    a.play().then(() => setPlaying(key)).catch(() => setPlaying(null));
+  };
 
   return (
     <div className={s.root}>
@@ -26,32 +83,68 @@ export function Science() {
       <div className={s.body}>
         <div className={s.label}>The science</div>
         <h1 className={s.h}>
-          Why <span className={s.it}>you</span> snore.<br />
-          Specifically you.
+          Every snore says<br /><span className={s.it}>where it came from.</span>
         </h1>
         <p className={s.lede}>
-          The mouthpiece holds your jaw. <span className={s.em}>Everything else</span> — what you ate, the room, the season, your weight — also moves the dial. After {state.nights.length} nights I can see your patterns clearly enough to name them.
+          A snore is tissue vibrating somewhere in your airway — and each place vibrates at its
+          own frequencies. That's how the app can tell <span className={s.em}>what kind</span> of
+          snorer you are from sound alone, and why it matters for the device.
         </p>
 
+        {/* ---- Three snores, three places — listen to each ---- */}
+        <div className={s.types}>
+          {TYPES.map(t => (
+            <div key={t.key} className={`${s.type} ${playing === t.key ? s.playing : ''}`}>
+              <div className={s.typeHead}>
+                <button
+                  className={`${s.play} tap`}
+                  onClick={() => togglePlay(t.key, t.sample)}
+                  aria-label={playing === t.key ? `Pause ${t.name} sample` : `Play ${t.name} sample`}
+                >
+                  {playing === t.key ? <PauseIcon /> : <PlayIcon />}
+                </button>
+                <div className={s.typeId}>
+                  <div className={s.typeName}>{t.name} <span className={s.typeSite}>· {t.site}</span></div>
+                  <div className={s.typeSample}>sample audio · {t.loHz}–{t.hiHz} Hz</div>
+                </div>
+                {dominant.key === t.key && types[t.key] > 0 && (
+                  <span className={s.yours}>{pct(types[t.key])}% of yours</span>
+                )}
+              </div>
+
+              {/* Frequency band: where this type lives on the 0–3 kHz axis */}
+              <div className={s.band} aria-hidden>
+                <i
+                  className={s.bandFill}
+                  style={{
+                    left: `${(t.loHz / BAND_MAX_HZ) * 100}%`,
+                    width: `${((t.hiHz - t.loHz) / BAND_MAX_HZ) * 100}%`,
+                  }}
+                />
+              </div>
+              <div className={s.bandAxis} aria-hidden><span>0</span><span>1 kHz</span><span>2 kHz</span><span>3 kHz</span></div>
+
+              <p className={s.typeDesc}>{t.character} <span className={s.em}>{t.device}</span></p>
+            </div>
+          ))}
+        </div>
+
+        {/* ---- Your fingerprint (real data) ---- */}
         <div className={s.finger}>
           <div className={s.top}>
             <div className={s.k}>Your acoustic fingerprint</div>
-            <div className={s.ts}>Last 90 nights</div>
+            <div className={s.ts}>{last ? `Last night` : 'No nights yet'}</div>
           </div>
-          <div className={s.v}>
-            <span className={s.pct}>{pct(types.palatal)}%</span>
-            <span className={s.it}>soft palate</span> · low rumble, periodic
-          </div>
-
-          <div className={s.spec}>
-            <Spectrogram />
-            <span className={s.legend}>120 → 2000 Hz</span>
-            <span className={s.freq}>Time →</span>
-          </div>
+          {last && (
+            <div className={s.v}>
+              <span className={s.pct}>{pct(types[dominant.key])}%</span>
+              <span className={s.it}>{dominant.site.toLowerCase()}</span> · {dominant.key === 'palatal' ? 'low rumble, periodic' : dominant.key === 'tongue' ? 'broadband, irregular' : 'high flutter'}
+            </div>
+          )}
 
           <div className={s.breakdown}>
             <div className={s.b}><div className={s.nm}>Soft palate</div><div className={s.pc}>{pct(types.palatal)}%</div><div className={s.desc}>Periodic, low rumble</div></div>
-            <div className={s.b}><div className={s.nm}>Tongue base</div><div className={s.pc}>{pct(types.tongue)}%</div><div className={s.desc}>Wet, irregular</div></div>
+            <div className={s.b}><div className={s.nm}>Tongue base</div><div className={s.pc}>{pct(types.tongue)}%</div><div className={s.desc}>Broadband, irregular</div></div>
             <div className={s.b}><div className={s.nm}>Nasal</div><div className={s.pc}>{pct(types.nasal)}%</div><div className={s.desc}>High flutter</div></div>
           </div>
 
@@ -71,65 +164,85 @@ export function Science() {
           )}
 
           <div className={s.reason}>
-            Your soft palate vibrates when you exhale through a partly-closed airway. <span className={s.em}>That's the type the mouthpiece treats best</span> — which is why it's working.
+            {types.palatal + types.tongue > types.nasal
+              ? <>Most of your snoring comes from tissue the mouthpiece can reach. <span className={s.em}>That's why jaw advancement is the right tool for you.</span></>
+              : <>A lot of your snoring is nasal — <span className={s.em}>worth pairing the mouthpiece with breathing strips.</span></>}
           </div>
         </div>
 
-        <h2 className={s.h2}>What's <span className={s.it}>moving the needle</span></h2>
-        <p className={s.h2sub}>Patterns the on-device model has found in your data. None of these are causal proof — they're hypotheses worth testing.</p>
+        {/* ---- The published evidence ---- */}
+        <h2 className={s.h2}>The <span className={s.it}>published evidence</span></h2>
+        <p className={s.h2sub}>The claims this screen makes, and where they come from. Peer-reviewed, not marketing.</p>
 
         <div className={s.find}>
           <div className={s.meta}>
-            <div className={s.nm}>Alcohol within <span className={s.it}>3 hours of sleep</span></div>
-            <div className={s.conf}>Strong · r = 0.71</div>
+            <div className={s.nm}>Sound reveals the <span className={s.it}>vibration site</span></div>
+            <div className={s.conf}>p &lt; 0.0001</div>
           </div>
           <div className={s.insight}>
-            On the <span className={s.data}>23 nights</span> you logged a drink within three hours, your snore index averaged <span className={s.data}>2.3×</span> your baseline. <span className={s.em}>Two drinks pushes it to 3.1×.</span> The mouthpiece can't reach this — alcohol relaxes the same muscles the strap is fighting.
-          </div>
-        </div>
-
-        <div className={s.find}>
-          <div className={s.meta}>
-            <div className={s.nm}>Bedroom <span className={s.it}>temperature</span></div>
-            <div className={`${s.conf} ${s.med}`}>Moderate · r = 0.54</div>
-          </div>
-          <div className={s.insight}>
-            Your sweet spot is <span className={s.data}>65–67°F</span>. Below 62 your nose dries out and you breathe through your mouth more; above 70 you sleep lighter and roll. <span className={s.em}>HomeKit can hold this for you</span> if you'd like.
+            Snore energy splits into low, mid and high bands, and the band pattern maps to where
+            the obstruction is — palate and tongue-base each leave a distinct signature.
+            <span className={s.cite}>Sci. Rep. srep30629 · Acta Otorhinolaryngol.</span>
           </div>
         </div>
 
         <div className={s.find}>
           <div className={s.meta}>
-            <div className={s.nm}>Exercise <span className={s.it}>that day</span></div>
-            <div className={`${s.conf} ${s.med}`}>Moderate · r = -0.48</div>
+            <div className={s.nm}>Classification from <span className={s.it}>audio alone</span> works</div>
+            <div className={s.conf}>92% accuracy</div>
           </div>
           <div className={s.insight}>
-            Days you hit <span className={s.data}>8,000+ steps</span> or 30 minutes of cardio, you snore <span className={s.data}>28% less</span> that night. <span className={s.em}>Within reason</span> — workouts after 8 p.m. spike your HR and undo the gain.
+            In clinical recordings labeled by direct endoscopic observation, machine classifiers
+            identified the snore's origin site from sound alone with 92.2% accuracy.
+            <span className={s.cite}>PMC8320490 · VOTE classification</span>
           </div>
         </div>
 
         <div className={s.find}>
           <div className={s.meta}>
-            <div className={s.nm}>Pollen <span className={s.it}>count</span></div>
-            <div className={s.conf}>Strong · r = 0.66</div>
+            <div className={s.nm}>Phone-mic counting is <span className={s.it}>validated</span></div>
+            <div className={s.conf}>95% accuracy</div>
           </div>
           <div className={s.insight}>
-            Your nasal share triples on <span className={s.data}>high-pollen days</span> (oak in spring, ragweed in fall). It's the only signal where the device can't help — you'd want a saline rinse before bed and an antihistamine, if your doctor's onboard.
+            Smartphone snore detection has reached 95.2% accuracy against ground truth in formal
+            trials — counting snores from a nightstand mic is publishable-grade measurement.
+            <span className={s.cite}>JMIR Formative Research 2025 · IJERPH 18/7326</span>
           </div>
         </div>
 
-        <div className={`${s.find} ${s.flag}`}>
+        <div className={s.find}>
           <div className={s.meta}>
-            <div className={s.nm}>Brief <span className={s.it}>silence-then-gasp</span> events</div>
-            <div className={s.conf}>Worth flagging</div>
+            <div className={s.nm}>Timing beats <span className={s.it}>counting</span></div>
+            <div className={s.conf}>r = 0.89</div>
           </div>
           <div className={s.insight}>
-            I've heard <span className={s.data}>14 events</span> across the last 90 nights that look like obstruction, not snoring — silence followed by a sharp inhale. <span className={s.em}>That's not enough to call apnea, but it's enough to mention.</span> If you want, I can package these for your GP or fax them straight to a sleep clinic.
+            The rhythm of snoring — how it clusters and pauses — tracks clinical severity far better
+            than raw counts (r = 0.89 vs 0.39). That's why the app measures snore-time percentage
+            and quiet stretches, not just a number.
+            <span className={s.cite}>Meta-analysis, PMC9670768 · 13 studies, 3,153 adults</span>
           </div>
         </div>
+
+        {wine.confidence !== 'insufficient' && (
+          <div className={s.find}>
+            <div className={s.meta}>
+              <div className={s.nm}>And in <span className={s.it}>your own data</span></div>
+              <div className={`${s.conf} ${wine.confidence === 'emerging' ? s.med : ''}`}>
+                {wine.confidence === 'solid' ? 'Solid' : 'Emerging'} · your nights
+              </div>
+            </div>
+            <div className={s.insight}>
+              {wine.sentence} <span className={s.em}>Alcohol relaxes the same muscles the strap is
+              fighting</span> — the one variable the device can't reach.
+            </div>
+          </div>
+        )}
 
         <p className={s.footnote}>
-          All of this runs on your phone — your audio doesn't leave the device. CoreML 8 finds the patterns; I just translate them into something useful.
+          Detection runs on your phone: loudness-gated, low-frequency-aware event detection with
+          band-energy classification. Your audio never leaves the device. And the honest limit:
+          a microphone measures snoring — it cannot detect or diagnose sleep apnea. If something
+          in your data is worth a clinician's eyes, the app will say so, plainly.
         </p>
       </div>
     </div>
@@ -150,68 +263,9 @@ function TypeTrend({ series }: { series: Array<{ palatal: number; tongue: number
   );
 }
 
-function Spectrogram() {
-  return (
-    <svg viewBox="0 0 320 120" preserveAspectRatio="none" aria-hidden>
-      <defs>
-        <linearGradient id="palatal" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.05 }} />
-          <stop offset="20%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.55 }} />
-          <stop offset="50%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.9 }} />
-          <stop offset="80%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.55 }} />
-          <stop offset="100%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.05 }} />
-        </linearGradient>
-      </defs>
-      <g transform="translate(0,8)">
-        <rect width="320" height="20" style={{ fill: 'var(--spec-panel)' }} />
-        <g fill="url(#palatal)" opacity="0.35">
-          <rect x="40" y="6" width="8" height="8" />
-          <rect x="86" y="7" width="6" height="6" />
-          <rect x="142" y="5" width="10" height="10" />
-          <rect x="198" y="7" width="6" height="6" />
-          <rect x="244" y="6" width="8" height="8" />
-        </g>
-      </g>
-      <g transform="translate(0,34)">
-        <rect width="320" height="22" style={{ fill: 'var(--spec-panel)' }} />
-        <g fill="url(#palatal)" opacity="0.55">
-          <rect x="20" y="4" width="14" height="14" />
-          <rect x="54" y="6" width="10" height="10" />
-          <rect x="92" y="3" width="16" height="16" />
-          <rect x="138" y="5" width="12" height="12" />
-          <rect x="178" y="2" width="18" height="18" />
-          <rect x="222" y="5" width="12" height="12" />
-          <rect x="262" y="3" width="16" height="16" />
-          <rect x="298" y="6" width="10" height="10" />
-        </g>
-      </g>
-      <g transform="translate(0,62)">
-        <rect width="320" height="26" style={{ fill: 'var(--spec-panel)' }} />
-        <g style={{ fill: 'var(--accent)' }} opacity="0.92">
-          <rect x="6" y="4" width="22" height="18" />
-          <rect x="36" y="2" width="26" height="22" />
-          <rect x="72" y="3" width="24" height="20" />
-          <rect x="106" y="1" width="28" height="24" />
-          <rect x="146" y="2" width="26" height="22" />
-          <rect x="184" y="3" width="24" height="20" />
-          <rect x="220" y="2" width="26" height="22" />
-          <rect x="258" y="4" width="22" height="18" />
-          <rect x="292" y="3" width="24" height="20" />
-        </g>
-      </g>
-      <g transform="translate(0,94)">
-        <rect width="320" height="22" style={{ fill: 'var(--spec-panel)' }} />
-        <g fill="url(#palatal)" opacity="0.7">
-          <rect x="14" y="5" width="14" height="12" />
-          <rect x="48" y="6" width="12" height="10" />
-          <rect x="84" y="4" width="16" height="14" />
-          <rect x="124" y="6" width="12" height="10" />
-          <rect x="160" y="3" width="18" height="16" />
-          <rect x="200" y="5" width="14" height="12" />
-          <rect x="240" y="6" width="12" height="10" />
-          <rect x="276" y="4" width="16" height="14" />
-        </g>
-      </g>
-    </svg>
-  );
+function PlayIcon() {
+  return <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden><path d="M4 2.5v11l9-5.5z" fill="currentColor" /></svg>;
+}
+function PauseIcon() {
+  return <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden><path d="M4 2.5h3v11H4zm5 0h3v11H9z" fill="currentColor" /></svg>;
 }

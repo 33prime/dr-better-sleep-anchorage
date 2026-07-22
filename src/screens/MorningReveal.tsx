@@ -7,7 +7,7 @@ import { TickNumber } from '../components/TickNumber';
 import { PaperStar } from '../components/paper/PaperScene';
 import { ArrowRight } from '../components/icons';
 import { fmtDateLong, fmtDelta, fmtDuration, pad2, parseIsoDate } from '../utils/format';
-import { latestClips, clipBlob, type SnoreClip } from '../lib/clipRecorder';
+import { clipsForNight, clipBlob, type SnoreClip } from '../lib/clipRecorder';
 import s from './MorningReveal.module.css';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -36,10 +36,11 @@ export function MorningReveal() {
   const [, navigate] = useLocation();
   const last = lastNight(state);
   // Loudest-snore playback card — clips are looked up by the revealed
-  // night's date; latestClips() only ever has the newest recorded night's
-  // clips, so this naturally comes back empty on demo/seed nights or when
-  // the revealed night isn't the one the mic most recently captured.
-  const clip = useLoudestClip(last?.date);
+  // night's date via clipsForNight(), which falls back to sample-backed
+  // demo clips only for source:'demo' nights. Otherwise this naturally
+  // comes back empty on local-seed nights or when the revealed night isn't
+  // the one the mic most recently captured.
+  const clip = useLoudestClip(last?.date, last?.source === 'demo');
   if (!last) return null;
 
   // The previous 14 nights, excluding the night being revealed.
@@ -182,20 +183,22 @@ function WatchIcon(p: SVGProps<SVGSVGElement>) {
 // object URL on unmount / clip change so blobs never linger in memory.
 
 /** Loudest clip for a given night's date, or null once resolved with none.
- *  undefined while the IndexedDB lookup is in flight. */
-function useLoudestClip(nightDate: string | undefined): SnoreClip | null {
+ *  undefined while the lookup is in flight. Falls back to a sample clip
+ *  (via clipsForNight) only when `isDemoSource` — a real recorded night with
+ *  no captured clip just stays empty. */
+function useLoudestClip(nightDate: string | undefined, isDemoSource: boolean): SnoreClip | null {
   const [clip, setClip] = useState<SnoreClip | null>(null);
   useEffect(() => {
     if (!nightDate) { setClip(null); return; }
     let cancelled = false;
-    latestClips()
+    clipsForNight(nightDate, isDemoSource)
       .then(clips => {
         if (cancelled) return;
-        setClip(clips.find(c => c.nightDate === nightDate) ?? null);
+        setClip(clips[0] ?? null);
       })
       .catch(() => { if (!cancelled) setClip(null); });
     return () => { cancelled = true; };
-  }, [nightDate]);
+  }, [nightDate, isDemoSource]);
   return clip;
 }
 
@@ -267,6 +270,7 @@ function SnoreClipCard({ clip, delay }: { clip: SnoreClip; delay: number }) {
         </div>
         <div className={s.clipTime}>{fmtClipTime(currentMs)} / {fmtClipTime(clip.durationMs)}</div>
       </div>
+      {clip.isSample && <div className={s.sampleTag}>Sample audio — not tonight's recording</div>}
       <audio
         ref={audioRef}
         preload="none"

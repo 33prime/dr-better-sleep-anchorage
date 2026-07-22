@@ -43,6 +43,12 @@ import type { AppState, ChatMessage, Night, OnboardingState, Partner, Recommenda
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type DeviceRow = Database['public']['Tables']['devices']['Row'];
 type NightRow = Database['public']['Tables']['nights']['Row'];
+// Nights fetched for hydrate() come embedded with their linked sleep_sessions
+// row (see fetchAccountData's nights query in db.ts) so the real per-night
+// strap position can be recovered — see mapNightRow below. Kept as a
+// separate type from the bare NightRow so NightWrite (derived from NightRow)
+// never picks up this join-only field.
+type NightRowWithSession = NightRow & { sleep_sessions?: { strap_position: number | null } | null };
 type ChatRow = Database['public']['Tables']['chat_messages']['Row'];
 type RecommendationRow = Database['public']['Tables']['recommendations']['Row'];
 type SleepSessionRow = Database['public']['Tables']['sleep_sessions']['Row'];
@@ -62,7 +68,7 @@ export type SnoreEventWrite = Omit<SnoreEventRow, 'id' | 'created_at'>;
 export interface AccountBundle {
   profile: ProfileRow | null;
   device: DeviceRow | null;
-  nights: NightRow[];
+  nights: NightRowWithSession[];
   chatMessages: ChatRow[];
   recommendations: RecommendationRow[];
 }
@@ -301,7 +307,7 @@ function jsonPositions(v: unknown): Night['positions'] {
   return { side_left: o.side_left, side_right: o.side_right, back: o.back, stomach: o.stomach };
 }
 
-function mapNightRow(row: NightRow, fallbackStrapPosition: number): Night {
+function mapNightRow(row: NightRowWithSession): Night {
   return {
     date: row.date,
     totalSnores: row.total_snores ?? 0,
@@ -317,11 +323,15 @@ function mapNightRow(row: NightRow, fallbackStrapPosition: number): Night {
     positionSnores: jsonPositions(row.position_snores),
     snoresByHour: Array.isArray(row.snores_by_hour) ? (row.snores_by_hour as number[]) : [],
     peakDb: row.peak_db ?? 0,
-    // `nights` has no strap_position column (that lives on sleep_sessions,
-    // which hydrate() doesn't fetch) — fall back to the device's current
-    // position rather than fabricating a per-night value. Known deviation;
-    // see report.
-    strapPosition: fallbackStrapPosition,
+    // `nights` has no strap_position column (that lives on sleep_sessions) —
+    // recovered per-night from the embedded sleep_sessions row fetched
+    // alongside it (see fetchAccountData's nights query in db.ts, matching
+    // the same join db.ts's own fetchNights()/fromNightRow() already uses).
+    // A night with no linked session (or a session that didn't record strap
+    // position) honestly comes back 0 rather than being stamped with the
+    // device's current position — the device may have moved many times
+    // since that night.
+    strapPosition: row.sleep_sessions?.strap_position ?? 0,
     startedAt: row.started_at ?? '',
     endedAt: row.ended_at ?? '',
     alcohol: row.alcohol,
@@ -380,7 +390,7 @@ export async function hydrate(userId: string, email: string): Promise<void> {
     next.uiTheme = (bundle.profile?.ui_theme as AppState['uiTheme']) ?? s.uiTheme;
     next.device = mapDeviceRow(bundle.device, s.device);
     next.nights = bundle.nights
-      .map(row => mapNightRow(row, next.device.strapPosition))
+      .map(row => mapNightRow(row))
       .sort((a, b) => a.date.localeCompare(b.date));
     next.chat = bundle.chatMessages.map(mapChatRow).sort((a, b) => a.ts - b.ts);
     next.recommendations = bundle.recommendations.map(mapRecommendationRow);
