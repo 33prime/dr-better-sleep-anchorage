@@ -280,7 +280,7 @@ export function Dashboard() {
         <div className={s.body}>
           <div className={s.label}>Where you are</div>
           <div className={s.copy}>
-            Day {daysSince(state.device.fittedAt)} of <strong>strap position {state.device.strapPosition}</strong>. I'll check in tomorrow morning.
+            Day {daysSince(state.device.fittedAt)} with the device · <strong>strap position {state.device.strapPosition}</strong>. I'll check in tomorrow morning.
           </div>
         </div>
         <div className={s.chev}><ChevronRight /></div>
