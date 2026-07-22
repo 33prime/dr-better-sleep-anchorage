@@ -1,12 +1,34 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useStore, lastNight } from '../store';
 import { Avatar } from '../components/Avatar';
 import { ChevronLeft } from '../components/icons';
 import { Menu } from '../components/Menu';
-import { showToast } from '../components/Toast';
+import { pad2 } from '../utils/format';
+import { latestClips, clipBlob, type SnoreClip } from '../lib/clipRecorder';
+import { shareLastNight } from '../lib/share';
 import s from './Chat.module.css';
 import r from './ChatRich.module.css';
+
+// "1a 2:38 → 2:43 p.m." style window from a clip's real event time + duration.
+function fmtClipWindow(clip: SnoreClip): string {
+  const start = new Date(clip.ts);
+  const end = new Date(clip.ts + clip.durationMs);
+  const clock = (d: Date) => `${d.getHours() % 12 || 12}:${pad2(d.getMinutes())}`;
+  const period = end.getHours() >= 12 ? 'p.m.' : 'a.m.';
+  return `${clock(start)} → ${clock(end)} ${period}`;
+}
+
+function fmtClipTime(ms: number): string {
+  const totalSec = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(totalSec / 60);
+  return `${m}:${pad2(totalSec % 60)}`;
+}
+
+// 20 pseudo-static bar heights (the original mock's two 8/12-bar arrays,
+// concatenated) — decorative, since the Clip-store API doesn't expose a real
+// waveform. Split point moves with real playback progress instead.
+const CLIP_BAR_HEIGHTS = [6, 9, 5, 11, 8, 13, 10, 7, 14, 9, 11, 6, 10, 13, 8, 5, 9, 7, 11, 4];
 
 /**
  * Chat with rich data cards — a "showcase" variant of the chat. Composer is
@@ -25,7 +47,63 @@ export function ChatRich() {
     if (convoRef.current) convoRef.current.scrollTop = convoRef.current.scrollHeight;
   }, []);
 
+  // Real loudest-clip playback replaces the old toast stub. No clip for this
+  // night → the whole "play it" exchange is hidden below rather than ending
+  // in a dead card.
+  const nightDate = last?.date;
+  const [clip, setClip] = useState<SnoreClip | null>(null);
+  useEffect(() => {
+    if (!nightDate) { setClip(null); return; }
+    let cancelled = false;
+    latestClips()
+      .then(clips => {
+        if (cancelled) return;
+        setClip(clips.find(c => c.nightDate === nightDate) ?? null);
+      })
+      .catch(() => { if (!cancelled) setClip(null); });
+    return () => { cancelled = true; };
+  }, [nightDate]);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const clipUrlRef = useRef<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [currentMs, setCurrentMs] = useState(0);
+  // Guards the post-await continuation in togglePlay below — if this screen
+  // unmounts (or the clip changes) before clipBlob() resolves, we must not
+  // touch the by-then-detached <audio> node or create an object URL nobody
+  // will ever revoke.
+  const aliveRef = useRef(true);
+
+  useEffect(() => {
+    aliveRef.current = true;
+    return () => {
+      aliveRef.current = false;
+      audioRef.current?.pause();
+      if (clipUrlRef.current) { URL.revokeObjectURL(clipUrlRef.current); clipUrlRef.current = null; }
+    };
+  }, [clip?.id]);
+
+  const togglePlay = async () => {
+    const audio = audioRef.current;
+    if (!audio || !clip) return;
+    if (playing) { audio.pause(); return; }
+    if (!clipUrlRef.current) {
+      setLoading(true);
+      const blob = await clipBlob(clip.id);
+      if (!aliveRef.current) return; // unmounted/clip changed while awaiting — nothing to clean up, URL never created
+      setLoading(false);
+      if (!blob) return;
+      clipUrlRef.current = URL.createObjectURL(blob);
+      audio.src = clipUrlRef.current;
+    }
+    try { await audio.play(); } catch { /* blocked/unsupported — stay paused */ }
+  };
+
   if (!last) return null;
+
+  const clipProgress = clip && clip.durationMs > 0 ? Math.min(1, currentMs / clip.durationMs) : 0;
+  const filledBars = Math.round(clipProgress * CLIP_BAR_HEIGHTS.length);
 
   return (
     <div className={s.root}>
@@ -41,7 +119,7 @@ export function ChatRich() {
           </div>
         </div>
         <Menu className={s.back} ariaLabel="More" items={[
-          { label: 'Share with Sarah', onClick: () => showToast('Last night shared with Sarah ✓') },
+          { label: `Share with ${state.partner.name}`, onClick: () => { void shareLastNight(state); } },
         ]} />
       </div>
 
@@ -108,49 +186,72 @@ export function ChatRich() {
                 Cluster at <span className={r.noteEm} style={{ fontFamily: 'var(--serif)', fontStyle: 'italic' }}>2 a.m.</span> — same hour you flipped to your back. The strap held; the sound didn't.
               </div>
             </div>
-            <div className={`${s.bubble} ${s.bubbleThem}`} style={{ borderTopLeftRadius: 18 }}>
-              Want me to read you what was happening at that hour?
-            </div>
+            {clip && (
+              <div className={`${s.bubble} ${s.bubbleThem}`} style={{ borderTopLeftRadius: 18 }}>
+                Want me to read you what was happening at that hour?
+              </div>
+            )}
           </div>
         </div>
 
-        <div className={`${s.row} ${s.rowMe}`}>
-          <div className={`${s.bubble} ${s.bubbleMe}`}>Yeah, play it.</div>
-        </div>
+        {/* Real loudest-clip playback (Clip-store API) — this whole exchange
+            is hidden when the night has no captured clip, rather than ending
+            in a "play it" reply with nothing to play. */}
+        {clip && (
+          <>
+            <div className={`${s.row} ${s.rowMe}`}>
+              <div className={`${s.bubble} ${s.bubbleMe}`}>Yeah, play it.</div>
+            </div>
 
-        <div className={s.row}>
-          <Avatar size={22} style={{ marginBottom: 4 }} />
-          <div className={s.stack}>
-            <div className={s.card} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
-                className="tap"
-                style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent)', color: '#1B2340', display: 'grid', placeItems: 'center', flex: 'none', border: 0 }}
-                aria-label="Play"
-                onClick={() => showToast('Playing 2:38–2:43 a.m. · soft snoring')}
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 14, height: 14, marginLeft: 2 }}>
-                  <path d="M6 4l14 8-14 8z" />
-                </svg>
-              </button>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className={r.clipTitle} style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 15 }}>
-                  2:38 → 2:43 a.m. · soft snoring
-                </div>
-                <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 16 }}>
-                    {[6, 9, 5, 11, 8, 13, 10, 7].map((h, i) => (
-                      <i key={i} style={{ width: 2, height: h, background: 'var(--accent)', borderRadius: 1 }} />
-                    ))}
-                    {[14, 9, 11, 6, 10, 13, 8, 5, 9, 7, 11, 4].map((h, i) => (
-                      <i key={i + 8} style={{ width: 2, height: h, background: 'var(--accent)', borderRadius: 1, opacity: 0.45 }} />
-                    ))}
+            <div className={s.row}>
+              <Avatar size={22} style={{ marginBottom: 4 }} />
+              <div className={s.stack}>
+                <div className={s.card} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <button
+                    className="tap"
+                    style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent)', color: '#1B2340', display: 'grid', placeItems: 'center', flex: 'none', border: 0 }}
+                    aria-label={playing ? 'Pause' : 'Play'}
+                    disabled={loading}
+                    onClick={togglePlay}
+                  >
+                    {playing ? (
+                      <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 13, height: 13 }}>
+                        <rect x="5" y="4" width="5" height="16" rx="1" />
+                        <rect x="14" y="4" width="5" height="16" rx="1" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 14, height: 14, marginLeft: 2 }}>
+                        <path d="M6 4l14 8-14 8z" />
+                      </svg>
+                    )}
+                  </button>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className={r.clipTitle} style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 15 }}>
+                      {fmtClipWindow(clip)} · {Math.round(clip.peakDb)} dB peak
+                    </div>
+                    <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 16 }}>
+                        {CLIP_BAR_HEIGHTS.map((h, i) => (
+                          <i key={i} style={{ width: 2, height: h, background: 'var(--accent)', borderRadius: 1, opacity: i < filledBars ? 1 : 0.4 }} />
+                        ))}
+                      </div>
+                      <div className={r.clipTime} style={{ fontFamily: 'var(--mono)', fontSize: 10 }}>{fmtClipTime(currentMs)} / {fmtClipTime(clip.durationMs)}</div>
+                    </div>
                   </div>
-                  <div className={r.clipTime} style={{ fontFamily: 'var(--mono)', fontSize: 10 }}>0:18 / 0:42</div>
+                  <audio
+                    ref={audioRef}
+                    preload="none"
+                    onPlay={() => setPlaying(true)}
+                    onPause={() => setPlaying(false)}
+                    onEnded={() => { setPlaying(false); setCurrentMs(0); }}
+                    onTimeUpdate={(e) => setCurrentMs(e.currentTarget.currentTime * 1000)}
+                    style={{ display: 'none' }}
+                  />
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* the report is read-only — the composer hands off to the live chat */}

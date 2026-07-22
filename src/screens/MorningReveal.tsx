@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import { useEffect, useRef, useState, type SVGProps } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { useStore, lastNight, baselineSnores, daysSince } from '../store';
@@ -6,7 +6,8 @@ import { snoreTimeTrend } from '../utils/insights';
 import { TickNumber } from '../components/TickNumber';
 import { PaperStar } from '../components/paper/PaperScene';
 import { ArrowRight } from '../components/icons';
-import { fmtDateLong, fmtDelta, fmtDuration, parseIsoDate } from '../utils/format';
+import { fmtDateLong, fmtDelta, fmtDuration, pad2, parseIsoDate } from '../utils/format';
+import { latestClips, clipBlob, type SnoreClip } from '../lib/clipRecorder';
 import s from './MorningReveal.module.css';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -34,6 +35,11 @@ export function MorningReveal() {
   const state = useStore();
   const [, navigate] = useLocation();
   const last = lastNight(state);
+  // Loudest-snore playback card — clips are looked up by the revealed
+  // night's date; latestClips() only ever has the newest recorded night's
+  // clips, so this naturally comes back empty on demo/seed nights or when
+  // the revealed night isn't the one the mic most recently captured.
+  const clip = useLoudestClip(last?.date);
   if (!last) return null;
 
   // The previous 14 nights, excluding the night being revealed.
@@ -109,6 +115,8 @@ export function MorningReveal() {
         )}
       </div>
 
+      {clip && <SnoreClipCard clip={clip} delay={1.02} />}
+
       <motion.div className={s.footer} {...fadeUp(1.1)}>
         <button className={`${s.cta} tap`} onClick={() => navigate(`/night/${last.date}`)}>
           See the full night
@@ -164,6 +172,127 @@ function WatchIcon(p: SVGProps<SVGSVGElement>) {
       <rect x="7" y="7" width="10" height="10" rx="2.4" />
       <path d="M9 7V4.6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7M9 17v2.4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V17" />
       <path d="M12 10v2l1.3 1.3" />
+    </svg>
+  );
+}
+
+// ---------- "Hear your loudest snore" playback card ----------
+// Consumes the Clip-store API (src/lib/clipRecorder.ts, Lane A) — never
+// autoplays, streams the blob only once the user taps play, and revokes the
+// object URL on unmount / clip change so blobs never linger in memory.
+
+/** Loudest clip for a given night's date, or null once resolved with none.
+ *  undefined while the IndexedDB lookup is in flight. */
+function useLoudestClip(nightDate: string | undefined): SnoreClip | null {
+  const [clip, setClip] = useState<SnoreClip | null>(null);
+  useEffect(() => {
+    if (!nightDate) { setClip(null); return; }
+    let cancelled = false;
+    latestClips()
+      .then(clips => {
+        if (cancelled) return;
+        setClip(clips.find(c => c.nightDate === nightDate) ?? null);
+      })
+      .catch(() => { if (!cancelled) setClip(null); });
+    return () => { cancelled = true; };
+  }, [nightDate]);
+  return clip;
+}
+
+function fmtClipTime(ms: number): string {
+  const totalSec = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(totalSec / 60);
+  return `${m}:${pad2(totalSec % 60)}`;
+}
+
+function SnoreClipCard({ clip, delay }: { clip: SnoreClip; delay: number }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const urlRef = useRef<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [currentMs, setCurrentMs] = useState(0);
+  // Guards the post-await continuation in togglePlay below — if this screen
+  // unmounts (e.g. "See the full night" tapped right after tapping play) or
+  // the clip changes before clipBlob() resolves, we must not touch the
+  // by-then-detached <audio> node or create an object URL nobody will ever
+  // revoke.
+  const aliveRef = useRef(true);
+
+  // Revoke the object URL whenever the clip changes or the card unmounts —
+  // clips never leave the device and shouldn't linger as blob: URLs either.
+  useEffect(() => {
+    aliveRef.current = true;
+    return () => {
+      aliveRef.current = false;
+      audioRef.current?.pause();
+      if (urlRef.current) { URL.revokeObjectURL(urlRef.current); urlRef.current = null; }
+    };
+  }, [clip.id]);
+
+  const togglePlay = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) { audio.pause(); return; }
+    if (!urlRef.current) {
+      setLoading(true);
+      const blob = await clipBlob(clip.id);
+      if (!aliveRef.current) return; // unmounted/clip changed while awaiting — nothing to clean up, URL never created
+      setLoading(false);
+      if (!blob) return;
+      urlRef.current = URL.createObjectURL(blob);
+      audio.src = urlRef.current;
+    }
+    try { await audio.play(); } catch { /* blocked/unsupported — stay paused */ }
+  };
+
+  const progress = clip.durationMs > 0 ? Math.min(1, currentMs / clip.durationMs) : 0;
+
+  return (
+    <motion.div className={s.clipCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: easeOut, delay }}>
+      <div className={s.clipHead}>
+        <div className={s.clipTitle}>Hear your loudest snore</div>
+        <div className={s.clipDb}>{Math.round(clip.peakDb)} dB peak</div>
+      </div>
+      <div className={s.clipRow}>
+        <button
+          className={`${s.clipPlay} tap`}
+          onClick={togglePlay}
+          disabled={loading}
+          aria-label={playing ? 'Pause' : 'Play'}
+        >
+          {playing ? <PauseGlyph /> : <PlayGlyph />}
+        </button>
+        <div className={s.clipTrack}>
+          <div className={s.clipFill} style={{ width: `${progress * 100}%` }} />
+        </div>
+        <div className={s.clipTime}>{fmtClipTime(currentMs)} / {fmtClipTime(clip.durationMs)}</div>
+      </div>
+      <audio
+        ref={audioRef}
+        preload="none"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => { setPlaying(false); setCurrentMs(0); }}
+        onTimeUpdate={(e) => setCurrentMs(e.currentTarget.currentTime * 1000)}
+        style={{ display: 'none' }}
+      />
+    </motion.div>
+  );
+}
+
+function PlayGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+      <path d="M6 4l14 8-14 8z" />
+    </svg>
+  );
+}
+
+function PauseGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+      <rect x="5" y="4" width="5" height="16" rx="1" />
+      <rect x="14" y="4" width="5" height="16" rx="1" />
     </svg>
   );
 }

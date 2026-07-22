@@ -32,6 +32,9 @@
 .copy { margin-top: 16px; border-left: 1px solid var(--accent); padding-left: 14px; font-size: 13.5px; line-height: 1.55; color: var(--text-secondary); text-wrap: pretty; }
 .copy .em { font-family: var(--serif); font-style: italic; color: var(--text-primary); }
 
+.methodNote { margin-top: 10px; font-family: var(--mono); font-size: 10.5px; line-height: 1.6; color: var(--text-tertiary); text-wrap: pretty; }
+.methodNote .em { font-style: italic; color: var(--text-secondary); }
+
 .strip { margin-top: 32px; border-top: 1px solid var(--hairline); }
 .metric { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
 .metric .row { display: flex; align-items: baseline; justify-content: space-between; }
@@ -80,6 +83,8 @@
 
 :global(.screen.night) .copy { color: var(--night-text-2); }
 :global(.screen.night) .copy .em { color: var(--night-text-1); }
+:global(.screen.night) .methodNote { color: var(--night-text-3); }
+:global(.screen.night) .methodNote .em { color: var(--night-text-2); }
 
 :global(.screen.night) .strip { border-top-color: var(--hairline-night); }
 :global(.screen.night) .metric { border-bottom-color: var(--hairline-night); }

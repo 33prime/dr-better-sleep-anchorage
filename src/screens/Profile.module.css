@@ -74,6 +74,16 @@
 }
 .rowLink svg { width: 18px; height: 18px; color: var(--accent); }
 
+.shareBtn {
+  margin-top: 14px; padding-top: 14px;
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  border: 0; border-top: 1px solid var(--hairline);
+  background: none; cursor: pointer;
+  font-size: 13.5px; font-weight: 700; color: var(--accent);
+}
+.shareBtn svg { width: 16px; height: 16px; flex: none; }
+
 /* Toggle row */
 .toggleRow { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .toggleText { min-width: 0; }
@@ -155,6 +165,7 @@
 }
 :global(.screen.night) .rowTitle { color: var(--night-text-1); }
 :global(.screen.night) .rowSub { color: var(--night-text-2); }
+:global(.screen.night) .shareBtn { border-top-color: var(--hairline-night); color: var(--accent); }
 :global(.screen.night) .switch { background: var(--night-bg-3); }
 :global(.screen.night) .switch.on { background: var(--accent); }
 :global(.screen.night) .seg { background: rgba(247,248,251,0.05); }

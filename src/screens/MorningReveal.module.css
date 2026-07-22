@@ -92,6 +92,38 @@
   color: var(--text-tertiary);
 }
 
+/* "Hear your loudest snore" — playback card for tonight's top clip, wired to
+   the Clip-store API (src/lib/clipRecorder.ts). Only rendered when a clip
+   exists for the revealed night; never autoplays. */
+.clipCard {
+  margin-top: 24px;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: 16px 18px;
+}
+.clipHead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.clipTitle { font-family: var(--serif); font-weight: 700; font-size: 14px; color: var(--text-primary); }
+.clipDb {
+  font-family: var(--mono); font-weight: 500; font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-tertiary);
+  flex: none;
+}
+.clipRow { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
+.clipPlay {
+  width: 36px; height: 36px; border-radius: 50%; flex: none;
+  background: var(--accent); color: #1B2340;
+  display: grid; place-items: center;
+  border: 0; cursor: pointer;
+}
+.clipPlay:disabled { opacity: 0.6; cursor: default; }
+.clipTrack {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: rgba(30,37,68,0.08);
+  position: relative; overflow: hidden;
+}
+.clipFill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 2px; }
+.clipTime { font-family: var(--mono); font-size: 10px; color: var(--text-tertiary); flex: none; }
+
 .footer {
   margin-top: 40px;
   display: flex; align-items: center; justify-content: space-between;
@@ -131,3 +163,8 @@
 :global(.screen.night) .wearCta { border-color: var(--hairline-night); }
 :global(.screen.night) .wearTitle { color: var(--night-text-1); }
 :global(.screen.night) .wearSub { color: var(--night-text-3); }
+:global(.screen.night) .clipCard { background: var(--night-bg-2); border: 1px solid var(--hairline-night); }
+:global(.screen.night) .clipTitle { color: var(--night-text-1); }
+:global(.screen.night) .clipDb { color: var(--night-text-3); }
+:global(.screen.night) .clipTrack { background: var(--night-bg-3); }
+:global(.screen.night) .clipTime { color: var(--night-text-3); }

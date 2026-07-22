@@ -464,6 +464,16 @@ function buildChatMessages(nights, userId) {
   return msgs;
 }
 
+// Client-side Recommendation type gained an additive `sourceNightDate` field
+// (see src/seed.ts) so Reorder can navigate "show me the night" -> a real
+// night. The `recommendations` table has no `source_night_date` column yet
+// (that's a schema change outside this lane's file ownership — see PLAN2.md
+// "File ownership"), so we don't send one here. It's not needed for the demo
+// account: every `recommended_on` below is built from `at(idx)`, i.e. it's
+// already the dateIso of a real row in `nights` (all 75 nights get a `nights`
+// row, not just the last 14 with events), so Reorder's client-side fallback
+// chain (sourceNightDate -> recommendedOn -> latest night) resolves correctly
+// via `recommendedOn` alone once that data is read back through sync.ts.
 function buildRecommendations(userId, nights) {
   const at = (idx) => nights[idx].dateIso;
   return [

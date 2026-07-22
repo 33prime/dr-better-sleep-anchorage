@@ -6,9 +6,12 @@ import { ArrowRight } from '../components/icons';
 import { PaperStar, PaperMoon } from '../components/paper/PaperScene';
 import s from './Auth.module.css';
 
-const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL as string | undefined;
-const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined;
-const DEMO_AVAILABLE = !!DEMO_EMAIL && !!DEMO_PASSWORD;
+// Demo access goes through /api/demo-login (server holds the credential —
+// nothing demo-related ships in this bundle). The button shows whenever
+// Supabase is configured; if the endpoint isn't deployed (e.g. plain vite
+// preview), the tap fails soft with an error line.
+const DEMO_LOGIN_URL = '/api/demo-login';
+const DEMO_AVAILABLE = true; // endpoint-gated at tap time, not build time
 
 const CODE_LEN = 6;
 const RESEND_COOLDOWN_S = 30;
@@ -87,14 +90,15 @@ export function Auth() {
   }
 
   async function exploreDemo() {
-    if (!supabase || !DEMO_EMAIL || !DEMO_PASSWORD) return;
+    if (!supabase) return;
     setError(null);
     setDemoLoading(true);
     try {
-      const { error: err } = await supabase.auth.signInWithPassword({
-        email: DEMO_EMAIL,
-        password: DEMO_PASSWORD,
-      });
+      const res = await fetch(DEMO_LOGIN_URL, { method: 'POST' });
+      if (!res.ok) throw new Error('Could not load the demo account right now.');
+      const { access_token, refresh_token } = await res.json();
+      if (!access_token || !refresh_token) throw new Error('Could not load the demo account right now.');
+      const { error: err } = await supabase.auth.setSession({ access_token, refresh_token });
       if (err) throw err;
       navigate('/', { replace: true });
     } catch (e) {

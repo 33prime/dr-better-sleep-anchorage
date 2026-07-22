@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { noteEvent, stopClipCapture, currentChunkIndex } from '../lib/clipRecorder';
 
 // Live snore detection from the device microphone.
 //
@@ -80,6 +81,13 @@ export function useSnoreDetector(onEvent?: (event: SnoreEventRecord) => void) {
     durStartWall: 0,
     durPeakDb: 0,
     durBand: { palatal: 0, tongue: 0, nasal: 0 },
+    // Chunk index clipRecorder was actively recording into at this event's
+    // true onset (durStartWall/durStartPerf) — captured the moment durActive
+    // flips true, *not* when the event is finally reported (which can be
+    // many chunks later for a sustained snore). Lets clipRecorder freeze the
+    // clip's window from the real onset instead of anchoring only to the
+    // chunk active when the event happened to end.
+    durOnsetChunkIndex: 0,
   });
 
   const stop = useCallback(() => {
@@ -87,11 +95,21 @@ export function useSnoreDetector(onEvent?: (event: SnoreEventRecord) => void) {
     c.running = false;
     if (c.raf) cancelAnimationFrame(c.raf);
     if (c.sim) clearInterval(c.sim);
-    c.stream?.getTracks().forEach(t => t.stop());
-    c.ctx?.close().catch(() => {});
+    const stream = c.stream;
+    const ctx = c.ctx;
     c.ctx = c.stream = c.analyser = c.td = c.fd = undefined;
     c.raf = c.sim = 0;
     c.durActive = false;
+    // Stop clip capture *before* tearing down the mic stream/AudioContext —
+    // MediaRecorder needs the tracks alive a moment longer to flush its
+    // final chunk cleanly. Doing this here (rather than relying on a
+    // separate effect in whatever component calls this hook) means the
+    // ordering no longer depends on React running effect cleanups in a
+    // particular sequence relative to this hook's own unmount cleanup.
+    void stopClipCapture().finally(() => {
+      stream?.getTracks().forEach(t => t.stop());
+      ctx?.close().catch(() => {});
+    });
   }, []);
 
   const tick = useCallback(() => {
@@ -145,6 +163,11 @@ export function useSnoreDetector(onEvent?: (event: SnoreEventRecord) => void) {
         c.durActive = true;
         c.durStartPerf = c.loudSince;
         c.durStartWall = c.loudSinceWall;
+        // Snapshot which chunk clipRecorder is recording into right now —
+        // this event's real onset — so a sustained snore's clip window is
+        // anchored to where it started, not wherever recording happens to
+        // be by the time the loud spell finally quiets down.
+        c.durOnsetChunkIndex = currentChunkIndex();
         c.durPeakDb = db;
         c.durBand = { palatal: bPalatal, tongue: bTongue, nasal: bNasal };
         c.loudSince = 0;
@@ -173,6 +196,7 @@ export function useSnoreDetector(onEvent?: (event: SnoreEventRecord) => void) {
           bandNasal: accSum > 0 ? c.durBand.nasal / accSum : 0,
         };
         c.durActive = false;
+        noteEvent({ ts: record.ts, peakDb: record.peakDb, onsetChunkIndex: c.durOnsetChunkIndex });
         onEventRef.current?.(record);
       }
     }
@@ -232,6 +256,7 @@ export function useSnoreDetector(onEvent?: (event: SnoreEventRecord) => void) {
       c.loudSince = 0;
       c.refractoryUntil = 0;
       c.durActive = false;
+      c.durOnsetChunkIndex = 0;
       c.typeAccum = { palatal: 0, tongue: 0, nasal: 0 };
       c.running = true;
       setState(s => ({ ...s, status: 'listening' }));
@@ -291,5 +316,9 @@ export function useSnoreDetector(onEvent?: (event: SnoreEventRecord) => void) {
 
   useEffect(() => () => stop(), [stop]);
 
-  return { ...state, start, startSimulated, stop };
+  // The live getUserMedia stream, when running for real (never set in
+  // simulated mode) — exposed so callers (Night.tsx) can hand the *same*
+  // stream to clipRecorder.startClipCapture rather than opening a second
+  // mic session.
+  return { ...state, start, startSimulated, stop, stream: r.current.stream ?? null };
 }

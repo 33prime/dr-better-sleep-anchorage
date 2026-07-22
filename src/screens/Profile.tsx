@@ -7,6 +7,8 @@ import { Avatar } from '../components/Avatar';
 import { Wordmark } from '../components/Wordmark';
 import { ChevronRight } from '../components/icons';
 import { showToast } from '../components/Toast';
+import { shareLastNight } from '../lib/share';
+import { deleteAllClips } from '../lib/clipRecorder';
 import s from './Profile.module.css';
 
 const THEMES: Array<'auto' | 'light' | 'dark'> = ['auto', 'light', 'dark'];
@@ -46,6 +48,27 @@ export function Profile() {
     store.reset();
     showToast('Reset to the demo seed.');
     navigate('/');
+  };
+
+  // Web Share API with a clipboard fallback — real share sheet, not a toast
+  // pretending something was sent. Partner name always comes from profile,
+  // never hardcoded (this used to be "Share with Sarah" verbatim in a couple
+  // of other screens — shareLastNight now lives in ../lib/share.ts so every
+  // screen with a share affordance calls the exact same real implementation).
+  const doShare = () => { void shareLastNight(state); };
+
+  // Privacy is product-critical for clips (PLAN2.md Lane A): "Clips stay on
+  // your phone" only means something if there's also a way to delete them.
+  const [deletingClips, setDeletingClips] = useState(false);
+  const handleDeleteClips = async () => {
+    if (!window.confirm('Delete all recorded snore clips from this phone? This can’t be undone.')) return;
+    setDeletingClips(true);
+    try {
+      await deleteAllClips();
+      showToast('Snore clips deleted from this phone.');
+    } finally {
+      setDeletingClips(false);
+    }
   };
 
   return (
@@ -126,6 +149,10 @@ export function Profile() {
             <span className={s.knob} />
           </button>
         </div>
+        <button className={`${s.shareBtn} tap`} onClick={doShare}>
+          <ShareIcon />
+          <span>Share last night with {state.partner.name}</span>
+        </button>
       </div>
 
       {/* Appearance */}
@@ -165,6 +192,20 @@ export function Profile() {
         )}
       </div>
 
+      {/* Privacy */}
+      <div className={s.sectionLabel}>Privacy</div>
+      <div className={s.card}>
+        <div className={s.toggleRow}>
+          <div className={s.toggleText}>
+            <div className={s.rowTitle}>Clips stay on your phone</div>
+            <div className={s.rowSub}>Snore recordings never leave this device or reach our servers.</div>
+          </div>
+        </div>
+      </div>
+      <button className={`${s.signout} tap`} onClick={() => { void handleDeleteClips(); }} disabled={deletingClips}>
+        {deletingClips ? 'Deleting…' : 'Delete all sleep clips'}
+      </button>
+
       {!isSupabaseConfigured && (
         <div className={s.rowSub} style={{ marginTop: 10, textAlign: 'center' }}>
           Sign-in isn't configured for this build — the demo still works locally.
@@ -173,5 +214,14 @@ export function Profile() {
 
       <div className={s.scrollPad} />
     </div>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+      <path d="M8.6 10.5 15.4 6.5M8.6 13.5 15.4 17.5" />
+    </svg>
   );
 }

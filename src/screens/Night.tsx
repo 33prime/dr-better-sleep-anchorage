@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { useStore, store } from '../store';
 import { useSnoreDetector, type SnoreEventRecord } from '../hooks/useSnoreDetector';
 import { sessionRecorder, nightFromSummary } from '../lib/sessionRecorder';
+import { startClipCapture, stopClipCapture } from '../lib/clipRecorder';
 import { useWakeLock } from '../lib/wakeLock';
 import { pad2 } from '../utils/format';
 import { PaperStar } from '../components/paper/PaperScene';
@@ -22,6 +23,10 @@ export function Night() {
     sessionRecorder.addEvent(ev);
   }, []);
   const det = useSnoreDetector(handleSnoreEvent);
+
+  // Local id of tonight's recording session, once known — keys clip capture
+  // to the same session sessionRecorder is buffering events into.
+  const [recordingSessionId, setRecordingSessionId] = useState<string | null>(null);
 
   // Recover any night lost to a crash (IndexedDB buffer with no matching
   // `end()`), then start — or resume — tonight's recording session. Runs
@@ -59,9 +64,29 @@ export function Night() {
         // rather than losing tonight's events from this point forward.
         await sessionRecorder.start({ strapPosition: store.get().device.strapPosition });
       }
+      if (!cancelled) setRecordingSessionId(sessionRecorder.sessionId);
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // Start clip capture once both the mic stream and tonight's session id are
+  // known — shares the detector's getUserMedia stream, never opens a second
+  // one. Only runs while this screen is actively listening (battery/CPU
+  // guard); stopped on End night and on unmount below.
+  useEffect(() => {
+    if (det.status !== 'listening' || !det.stream || !recordingSessionId) return;
+    startClipCapture(det.stream, recordingSessionId);
+  }, [det.status, det.stream, recordingSessionId]);
+
+  // Belt-and-suspenders: if this screen unmounts without End night being
+  // tapped (backgrounded, navigated away), make sure clip capture is
+  // stopped. The ordering that actually matters — stop the recorder before
+  // the stream/AudioContext get torn down — is guaranteed inside
+  // useSnoreDetector's own stop() now (it awaits stopClipCapture() before
+  // killing tracks), so this doesn't rely on React running this effect's
+  // cleanup before or after the detector's internal one. stopClipCapture()
+  // is idempotent, so this is just a harmless extra call in the common case.
+  useEffect(() => () => { void stopClipCapture(); }, []);
 
   // 1s heartbeat so the clock and "last snore" age stay fresh even when silent.
   const [, force] = useState(0);
@@ -112,6 +137,9 @@ export function Night() {
     : 'Ready when you are.';
 
   const endNight = async () => {
+    // Stop the recorder while the stream is still live so its final chunk
+    // flushes cleanly, *then* tear down the mic/AudioContext.
+    await stopClipCapture();
     det.stop();
     const summary = await sessionRecorder.end();
     if (!summary) { navigate('/'); return; }
@@ -175,7 +203,7 @@ export function Night() {
           <button className={`${s.simLink} tap`} onClick={det.startSimulated}>or continue in demo mode</button>
         )}
         {det.status === 'idle' && (
-          <div className={s.hint}>Your audio never leaves the phone</div>
+          <div className={s.hint}>Your audio never leaves the phone. Clips stay on your phone.</div>
         )}
       </div>
 

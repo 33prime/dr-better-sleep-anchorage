@@ -14,9 +14,10 @@ import type { TablesInsert } from './database.types';
 import type { SnoreEventRecord } from '../hooks/useSnoreDetector';
 import type { Night } from '../seed';
 import { fmtClockHM, isoDate } from '../utils/format';
+import { finalizeClips } from './clipRecorder';
 
 const DB_NAME = 'dns-sessions';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // v2 adds clipRecorder.ts's `clips` store alongside `events`
 const STORE = 'events';
 
 /** What's mirrored to IndexedDB — one record per in-progress session. */
@@ -89,7 +90,14 @@ function openDb(): Promise<IDBDatabase> {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
+      // Idempotent regardless of which module (this one or clipRecorder.ts)
+      // happens to run the upgrade first.
       if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'sessionId' });
+      if (!db.objectStoreNames.contains('clips')) {
+        const clipsStore = db.createObjectStore('clips', { keyPath: 'id' });
+        clipsStore.createIndex('sessionId', 'sessionId');
+        clipsStore.createIndex('nightDate', 'nightDate');
+      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -287,6 +295,12 @@ export class SessionRecorder {
     return this.buffer !== null;
   }
 
+  /** The local id of the in-progress session, or null if none — Night.tsx
+   *  reads this to key clipRecorder.startClipCapture to the same session. */
+  get sessionId(): string | null {
+    return this.buffer?.sessionId ?? null;
+  }
+
   setPersistence(persistence: SessionRecorderPersistence): void {
     this.persistence = persistence;
   }
@@ -347,6 +361,7 @@ export class SessionRecorder {
     const summary = summarize(buffer, endedAtMs, false);
     await this.persistSummary(buffer, summary, endedAtMs, 'ended');
     await idbDelete(buffer.sessionId);
+    await finalizeClips(buffer.sessionId, summary.date);
     return summary;
   }
 
@@ -397,6 +412,10 @@ export class SessionRecorder {
       const summary = summarize(buffer, endedAtMs, true);
       await this.persistSummary(buffer, summary, endedAtMs, 'abandoned');
       await idbDelete(buffer.sessionId);
+      // This session never reached a clean end() — any clips captured
+      // before the crash still only carry a sessionId, no nightDate, so
+      // stamp it here or latestClips() would never surface them.
+      await finalizeClips(buffer.sessionId, summary.date);
       recovered.push(summary);
     }
     return { recovered, resumed, resumedStartedAtMs, resumedStrapPosition };

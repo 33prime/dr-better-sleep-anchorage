@@ -11,7 +11,7 @@ interface TabDef {
   accent?: 'coral';   // active-underline color; teal unless set (brand motif: the two accents alternate)
 }
 const TABS: TabDef[] = [
-  { key: 'home',    path: '/',         icon: HomeFilled,  label: 'Home',    matches: (p) => p === '/' || p === '/dashboard/dark' },
+  { key: 'home',    path: '/',         icon: HomeFilled,  label: 'Home',    matches: (p) => p === '/' },
   { key: 'trends',  path: '/trends',   icon: TrendsIcon,  label: 'Trends',  matches: (p) => p.startsWith('/trends') },
   { key: 'chat',    path: '/chat',     icon: ChatIcon,    label: 'Chat',    matches: (p) => p.startsWith('/chat'), badge: true },
   { key: 'profile', path: '/profile',  icon: ProfileIcon, label: 'Profile', matches: (p) => p.startsWith('/profile'), accent: 'coral' },

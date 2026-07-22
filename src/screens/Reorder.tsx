@@ -1,10 +1,11 @@
 import { useLocation } from 'wouter';
-import { useStore, store, daysSince } from '../store';
+import { useStore, store, daysSince, findNight, lastNight } from '../store';
 import { ChevronLeft } from '../components/icons';
 import { Menu } from '../components/Menu';
 import { isoDate } from '../utils/format';
 import { showToast } from '../components/Toast';
 import { PaperMoon, PaperStar } from '../components/paper/PaperScene';
+import type { Recommendation } from '../seed';
 import s from './Reorder.module.css';
 
 export function Reorder() {
@@ -17,19 +18,33 @@ export function Reorder() {
   const pctUsed = Math.min(100, (used / totalNights) * 100);
   const monthsLeft = Math.max(0, Math.round(remaining / 30));
 
+  // Honest mock purchase: this build has no payment processing, so "reorder"
+  // is a preorder-interest toggle, not a charge. Never imply money moved.
   const reorder = () => {
     if (state.reorder.ordered) {
-      showToast('Already ordered — ships in 2 days.');
+      showToast(`Already on the list — preordered ${fmtFullDate(state.reorder.orderedAt!)}.`);
       return;
     }
     store.set(s2 => {
       s2.reorder = { ...s2.reorder, ordered: true, orderedAt: isoDate(new Date()) };
     });
-    showToast('Ordered. Confirmation in your email.');
+    showToast("Added to your preorder — no charge yet. I'll email you when it's ready to ship.");
   };
 
   const toggleRemind = () => {
     store.set(s2 => { s2.reorder.remindIn3mo = !s2.reorder.remindIn3mo; });
+  };
+
+  // "Show me the night" — sourceNightDate is a curated field that only the
+  // local demo seed carries today (see seed.ts); real accounts fall back to
+  // recommendedOn if it happens to fall inside the tracked window, then to
+  // the latest night, so the tap always goes somewhere real.
+  const openRecNight = (rec: Recommendation) => {
+    const target =
+      (rec.sourceNightDate && findNight(state, rec.sourceNightDate) && rec.sourceNightDate) ||
+      (rec.recommendedOn && findNight(state, rec.recommendedOn) && rec.recommendedOn) ||
+      lastNight(state)?.date;
+    if (target) navigate('/night/' + target);
   };
 
   return (
@@ -51,7 +66,16 @@ export function Reorder() {
         </button>
         <Menu className={s.more} ariaLabel="More" items={[
           { label: 'Manage subscription', onClick: () => showToast('No subscription — you only order when you need to.') },
-          { label: 'Order history', onClick: () => showToast('No past orders yet.') },
+          {
+            label: 'Order history',
+            // No order-history backend yet — reflect the one thing we
+            // actually track (reorder.ordered) instead of a canned toast.
+            onClick: () => showToast(
+              state.reorder.ordered
+                ? `1 preorder · ${fmtFullDate(state.reorder.orderedAt!)} · not yet shipped`
+                : 'No orders yet.'
+            ),
+          },
         ]} />
       </div>
 
@@ -92,9 +116,11 @@ export function Reorder() {
         <div className={s.primary}>
           <button className={`${s.btn} tap ${state.reorder.ordered ? s.ordered : ''}`} onClick={reorder}>
             <div className={s.lab}>
-              {state.reorder.ordered ? 'Ordered' : 'Reorder one device'}
+              {state.reorder.ordered ? 'Preordered' : 'Preorder — coming soon'}
               <span className={s.sub}>
-                {state.reorder.ordered ? 'Ships in 2 days · arrives before yours wears out' : 'Ships in 2 days · arrives before yours wears out'}
+                {state.reorder.ordered
+                  ? `No charge yet · preordered ${fmtFullDate(state.reorder.orderedAt!)}`
+                  : "No charge yet — I'll email you when it's ready to ship"}
               </span>
             </div>
             <div className={s.price}>{state.reorder.ordered ? '✓' : '$89'}</div>
@@ -131,7 +157,14 @@ export function Reorder() {
           <div className={s.lede}>Only what came up in our conversations. Each one tied to the night I noticed something.</div>
 
           {state.recommendations.map(r => (
-            <div className={s.rec} key={r.id}>
+            <div
+              className={`${s.rec} tap`}
+              key={r.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => openRecNight(r)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') openRecNight(r); }}
+            >
               <div className={s.thumb}>
                 <RecIcon kind={r.iconKind} />
               </div>

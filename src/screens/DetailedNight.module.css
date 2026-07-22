@@ -42,6 +42,32 @@
 .hypLegend .l .k { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
 .hypLegend .l .v { font-family: var(--mono); font-size: 14px; color: var(--text-primary); letter-spacing: -0.02em; }
 
+/* "Connect a wearable" — one compact card replacing the old separate
+   sleep-stages and by-position stub messages on a recorded night with no
+   wearable paired (see PLAN2 "Dead-screen fixes" item 2). */
+.wearCard {
+  margin-top: 22px;
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 18px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 20px;
+}
+.wearIcon { flex: none; width: 20px; height: 20px; margin-top: 1px; color: var(--accent); }
+.wearTitle { font-family: var(--serif); font-weight: 700; font-size: 14px; color: var(--text-primary); }
+.wearSub { margin-top: 2px; font-size: 12px; line-height: 1.45; color: var(--text-tertiary); }
+
+/* Timeline clip chips — real playback moments, positioned along the same
+   width as the snore-intensity chart + its legend below it. */
+.clipChips { position: relative; height: 22px; margin-top: 8px; z-index: 1; }
+.clipChip {
+  position: absolute; top: 0; transform: translateX(-50%);
+  width: 20px; height: 20px; border-radius: 50%; flex: none;
+  background: var(--accent); color: #1B2340;
+  display: grid; place-items: center;
+  border: 0; padding: 0; cursor: pointer;
+  box-shadow: 0 2px 5px rgba(27,35,64,0.25);
+}
+
 .section { margin-top: 28px; }
 .section .h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
 .section h2 { font-family: var(--serif); font-size: 20px; font-weight: 800; }
@@ -105,6 +131,10 @@
 
 :global(.screen.night) .hero .num { color: var(--night-text-1); }
 :global(.screen.night) .hero .unit { color: var(--night-text-2); }
+
+:global(.screen.night) .wearCard { border-color: var(--hairline-night); }
+:global(.screen.night) .wearTitle { color: var(--night-text-1); }
+:global(.screen.night) .wearSub { color: var(--night-text-3); }
 
 :global(.screen.night) .hyp {
   background: var(--night-bg-2);

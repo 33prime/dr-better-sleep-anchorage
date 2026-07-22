@@ -59,10 +59,19 @@ export interface Recommendation {
   name: string;          // "Magnesium glycinate"
   emphasis: string;      // "200 mg" — italicized portion
   quote: string;
-  recommendedOn: string; // ISO date
+  recommendedOn: string; // ISO date — when the rec was surfaced in chat
   price: string;
   priceSubtext?: string;
   iconKind: 'pill' | 'pillow' | 'tablet';
+  // Additive field (Phase 2, Lane C "Reorder card navigation"). The night
+  // whose data actually prompted this rec — not always the same date as
+  // `recommendedOn` (e.g. a rec can be surfaced days after the pattern it's
+  // based on, or reference a night outside the tracked window entirely).
+  // Optional: real accounts pulled from Supabase won't have this column yet
+  // (see scripts/seed-demo.mjs), so consumers must fall back — first to
+  // `recommendedOn` if it happens to match a tracked night, then to the
+  // latest night. See Reorder.tsx.
+  sourceNightDate?: string;
 }
 
 export interface UserProfile {
@@ -288,6 +297,13 @@ function defaultRecommendations(today: Date): Recommendation[] {
   const apr21 = new Date(today); apr21.setDate(today.getDate() - 14);
   const apr9 = new Date(today); apr9.setDate(today.getDate() - 26);
   const mar28 = new Date(today); mar28.setDate(today.getDate() - 38);
+  // The nights array only covers the last 31 days (see simulateNights) — a
+  // rec's `recommendedOn` can predate that window (mar28 is 38 days back),
+  // so `sourceNightDate` is chosen separately and always lands on a night
+  // that's actually in `nights`, for Reorder's "show me the night" tap.
+  const night16 = new Date(today); night16.setDate(today.getDate() - 16);
+  const night26 = new Date(today); night26.setDate(today.getDate() - 26); // same night as apr9 itself
+  const night30 = new Date(today); night30.setDate(today.getDate() - 30); // oldest tracked night
   return [
     {
       id: 'r1',
@@ -295,6 +311,7 @@ function defaultRecommendations(today: Date): Recommendation[] {
       emphasis: 'glycinate · 200 mg',
       quote: '"Your deep sleep dipped two weeks running. This is the form that doesn\'t upset most stomachs."',
       recommendedOn: isoDate(apr21),
+      sourceNightDate: isoDate(night16),
       price: '$24',
       priceSubtext: '60 ct',
       iconKind: 'pill',
@@ -305,6 +322,7 @@ function defaultRecommendations(today: Date): Recommendation[] {
       emphasis: 'positional pillow',
       quote: '"Position 3 still slips when you flip to your back around 2 a.m. — this catches you before you do."',
       recommendedOn: isoDate(apr9),
+      sourceNightDate: isoDate(night26),
       price: '$58',
       iconKind: 'pillow',
     },
@@ -314,6 +332,7 @@ function defaultRecommendations(today: Date): Recommendation[] {
       emphasis: 'tablets · 60 ct',
       quote: '"You asked how to clean the tray properly. These dissolve in cold water — never warm, it\'ll warp the silicone."',
       recommendedOn: isoDate(mar28),
+      sourceNightDate: isoDate(night30),
       price: '$14',
       iconKind: 'tablet',
     },

@@ -80,15 +80,41 @@ await page.screenshot({ path: `${SHOTS}/local-night-detail.png` });
 console.log('ok local:night-detail', localDate);
 
 // ---- 2. demo-account sign-in --------------------------------------------
+// Production signs in via /api/demo-login (edge function, server-held
+// credential). `vite preview` has no edge functions, so the smoke test does
+// the password grant node-side using .env (never shipped to the page) and
+// installs the session via supabase.auth.setSession in the page.
+import { readFileSync } from 'node:fs';
+const env = Object.fromEntries(
+  readFileSync(new URL('../.env', import.meta.url), 'utf8')
+    .split('\n').filter(l => l.includes('=') && !l.startsWith('#'))
+    .map(l => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1)])
+);
+const grant = await fetch(`${env.VITE_SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json', apikey: env.VITE_SUPABASE_ANON_KEY },
+  body: JSON.stringify({ email: env.DEMO_EMAIL, password: env.DEMO_PASSWORD }),
+});
+const session = await grant.json();
+
 await page.goto(BASE + '/auth', { waitUntil: 'networkidle' });
 await page.waitForTimeout(800);
 await page.screenshot({ path: `${SHOTS}/auth.png` });
 const demoBtn = page.getByText(/explore the demo/i).first();
 if (!(await demoBtn.count())) {
   problems.push('auth: "Explore the demo" button not found');
+} else if (!session.access_token) {
+  problems.push('demo login: node-side password grant failed');
 } else {
-  await demoBtn.click();
-  await page.waitForTimeout(4000); // sign-in + hydrate
+  // Install the session through the same localStorage key the supabase
+  // client reads, then reload to trigger INITIAL_SESSION -> hydrate.
+  const ref = new URL(env.VITE_SUPABASE_URL).hostname.split('.')[0];
+  await page.evaluate(([key, value]) => localStorage.setItem(key, value), [
+    `sb-${ref}-auth-token`,
+    JSON.stringify(session),
+  ]);
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForTimeout(4000); // INITIAL_SESSION + hydrate
   const state = await page.evaluate(() => {
     const s = JSON.parse(localStorage.getItem('dr-better-sleep:v5'));
     return { mode: s.mode, nights: s.nights.length, chat: s.chat.length, name: s.user.name, partner: s.partner.name, onboardingComplete: s.onboarding.complete };

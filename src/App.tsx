@@ -25,7 +25,7 @@ import { Science } from './screens/Science';
 import { Demo } from './screens/Demo';
 import { Auth } from './screens/Auth';
 
-const TABBAR_ROUTES = ['/', '/dashboard/dark', '/trends', '/profile', '/demo'];
+const TABBAR_ROUTES = ['/', '/trends', '/profile', '/demo'];
 
 export function App() {
   const uiTheme = useStore(s => s.uiTheme);
@@ -44,7 +44,6 @@ export function App() {
 
   const themeForRoute = ((): 'day' | 'night' => {
     if (location === '/night') return 'night';
-    if (location === '/dashboard/dark') return 'night';
     // Every screen follows the appearance setting — the papercraft-night
     // brand is dark-first across the whole app.
     const dark = uiTheme === 'dark' || (uiTheme === 'auto' && shouldUseDarkDashboard());
@@ -59,7 +58,6 @@ export function App() {
         <AnimatedStage>
           <Switch>
             <Route path="/" component={Dashboard} />
-            <Route path="/dashboard/dark" component={Dashboard} />
             <Route path="/morning" component={MorningReveal} />
             <Route path="/chat" component={Chat} />
             <Route path="/chat/rich" component={ChatRich} />

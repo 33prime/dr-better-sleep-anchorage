@@ -59,6 +59,49 @@ Do not start lanes until Phase 1 is merged and green. Same non-negotiables.
 - Do NOT train or bundle a model now. The point: pipeline accepts a model file the day
   MPSSC-trained weights exist, zero refactor.
 
+## Clip-store API contract (cross-lane interface — code against this exactly)
+
+`src/lib/clipRecorder.ts` (Lane A) exports:
+
+```ts
+export interface SnoreClip {
+  id: string;            // `${sessionId}:${ts}`
+  sessionId: string;
+  nightDate?: string;    // stamped at finalize()
+  ts: number;            // event time, unix ms
+  peakDb: number;
+  durationMs: number;    // clip audio length
+  mime: string;          // actual MediaRecorder mime used
+}
+export function isClipCaptureSupported(): boolean
+export function startClipCapture(stream: MediaStream, sessionId: string): void
+export function noteEvent(e: { ts: number; peakDb: number }): void   // detector calls per event
+export function stopClipCapture(): Promise<void>
+export function finalizeClips(sessionId: string, nightDate: string): Promise<void> // sessionRecorder.end() calls
+export function latestClips(): Promise<SnoreClip[]>       // newest night's clips, loudest first
+export function clipBlob(id: string): Promise<Blob | null> // for playback via URL.createObjectURL
+export function deleteAllClips(): Promise<void>
+```
+
+Playback consumers (Lane B) import ONLY these. Storage: IndexedDB `dns-sessions`,
+new store `clips`. Blobs stay out of React state; create/revoke object URLs around
+playback.
+
+## File ownership (parallel lanes — do not cross)
+
+| Lane | Files |
+|---|---|
+| A clips-capture | `src/lib/clipRecorder.ts`, `src/hooks/useSnoreDetector.ts`, `src/lib/sessionRecorder.ts`, `src/screens/Night.tsx`, `Night.module.css` |
+| B clips-playback | `src/screens/MorningReveal.tsx`+css, `src/screens/ChatRich.tsx`+css, `src/screens/DetailedNight.tsx`+css |
+| C dead-ends | `src/screens/Reorder.tsx`+css, `src/screens/Comparisons.tsx`+css, `src/screens/DeviceOverview.tsx`, `src/screens/Profile.tsx`, `src/App.tsx`, `src/components/TabBar.tsx`, `src/seed.ts` (Recommendation.sourceNightDate only), `scripts/seed-demo.mjs` (rec field + rerun) |
+| D ml-scaffold | `src/lib/classifier.ts`, `package.json` (onnxruntime-web) |
+| integrate | conflict resolution anywhere, final build |
+
+Lane A calls Lane D's classifier through the interface in "Lane C — On-device ML
+scaffold" above (import from `../lib/classifier`); Lane D creates that file without
+touching the detector. Lane B's DetailedNight work also includes the honesty guards
+from the audit (see Lane B item 2 in "Dead-screen fixes").
+
 ## Testing protocol (every phase, before declaring done)
 
 1. `npm run build` green.
