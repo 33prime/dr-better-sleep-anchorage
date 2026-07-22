@@ -3,243 +3,233 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dr. Better Sleep — the mouthpiece is the fix, the app is the proof</title>
-<meta name="description" content="Dentist-designed anti-snoring mouthpiece with an app that counts every snore and plays you the silence. Preorders open this fall.">
+<title>Dr. Better Sleep — Breathe More. Snore Less. Sleep Better.</title>
+<meta name="description" content="Dentist-developed sleep products by Dr. Howard Sommers, DDS, D-ABDSM — with an app that measures every night. Preorders open this fall.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,700;0,800;0,900;1,800&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,700;0,800;0,900;1,800&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
 <nav class="nav" aria-label="Main">
-  <a class="brand" href="#top">Dr. <em>Better</em> Sleep</a>
+  <a class="brand" href="index.html">Dr. <em>Better</em> Sleep</a>
   <div class="navlinks">
     <a href="#products">Products</a>
+    <a href="about.html">About</a>
     <a href="#app">The app</a>
-    <a href="#doctor">The dentist</a>
     <a href="#faq">FAQ</a>
   </div>
-  <a class="navcta" href="#waitlist">Join the preorder list</a>
+  <a class="navcta" href="#waitlist">Pre-order</a>
 </nav>
 
-<!-- ======================= DUSK · HERO ======================= -->
-<header class="hero" id="top">
-  <div class="hero-copy">
-    <p class="eyebrow"><span class="clock">TONIGHT</span> · designed by a dentist, measured by your phone</p>
-    <h1>The mouthpiece is <em>the fix.</em><br>The app is <em>the proof.</em></h1>
-    <p class="lede">Dr. Never Snore gently advances your jaw to keep the airway open — the same
-    principle dental sleep medicine has used for decades. The Dr.&nbsp;Better&nbsp;Sleep app
-    listens all night, counts every snore, and shows you the silence.</p>
-
-    <form class="capture" id="hero-form" autocomplete="off">
-      <label class="visually-hidden" for="hero-email">Email</label>
-      <input id="hero-email" name="email" type="email" required placeholder="you@email.com" inputmode="email">
-      <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <button type="submit">Join the preorder list</button>
-      <p class="form-note" data-note>Ships this fall. No spam — one email when preorders open.</p>
-    </form>
-
-    <ul class="trust">
-      <li>Designed by Howard Sommers, DDS, D-ABDSM</li>
-      <li>30+ years of dental sleep medicine</li>
-      <li>Drug-free</li>
-      <li>30-day money-back guarantee</li>
-    </ul>
+<!-- ============ HERO (store structure: split, navy, photo right) ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="pill pill-teal">Clinically developed by Dr. Howard Sommers, DDS</p>
+      <h1>Breathe More.<br><em>Snore Less.</em> Sleep&nbsp;Better.</h1>
+      <p class="lede">A system of sleep products developed by snoring and sleep expert
+      Dr.&nbsp;Howard&nbsp;Sommers — built around one honest idea: fix the airway,
+      then prove it's working, night after measured night.</p>
+      <div class="btnrow">
+        <a class="btn btn-teal" href="#bundle">Shop Premium Bundle</a>
+        <a class="btn btn-ghost" href="#products">Learn more</a>
+      </div>
+      <ul class="chips">
+        <li>Dentist-developed</li>
+        <li>Drug-free</li>
+        <li>Preorder · Fall 2026</li>
+      </ul>
+    </div>
+    <div class="hero-photo">
+      <img src="assets/hero-bed.jpg" alt="A couple asleep in bed, a pug asleep on its back between them." width="733" height="722" loading="eager">
+    </div>
   </div>
-
-  <figure class="hero-phone reveal">
-    <img src="assets/app-dashboard.png" alt="The app's morning dashboard: 39 snores last night, down 34% from baseline; Sam slept through 6 of 7 nights this week." width="390" height="844" loading="eager">
-    <figcaption>A real morning in the app — every number measured, nothing staged.</figcaption>
-  </figure>
 </header>
 
-<!-- horizon: day → paper hills -->
-<div class="horizon" aria-hidden="true">
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <path class="h1" d="M0,70 Q240,20 480,55 T960,45 T1440,60 V120 H0 Z"/>
-    <path class="h2" d="M0,90 Q360,50 720,80 T1440,85 V120 H0 Z"/>
-    <path class="h3" d="M0,105 Q480,80 960,100 T1440,102 V120 H0 Z"/>
-  </svg>
+<!-- ============ TRUST BAR ============ -->
+<div class="trustbar" role="list">
+  <!-- TODO before public launch: restore "FDA-Cleared Device" here once the
+       510(k) clearance number is verified. -->
+  <span role="listitem">🦷 Dentist-developed</span>
+  <span role="listitem">🌙 Drug-free design</span>
+  <span role="listitem">📱 App included</span>
+  <span role="listitem">🚚 Free shipping on orders $50+</span>
+  <span role="listitem">↩️ 30-day money-back guarantee</span>
 </div>
 
-<!-- ======================= 10:47 PM · THE FITTING ======================= -->
+<!-- ============ PRODUCTS ============ -->
 <section class="section products" id="products">
-  <p class="eyebrow"><span class="clock">10:47 PM</span> · the fitting</p>
-  <h2>Three things on the <em>nightstand.</em></h2>
-  <p class="section-lede">One fix, two supporting acts. Boil, bite, and the mouthpiece holds the
-  shape of your teeth — five strap positions let it advance gently, week by week.</p>
+  <h2 class="center">Our Premium <em>Solutions</em></h2>
+  <p class="section-lede center">Tackle the major causes of snoring with three products designed to work as one system.</p>
 
   <div class="grid3">
-    <article class="card flagship">
-      <p class="tag">Flagship</p>
-      <div class="art" aria-hidden="true">
-        <svg viewBox="0 0 200 120">
-          <path d="M30,45 Q100,10 170,45 Q168,62 156,68 Q100,48 44,68 Q32,62 30,45 Z" class="a-teal"/>
-          <path d="M36,72 Q100,104 164,72 Q165,92 152,98 Q100,110 48,98 Q35,92 36,72 Z" class="a-ink"/>
-          <rect x="14" y="55" width="18" height="8" rx="3" class="a-strap"/>
-          <rect x="168" y="55" width="18" height="8" rx="3" class="a-strap"/>
-          <circle cx="177" cy="59" r="2.4" class="a-dot"/>
-        </svg>
-      </div>
-      <h3>Dr. Never Snore</h3>
-      <p class="desc">Boil-and-bite mandibular advancement mouthpiece. Two silicone straps,
-      five positions, low-profile fit with a breathing port.</p>
+    <article class="card">
+      <p class="tag tag-teal">Flagship product</p>
+      <div class="photo"><img src="assets/prod-mouthpiece.jpg" alt="The Dr. Never Snore mouthpiece: clear boil-and-bite trays with a blue insert and side straps." loading="lazy"></div>
+      <h3>Dr. Never Snore <span class="sku">(DNS)</span></h3>
+      <p class="sub">Anti-snoring mouthpiece</p>
+      <p class="desc">Intraoral device that gently positions your jaw forward to keep the
+      airway open — snoring's most common cause, addressed at the source.</p>
+      <ul class="checks">
+        <li>Boil &amp; bite custom fit</li>
+        <li>Two silicone straps, five positions</li>
+        <li>Low-profile design with breathing port</li>
+      </ul>
       <p class="price">$125.99 <span>preorder</span></p>
     </article>
 
     <article class="card">
       <p class="tag">Sleep support</p>
-      <div class="art" aria-hidden="true">
-        <svg viewBox="0 0 200 120">
-          <path d="M20,75 Q30,40 70,44 Q100,20 130,44 Q170,40 180,75 Q182,95 160,98 Q100,108 40,98 Q18,95 20,75 Z" class="a-paper"/>
-          <path d="M70,60 Q100,44 130,60" class="a-line"/>
-        </svg>
-      </div>
+      <div class="photo"><img src="assets/prod-pillow.jpg" alt="The Dr. Better Sleep contoured memory-foam pillow." loading="lazy"></div>
       <h3>Dr. Better Sleep Pillow</h3>
-      <p class="desc">Contoured memory foam that makes side-sleeping the easy default —
+      <p class="sub">Ergonomic sleep support pillow</p>
+      <p class="desc">Contoured design that makes side-sleeping the comfortable default —
       the position most snorers do best in.</p>
+      <ul class="checks">
+        <li>Contoured memory foam</li>
+        <li>Encourages side sleeping</li>
+        <li>Ergonomic neck support</li>
+      </ul>
       <p class="price">$119.99 <span>preorder</span></p>
     </article>
 
     <article class="card">
-      <p class="tag">Nasal care</p>
-      <div class="art" aria-hidden="true">
-        <svg viewBox="0 0 200 120">
-          <rect x="38" y="48" width="86" height="20" rx="10" transform="rotate(-8 81 58)" class="a-coral"/>
-          <rect x="86" y="62" width="86" height="20" rx="10" transform="rotate(-8 129 72)" class="a-paper"/>
-          <path d="M52,55 H108 M100,69 H156" class="a-line"/>
-        </svg>
-      </div>
+      <p class="tag tag-coral">Nasal care</p>
+      <div class="photo"><img src="assets/prod-strips.jpg" alt="Dr. Breathe Better nasal strips with four-way pull design." loading="lazy"></div>
       <h3>Dr. Breathe Better Strips</h3>
-      <p class="desc">Peel-and-stick strips that lift the nasal passages for easier airflow.
-      Drug-free, single use.</p>
+      <p class="sub">Peel &amp; stick nasal breathing strips</p>
+      <p class="desc">Enhanced-airflow strips that gently lift the nasal passages for easier
+      breathing — day or night, without medication.</p>
+      <ul class="checks">
+        <li>Four-way pull for increased airflow</li>
+        <li>Hypoallergenic, skin-friendly</li>
+        <li>Drug-free, single use</li>
+      </ul>
       <p class="price">$14.99 <span>preorder</span></p>
     </article>
   </div>
+</section>
 
-  <aside class="bundle">
+<!-- ============ BUNDLE ============ -->
+<section class="section bundle-band" id="bundle">
+  <p class="pill pill-teal center">Best value</p>
+  <h2 class="center">Save $41 with Our <em>Premium Bundle</em></h2>
+  <div class="bundle-thumbs">
+    <figure><img src="assets/prod-mouthpiece.jpg" alt="" loading="lazy"><figcaption>Dr. Never Snore<br><span>$125.99</span></figcaption></figure>
+    <figure><img src="assets/prod-pillow.jpg" alt="" loading="lazy"><figcaption>Dr. Better Sleep Pillow<br><span>$119.99</span></figcaption></figure>
+    <figure><img src="assets/prod-strips.jpg" alt="" loading="lazy"><figcaption>Dr. Breathe Better Strips<br><span>$14.99</span></figcaption></figure>
+  </div>
+  <p class="bundle-price">$219.97 <s>$260.97</s> <span class="save">Save $41</span></p>
+  <a class="btn btn-teal" href="#waitlist">Get the Bundle — Pre-Order</a>
+  <p class="fineprint-light">App access included with every device. No charge until units ship.</p>
+</section>
+
+<!-- ============ DR. SOMMERS ============ -->
+<section class="section doctor-band" id="doctor">
+  <div class="split">
     <div>
-      <h3>The whole nightstand — <em>$219.97</em> <s>$260.97</s></h3>
-      <p>Mouthpiece, pillow, and strips together, with app access included. Save $41.</p>
+      <p class="pill">Meet Dr. Never Snore</p>
+      <h2>Dr. Howard <em>Sommers</em></h2>
+      <p class="cred-line">DDS, D-ABDSM · Sleep Diplomate · Sleep health professional</p>
+      <p>Dr. Howard Sommers is the visionary behind Dr. Better Sleep. With nearly thirty
+      years in dentistry — a path that began as an ironworker on the World Trade Center
+      before NYU's College of Dentistry — he holds Diplomate status with the American Board
+      of Dental Sleep Medicine, working alongside physicians on oral-appliance therapy for
+      patients who can't tolerate CPAP.</p>
+      <ul class="checks two-col">
+        <li>30+ years experience as dentist</li>
+        <li>Sleep Diplomat</li>
+        <li>Developer of Dr. Never Snore</li>
+        <li>8,000 hours making custom snore guards</li>
+        <li>D-ABDSM board certified</li>
+        <li>Complete approach to sleep health</li>
+      </ul>
+      <a class="textlink" href="about.html">Read full bio →</a>
     </div>
-    <a class="btn" href="#waitlist">Reserve the bundle</a>
-  </aside>
-</section>
-
-<!-- horizon: paper → night -->
-<div class="horizon to-night" aria-hidden="true">
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <path class="n1" d="M0,60 Q240,90 480,55 T960,70 T1440,50 V120 H0 Z"/>
-    <path class="n2" d="M0,85 Q360,105 720,80 T1440,90 V120 H0 Z"/>
-  </svg>
-</div>
-
-<!-- ======================= 2:40 AM · WHILE YOU SLEEP ======================= -->
-<section class="section night" id="app">
-  <div class="stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <p class="eyebrow"><span class="clock">2:40 AM</span> · while you sleep</p>
-  <h2>Your phone hears what <em>you can't.</em></h2>
-  <p class="section-lede">On the nightstand, screen dimmed, the app measures the whole night —
-  and only claims what a microphone can truly know.</p>
-
-  <div class="phones">
-    <figure class="reveal"><img src="assets/app-night-detail.png" alt="Night detail screen: snoring intensity by hour with tappable audio clips at their real timestamps." loading="lazy"><figcaption>Every snore, timestamped</figcaption></figure>
-    <figure class="reveal delay1"><img src="assets/app-trends.png" alt="Trends screen: 30 nights of snore counts falling after the device was fitted." loading="lazy"><figcaption>The trend since fitting</figcaption></figure>
-    <figure class="reveal delay2"><img src="assets/app-chat.png" alt="Chat with Dr. Sommers, the AI sleep coach, discussing last night's data." loading="lazy"><figcaption>A coach who's seen the data</figcaption></figure>
-  </div>
-
-  <dl class="measures">
-    <div><dt>Counts every snore</dt><dd>Loudness-gated, low-frequency detection with per-event timestamps — not a vibe, a number.</dd></div>
-    <div><dt>Fingerprints the sound</dt><dd>Palatal, tongue-base, or nasal — the vibration site has an acoustic signature, and it changes how the device should be adjusted.</dd></div>
-    <div><dt>Records the proof</dt><dd>The five loudest snores, saved as clips you can play in the morning. They never leave your phone.</dd></div>
-    <div><dt>Coaches the fix</dt><dd>Dr. Sommers, the in-app coach, reads your nights and titrates the strap position — one quiet suggestion at a time.</dd></div>
-  </dl>
-</section>
-
-<!-- horizon: night → dawn -->
-<div class="horizon to-dawn" aria-hidden="true">
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <path class="d1" d="M0,55 Q360,25 720,50 T1440,45 V120 H0 Z"/>
-    <path class="d2" d="M0,90 Q480,65 960,88 T1440,85 V120 H0 Z"/>
-  </svg>
-</div>
-
-<!-- ======================= 6:30 AM · THE MORNING AFTER ======================= -->
-<section class="section morning" id="results">
-  <p class="eyebrow"><span class="clock">6:30 AM</span> · the morning after</p>
-  <h2>Wake up to <em>evidence.</em></h2>
-
-  <div class="split">
-    <figure class="hero-phone small reveal">
-      <img src="assets/app-morning.png" alt="Morning reveal screen summarizing the night honestly, with a play button for the loudest snore clip." loading="lazy">
+    <figure class="portrait">
+      <img src="assets/doctor.jpg" alt="Dr. Howard Sommers smiling in navy scrubs in his dental practice." loading="lazy">
+      <figcaption><strong>30+</strong> years experience</figcaption>
     </figure>
-    <div class="split-copy">
-      <p>The morning report says what happened — snore count against your baseline, the quiet
-      stretches, how the night compared to the week. If there's a clip worth hearing, it's one
-      tap away. If your partner finally slept through, that's the headline.</p>
-      <p>And the science behind the measurement is real, published, and cited in the app:</p>
-      <ul class="citations">
-        <li><strong>Snoring intensity tracks severity.</strong> Across 13 studies and 3,153 adults, snoring sound correlated with the apnea-hypopnea index at r&nbsp;=&nbsp;0.71.<span class="cite">Meta-analysis, PMC9670768</span></li>
-        <li><strong>Phone-mic snore counting is validated.</strong> Smartphone detection has reached 95.2% accuracy against ground truth in formal trials.<span class="cite">JMIR Formative Research, 2025</span></li>
-        <li><strong>The snore's sound reveals its source.</strong> Audio alone classified the vibration site with 92.2% accuracy in clinical recordings.<span class="cite">PMC8320490</span></li>
-      </ul>
-      <p class="fineprint">The app is a wellness product. It measures snoring — it does not detect
-      or diagnose sleep apnea, and it will always tell you when something belongs in front of a clinician.</p>
-    </div>
   </div>
 </section>
 
-<!-- ======================= THE DENTIST ======================= -->
-<section class="section doctor" id="doctor">
-  <p class="eyebrow"><span class="clock">THE DENTIST</span> · behind the device</p>
-  <h2>Howard Sommers, <em>DDS, D-ABDSM</em></h2>
+<!-- ============ THE APP ============ -->
+<section class="section app-band" id="app">
+  <p class="pill pill-teal center">Included with purchase</p>
+  <h2 class="center">The Dr. Better Sleep <em>App</em></h2>
+  <p class="section-lede center">Every purchase comes with the app — it listens from the
+  nightstand, counts every snore, fingerprints the sound, and coaches the fix. Real
+  measurement, honestly reported.</p>
+
+  <div class="phones5">
+    <figure><img src="assets/app-dashboard.png" alt="Sleep dashboard screen." loading="lazy"><figcaption><strong>Sleep dashboard</strong>Last night at a glance — snores, sleep, streak.</figcaption></figure>
+    <figure><img src="assets/app-night-detail.png" alt="Night detail screen with hourly snoring intensity." loading="lazy"><figcaption><strong>Every snore, timestamped</strong>Hour by hour, with playable clips.</figcaption></figure>
+    <figure><img src="assets/app-trends.png" alt="Trends screen showing 30 nights of decline." loading="lazy"><figcaption><strong>Trends &amp; insights</strong>Your progress over 7, 30, 90 nights.</figcaption></figure>
+    <figure><img src="assets/app-chat.png" alt="Chat with Dr. Sommers, the AI coach." loading="lazy"><figcaption><strong>Ask Dr. Sommers</strong>A coach who has read your data.</figcaption></figure>
+    <figure><img src="assets/app-morning.png" alt="Morning report screen." loading="lazy"><figcaption><strong>The morning report</strong>Wake up to evidence, not vibes.</figcaption></figure>
+  </div>
+
+  <div class="btnrow center">
+    <a class="btn btn-navy" href="https://dr-never-snore.netlify.app" rel="noopener">Open the web app</a>
+    <span class="soon">App Store &amp; Google Play at launch</span>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="section stats-band">
   <div class="split">
-    <div class="split-copy">
-      <p>Dr. Sommers has practiced dentistry for more than thirty years — a career that began,
-      improbably, as an ironworker on the World Trade Center before NYU's College of Dentistry.
-      He holds Diplomate status with the American Board of Dental Sleep Medicine, working
-      alongside physicians on oral-appliance therapy for patients who can't tolerate CPAP.</p>
-      <p>Dr. Never Snore is the boil-and-bite distillation of the custom snore guards he has
-      fitted by hand — more than eight thousand of them.</p>
-      <ul class="creds">
-        <li>DDS — NYU College of Dentistry · Phi Beta Kappa, B.S. Biology</li>
-        <li>Diplomate — American Board of Dental Sleep Medicine</li>
-        <li>Albert Einstein Medical Center · Mid Continent Orthodontics</li>
-        <li>IV Sedation certified — Oregon Health &amp; Science University</li>
-        <li>8,000+ custom snore guards fitted in practice</li>
-      </ul>
+    <div>
+      <h2>Stop Letting Snoring <em>Steal Your Sleep</em></h2>
+      <p>Millions of people lose sleep to snoring — their own, or the person's next to them.
+      It wears on energy, focus, relationships, and long-term health. Dr.&nbsp;Better&nbsp;Sleep
+      was created to change that, with dentist-developed products and measurement you can trust.</p>
+      <dl class="stats">
+        <div><dt>30+</dt><dd>Years of dental expertise</dd></div>
+        <div><dt>8,000+</dt><dd>Custom snore guards made in practice</dd></div>
+        <div><dt>90%</dt><dd>Of custom-guard patients reported reduced snoring</dd></div>
+        <div><dt>100%</dt><dd>Drug-free, every product</dd></div>
+      </dl>
+      <a class="btn btn-teal" href="#products">Shop all products</a>
     </div>
-    <div class="doctor-note" aria-hidden="true">
-      <p>“Most people don't need a lab. They need their jaw held four millimetres forward
-      and someone honest about whether it's working.”</p>
-      <p class="sig">— Dr. Sommers</p>
-    </div>
+    <figure class="stats-photo"><img src="assets/couch.jpg" alt="Someone asleep under a blanket on the living-room couch." loading="lazy"></figure>
   </div>
 </section>
 
-<!-- ======================= FAQ ======================= -->
+<!-- ============ REVIEWS (structure kept, honestly empty) ============ -->
+<section class="section reviews-band">
+  <h2 class="center">What Our Customers <em>Say</em></h2>
+  <p class="section-lede center">Real reviews from real customers — this space fills up when
+  the first preorders ship this fall.</p>
+  <div class="grid3 ghost-reviews" aria-hidden="true">
+    <div class="ghost"><span>★★★★★</span><p>Your review<br>goes here.</p></div>
+    <div class="ghost"><span>★★★★★</span><p>Shipping<br>this fall.</p></div>
+    <div class="ghost"><span>★★★★★</span><p>Verified purchases<br>only.</p></div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
 <section class="section faq" id="faq">
-  <p class="eyebrow"><span class="clock">BEFORE BED</span> · questions</p>
-  <h2>Asked, <em>answered.</em></h2>
+  <h2 class="center">Frequently Asked <em>Questions</em></h2>
   <div class="faqs">
     <details>
       <summary>How does the mouthpiece actually work?</summary>
-      <p>It's a mandibular advancement device: it holds your lower jaw slightly forward (up to
-      8&nbsp;mm, adjusted across five strap positions), which keeps the soft tissue at the back of
+      <p>It's a mandibular advancement device: it holds your lower jaw slightly forward
+      (up to 8&nbsp;mm across five strap positions), keeping the soft tissue at the back of
       the throat from collapsing into the airway — the collapse that makes the snoring sound.</p>
     </details>
     <details>
       <summary>Will it fit my mouth?</summary>
-      <p>Yes — that's the point of boil-and-bite. Soften it in hot water, bite for thirty seconds,
-      and it holds a custom impression of your teeth. Misfit? Re-boil and redo it, guided step by
-      step in the app.</p>
+      <p>Yes — that's the point of boil-and-bite. Soften it in hot water, bite for thirty
+      seconds, and it holds a custom impression of your teeth. Misfit? Re-boil and redo it,
+      guided step by step in the app.</p>
     </details>
     <details>
       <summary>Is the app included?</summary>
-      <p>Every device ships with app access included — tracking, snore-type analysis, clips, and
-      the Dr.&nbsp;Sommers coach. No subscription for preorder customers.</p>
+      <p>Every device ships with app access included — tracking, snore-type analysis, audio
+      clips, and the Dr.&nbsp;Sommers coach. No subscription for preorder customers.</p>
     </details>
     <details>
       <summary>Can the app tell me if I have sleep apnea?</summary>
@@ -250,39 +240,56 @@
     <details>
       <summary>When does it ship?</summary>
       <p>Production units arrive this fall. The preorder list gets first units, in order,
-      with the 30-day money-back guarantee from the day yours arrives.</p>
+      with the 30-day money-back guarantee starting the day yours arrives.</p>
     </details>
   </div>
 </section>
 
-<!-- ======================= FINAL CTA ======================= -->
-<section class="section closer" id="waitlist">
-  <div class="stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-  <h2>Tonight could be the <em>last loud one.</em></h2>
-  <p class="section-lede">Join the list — one email when preorders open this fall, first units in order.</p>
+<!-- ============ FINAL CTA ============ -->
+<section class="section cta-band" id="waitlist">
+  <h2 class="center">Ready to Sleep Better <em>Tonight?</em></h2>
+  <p class="section-lede center">Be among the first — one email when preorders open this fall,
+  first units in order.</p>
   <form class="capture center" id="footer-form" autocomplete="off">
     <label class="visually-hidden" for="footer-email">Email</label>
     <input id="footer-email" name="email" type="email" required placeholder="you@email.com" inputmode="email">
     <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <button type="submit">Join the preorder list</button>
-    <p class="form-note" data-note>Breathe more. Snore less. Sleep better.</p>
+    <button type="submit">Join the pre-order list</button>
+    <p class="form-note" data-note>30-day money-back guarantee · Free shipping on orders $100+ · Secure checkout at launch</p>
   </form>
 </section>
 
+<!-- ============ FOOTER ============ -->
 <footer class="footer">
-  <div>
-    <p class="brand">Dr. <em>Better</em> Sleep</p>
-    <p>Dentist-designed sleep products by Howard Sommers, DDS, D-ABDSM.</p>
+  <div class="footgrid">
+    <div>
+      <p class="brand">Dr. <em>Better</em> Sleep</p>
+      <p class="foot-sub">Clinically inspired sleep products developed by<br>Dr. Howard Sommers, DDS, D-ABDSM.</p>
+    </div>
+    <div>
+      <p class="foot-h">Products</p>
+      <a href="#products">Dr. Never Snore</a>
+      <a href="#products">Sleep Pillow</a>
+      <a href="#products">Breathing Strips</a>
+      <a href="#bundle">Premium Bundle</a>
+    </div>
+    <div>
+      <p class="foot-h">Company</p>
+      <a href="about.html">About</a>
+      <a href="#app">The app</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div>
+      <p class="foot-h">Legal</p>
+      <a href="#" aria-disabled="true">Terms &amp; policies (at launch)</a>
+      <a href="#" aria-disabled="true">Privacy (at launch)</a>
+    </div>
   </div>
-  <div class="footlinks">
-    <a href="#products">Products</a>
-    <a href="#app">The app</a>
-    <a href="#doctor">The dentist</a>
-    <a href="#faq">FAQ</a>
+  <div class="footbar">
+    <span>© 2026 Dr. Better Sleep. All rights reserved.</span>
+    <span>Developed by Dr. Howard Sommers, DDS, D-ABDSM</span>
+    <span>The app is a wellness product, not a medical device.</span>
   </div>
-  <p class="legal">© 2026 Dr. Better Sleep. The app is a wellness product, not a medical device.
-  <!-- TODO before public launch: verify the device's 510(k) clearance number before any
-       "FDA-cleared" language returns to this page; confirm guarantee terms. --></p>
 </footer>
 
 <script src="site.js"></script>
