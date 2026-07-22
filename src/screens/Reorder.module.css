@@ -1,4 +1,7 @@
-.root { padding-bottom: 36px; }
+.root { padding-bottom: 36px; position: relative; isolation: isolate; }
+
+/* quiet header decor — a coral paper moon over cream stars (night only) */
+.decor { display: none; }
 
 .nav { height: 44px; padding: 0 12px 0 8px; display: flex; align-items: center; justify-content: space-between; }
 .nav .back { color: var(--text-secondary); padding: 6px 8px; display: flex; align-items: center; gap: 4px; font-family: var(--serif); font-style: italic; font-size: 14px; background: none; border: 0; }
@@ -16,9 +19,15 @@
 .wear .l { flex: 1; }
 .wear .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
 .wear .v { margin-top: 6px; font-family: var(--serif); font-size: 22px; line-height: 1.15; color: var(--text-primary); }
-.wear .icon { width: 64px; height: 48px; flex: none; opacity: 0.85; }
+.wear .icon {
+  width: 64px; height: 48px; flex: none; opacity: 0.85;
+  --dev-shadow: rgba(30,37,68,0.06);
+  --dev-fill: rgba(255,255,255,0.7);
+  --dev-panel: var(--bg-secondary);
+  --dev-stroke: var(--text-primary);
+}
 .wear .meter { margin-top: 18px; height: 4px; border-radius: 2px; background: rgba(30,37,68,0.08); position: relative; overflow: hidden; }
-.wear .meter > i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--accent), #E5898B); border-radius: 2px; }
+.wear .meter > i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--accent), var(--coral)); border-radius: 2px; }
 .wear .metaRow { margin-top: 8px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.04em; }
 .wear .metaRow .now { color: var(--text-primary); }
 .wear .reason { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(30,37,68,0.08); font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); text-wrap: pretty; }
@@ -29,11 +38,11 @@
   display: flex; align-items: center; justify-content: space-between;
   width: 100%;
   height: 56px; border-radius: 14px;
-  background: var(--text-primary); color: var(--bg-primary);
+  background: var(--coral-deep); color: #FFFFFF;
   padding: 0 22px;
   border: 0;
 }
-.btn.ordered { background: var(--accent); color: var(--text-primary); }
+.btn.ordered { background: var(--accent); color: #FFFFFF; }
 .btn .lab { font-size: 15px; font-weight: 500; text-align: left; }
 .btn .lab .sub { display: block; font-family: var(--mono); font-size: 10px; opacity: 0.6; letter-spacing: 0.04em; margin-top: 2px; font-weight: 400; }
 .btn .price { font-family: var(--mono); font-size: 14px; font-weight: 300; }
@@ -70,3 +79,66 @@
 .rec .meta .price { font-family: var(--mono); font-size: 13px; color: var(--text-primary); font-weight: 300; }
 
 .footnote { margin-top: 22px; font-size: 11.5px; color: var(--text-tertiary); line-height: 1.5; font-family: var(--serif); font-style: italic; text-wrap: pretty; }
+
+/* ============================================================
+   NIGHT — "Papercraft Night" (see app/BRAND.md). Commerce screen:
+   coral carries the reorder CTA + prices (warmth/price), teal marks
+   the confirmed "ordered" state + reasoning. One quiet decorative
+   moment: a coral paper moon in the header. Day theme is untouched.
+   ============================================================ */
+:global(.screen.night) .decor {
+  display: block;
+  position: absolute; top: 2px; right: 10px;
+  width: 122px; height: 92px;
+  pointer-events: none; z-index: -1;
+}
+
+:global(.screen.night) .nav .back { color: var(--night-text-2); }
+:global(.screen.night) .nav .more { color: var(--night-text-2); }
+:global(.screen.night) .label { color: var(--night-text-2); }
+
+:global(.screen.night) .wear {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .wear .k { color: var(--night-text-2); }
+:global(.screen.night) .wear .v { color: var(--night-text-1); }
+:global(.screen.night) .wear .icon {
+  --dev-shadow: rgba(0,0,0,0.35);
+  --dev-fill: var(--night-bg-3);
+  --dev-panel: var(--night-bg-3);
+  --dev-stroke: var(--night-text-2);
+}
+:global(.screen.night) .wear .meter { background: var(--night-bg-3); }
+:global(.screen.night) .wear .metaRow { color: var(--night-text-3); }
+:global(.screen.night) .wear .metaRow .now { color: var(--night-text-1); }
+:global(.screen.night) .wear .reason { border-top-color: var(--hairline-night); color: var(--night-text-2); }
+:global(.screen.night) .wear .reason .em { color: var(--night-text-1); }
+
+/* primary CTA — filled coral (price/attention), ink-white text */
+:global(.screen.night) .btn { background: var(--coral-deep); color: var(--night-text-1); }
+:global(.screen.night) .btn.ordered { background: var(--accent); color: var(--night-bg-0); }
+
+:global(.screen.night) .toggleRow { border-bottom-color: var(--hairline-night); }
+:global(.screen.night) .toggleRow .ttl { color: var(--night-text-1); }
+:global(.screen.night) .toggleRow .sub { color: var(--night-text-2); }
+:global(.screen.night) .switch { background: var(--night-bg-3); }
+:global(.screen.night) .switch.on { background: var(--accent); }
+
+:global(.screen.night) .ship { border-bottom-color: var(--hairline-night); }
+:global(.screen.night) .ship .l .k { color: var(--night-text-2); }
+:global(.screen.night) .ship .l .v { color: var(--night-text-1); }
+:global(.screen.night) .ship .edit { color: var(--night-text-2); }
+
+:global(.screen.night) .shelf .h2 { color: var(--night-text-1); }
+:global(.screen.night) .shelf .lede { color: var(--night-text-2); }
+
+:global(.screen.night) .rec { border-top-color: var(--hairline-night); }
+:global(.screen.night) .rec:last-of-type { border-bottom-color: var(--hairline-night); }
+:global(.screen.night) .rec .thumb { background: var(--night-bg-3); color: var(--night-text-2); }
+:global(.screen.night) .rec .nm { color: var(--night-text-1); }
+:global(.screen.night) .rec .quote { color: var(--night-text-2); }
+:global(.screen.night) .rec .meta .when { color: var(--night-text-3); }
+:global(.screen.night) .rec .meta .price { color: var(--coral); }
+
+:global(.screen.night) .footnote { color: var(--night-text-3); }

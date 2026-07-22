@@ -1,57 +1,110 @@
-.root { padding: 4px 20px 100px; }
+.root { padding: 4px 20px 100px; position: relative; }
 
-.head { padding: 8px 0 12px; display: flex; align-items: baseline; justify-content: space-between; }
-.head h1 { font-family: var(--serif); font-size: 28px; }
-.head .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
+/* header decorations (clouds / stars / coral moon) */
+.scene {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 130px; width: 100%;
+  pointer-events: none;
+}
+
+.head { padding: 14px 0 12px; display: flex; align-items: baseline; justify-content: space-between; position: relative; }
+.head h1 { font-family: var(--serif); font-weight: 700; font-size: 36px; letter-spacing: -0.005em; }
+.head .sub { font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
 
 .tabs {
-  display: flex; gap: 4px; padding: 4px;
-  background: rgba(30,37,68,0.05); border-radius: 999px;
-  width: fit-content; margin: 6px 0 22px;
+  display: flex; gap: 4px; padding: 5px;
+  background: rgba(27,35,64,0.05);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  width: fit-content; margin: 10px 0 24px;
+  position: relative;
 }
 .tabs .t {
-  padding: 6px 14px; border-radius: 999px;
-  font-family: var(--mono); font-weight: 400; font-size: 11px;
+  padding: 9px 16px; border-radius: 999px;
+  font-family: var(--mono); font-weight: 600; font-size: 11px;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--text-tertiary);
   transition: background 200ms, color 200ms;
 }
-.tabs .on { background: var(--text-primary); color: var(--bg-primary); }
+/* selected segment: navy ink pill by day (light mock), teal at night */
+.tabs .on { background: var(--text-primary); color: #FFFFFF; }
 
-.chartCard { background: var(--bg-secondary); border-radius: 22px; padding: 22px 22px 18px; }
-.chartHead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.chartHead .k { font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
-.legend { display: flex; gap: 14px; align-items: center; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); }
-.legend .sw { display: inline-block; width: 12px; height: 2px; vertical-align: middle; margin-right: 5px; }
+.chartCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--hairline);
+  border-radius: 24px;
+  padding: 22px 22px 16px;
+  overflow: hidden;
+}
+.chartHead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.chartHead .k { font-family: var(--mono); font-weight: 600; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); white-space: nowrap; }
+.legend { display: flex; gap: 12px; align-items: center; font-family: var(--mono); font-weight: 500; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); }
+.legend > span { white-space: nowrap; display: inline-flex; align-items: center; }
+.legend .sw { display: inline-block; width: 14px; height: 2px; margin-right: 5px; border-radius: 1px; flex: none; }
 
-.numRow { margin-top: 12px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-.big { font-family: var(--mono); font-weight: 300; font-size: 56px; line-height: 0.9; letter-spacing: -0.05em; color: var(--text-primary); }
-.bigUnit { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--text-secondary); }
-.delta { font-family: var(--sans); font-weight: 500; font-size: 13px; color: var(--positive); }
-.delta .from { color: var(--text-tertiary); font-weight: 400; margin-left: 4px; }
+.numRow { margin-top: 14px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.big { font-family: var(--mono); font-weight: 400; font-size: 64px; line-height: 0.9; letter-spacing: -0.04em; color: var(--text-primary); }
+.bigUnit { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 22px; color: var(--text-primary); }
+.delta { flex-basis: 100%; margin-top: 2px; font-family: var(--sans); font-weight: 600; font-size: 14px; color: var(--positive); }
+.delta .from { color: var(--text-secondary); font-weight: 400; margin-left: 4px; }
 
 .xAxis {
-  display: flex; justify-content: space-between; margin-top: 6px;
-  font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; justify-content: space-between; margin-top: 10px;
+  font-family: var(--mono); font-weight: 500; font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.14em; text-transform: uppercase;
+  position: relative;
 }
 
 .annotation { margin-top: 16px; padding: 12px 14px; border-top: 1px solid var(--hairline); display: flex; gap: 12px; align-items: flex-start; }
-.annotation .icon { width: 28px; height: 28px; flex: none; border-radius: 8px; background: rgba(67,186,202,0.18); color: var(--accent); display: grid; place-items: center; }
+.annotation .icon { width: 28px; height: 28px; flex: none; border-radius: 8px; background: rgba(75,175,186,0.18); color: var(--accent); display: grid; place-items: center; }
 .annotation .icon svg { width: 16px; height: 16px; }
 .annotation .body { font-size: 13px; line-height: 1.5; color: var(--text-primary); text-wrap: pretty; }
 .annotation .body .it { font-family: var(--serif); font-style: italic; }
 
-.row2 { margin: 28px 0 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
+.row2 { margin: 28px 0 12px; font-family: var(--mono); font-weight: 600; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
 
 .miniGrid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 .mini {
   display: flex; align-items: stretch; gap: 14px;
-  background: var(--bg-secondary); border-radius: 16px; padding: 14px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  padding: 16px 18px;
 }
 .mini .col { flex: 1; }
-.mini .k { font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
-.mini .v { font-family: var(--mono); font-weight: 300; font-size: 26px; letter-spacing: -0.04em; margin-top: 4px; color: var(--text-primary); }
-.mini .d { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-.mini .d .pos { color: var(--positive); font-weight: 500; }
+.mini .k { font-family: var(--mono); font-weight: 600; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); }
+.mini .v { font-family: var(--mono); font-weight: 400; font-size: 30px; letter-spacing: -0.03em; margin-top: 6px; color: var(--text-primary); }
+.mini .d { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; }
+.mini .d .pos { color: var(--positive); font-weight: 600; }
 .mini .d .flat { color: var(--text-tertiary); }
-.mini .spark { width: 96px; flex: none; align-self: center; display: flex; align-items: center; }
+.mini .spark { width: 120px; flex: none; align-self: center; display: flex; align-items: center; }
+
+/* ============================================================
+   NIGHT — matches mock 02
+   ============================================================ */
+:global(.screen.night) .head h1 { color: var(--night-text-1); }
+:global(.screen.night) .head .sub { color: var(--night-text-2); }
+:global(.screen.night) .tabs {
+  background: rgba(247,248,251,0.03);
+  border-color: var(--hairline-night);
+}
+:global(.screen.night) .tabs .t { color: var(--night-text-2); }
+:global(.screen.night) .tabs .on { background: var(--accent-deep); color: #FFFFFF; }
+:global(.screen.night) .chartCard {
+  background: var(--night-bg-2);
+  border-color: var(--hairline-night);
+}
+:global(.screen.night) .chartHead .k { color: var(--night-text-2); }
+:global(.screen.night) .legend { color: var(--night-text-2); }
+:global(.screen.night) .big { color: var(--night-text-1); }
+:global(.screen.night) .bigUnit { color: var(--coral); }
+:global(.screen.night) .delta .from { color: var(--night-text-2); }
+:global(.screen.night) .xAxis { color: var(--night-text-2); }
+:global(.screen.night) .row2 { color: var(--night-text-2); }
+:global(.screen.night) .mini {
+  background: var(--night-bg-2);
+  border-color: var(--hairline-night);
+}
+:global(.screen.night) .mini .k { color: var(--night-text-2); }
+:global(.screen.night) .mini .v { color: var(--night-text-1); }
+:global(.screen.night) .mini .d { color: var(--night-text-2); }
+:global(.screen.night) .mini .d .flat { color: var(--night-text-3); }

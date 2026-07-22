@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useStore, lastNight } from '../store';
 import { Sparkline } from '../components/Sparkline';
+import { TrendChart } from '../components/TrendChart';
+import { PaperCloud, PaperMoon, PaperStar } from '../components/paper/PaperScene';
 import { TickNumber } from '../components/TickNumber';
 import { fmtDateShort, fmtDelta, parseIsoDate } from '../utils/format';
 import s from './Trends.module.css';
@@ -46,6 +48,18 @@ export function Trends() {
 
   return (
     <div className={s.root}>
+      {/* drifting clouds, stars, and the coral moon around the header */}
+      <svg viewBox="0 0 393 130" className={s.scene} aria-hidden focusable="false">
+        <PaperStar x={122} y={16} scale={0.9} delay={0.7} />
+        <PaperStar x={196} y={52} scale={0.7} delay={2.1} />
+        <PaperStar x={352} y={112} scale={0.8} delay={3.4} />
+        <PaperCloud x={40} y={8} scale={0.85} drift={1} />
+        <PaperCloud x={214} y={24} scale={0.75} drift={2} />
+        <PaperMoon x={316} y={54} scale={2.2} />
+        {/* this cloud tucks in front of the moon's lower edge, like the mock */}
+        <PaperCloud x={282} y={98} scale={0.8} drift={1} />
+      </svg>
+
       <div className={s.head}>
         <h1>Trends</h1>
         <div className={s.sub}>
@@ -71,8 +85,8 @@ export function Trends() {
         <div className={s.chartHead}>
           <div className={s.k}>Snoring · {slice.length} nights</div>
           <div className={s.legend}>
-            <span><span className={s.sw} style={{ background: '#43BACA' }} />Nightly</span>
-            <span><span className={s.sw} style={{ background: '#7FD1DE' }} />7-day avg</span>
+            <span><span className={s.sw} style={{ background: 'var(--accent)' }} />Nightly</span>
+            <span><span className={s.sw} style={{ background: 'none', borderTop: '2px dashed var(--chart-avg)', height: 0 }} />7-day avg</span>
           </div>
         </div>
 
@@ -86,15 +100,8 @@ export function Trends() {
           </div>
         </div>
 
-        <div style={{ marginTop: 18, height: 180 }}>
-          <Sparkline
-            values={slice.map(n => n.totalSnores)}
-            width={360}
-            height={180}
-            stroke="#43BACA"
-            fill="#43BACA"
-            strokeWidth={1.4}
-          />
+        <div style={{ marginTop: 18 }}>
+          <TrendChart values={slice.map(n => n.totalSnores)} width={320} height={210} />
         </div>
 
         <div className={s.xAxis}>
@@ -112,7 +119,7 @@ export function Trends() {
       <div className={s.miniGrid}>
         <MiniCard label="Sleep efficiency" value={`${Math.round((last?.efficiency ?? 0) * 100)}`} unit="%" deltaText={effD.text} deltaClass={effD.cls} trend={state.nights.slice(-14).map(n => n.efficiency)} />
         <MiniCard label="HRV (overnight)" value={String(last?.hrv ?? 0)} unit=" ms" deltaText={hrvD.text} deltaClass={hrvD.cls} trend={state.nights.slice(-14).map(n => n.hrv)} />
-        <MiniCard label="Resting HR" value={String(last?.restingHr ?? 0)} unit=" bpm" deltaText={rhrD.text} deltaClass={rhrD.cls} trend={state.nights.slice(-14).map(n => n.restingHr)} stroke="#8A90A6" />
+        <MiniCard label="Resting HR" value={String(last?.restingHr ?? 0)} unit=" bpm" deltaText={rhrD.text} deltaClass={rhrD.cls} trend={state.nights.slice(-14).map(n => n.restingHr)} />
       </div>
     </div>
   );
@@ -127,7 +134,7 @@ interface MiniProps {
   trend: number[];
   stroke?: string;
 }
-function MiniCard({ label, value, unit, deltaText, deltaClass, trend, stroke = '#43BACA' }: MiniProps) {
+function MiniCard({ label, value, unit, deltaText, deltaClass, trend, stroke = '#4BAFBA' }: MiniProps) {
   return (
     <div className={s.mini}>
       <div className={s.col}>
@@ -138,7 +145,7 @@ function MiniCard({ label, value, unit, deltaText, deltaClass, trend, stroke = '
         </div>
       </div>
       <div className={s.spark}>
-        <Sparkline values={trend} width={96} height={40} stroke={stroke} fill={stroke} />
+        <Sparkline values={trend} width={96} height={40} stroke={stroke} fill={stroke} dots />
       </div>
     </div>
   );

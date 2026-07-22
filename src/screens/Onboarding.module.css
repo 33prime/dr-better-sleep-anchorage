@@ -1,4 +1,4 @@
-.root { padding: 8px 24px 24px; display: flex; flex-direction: column; }
+.root { padding: 8px 24px 24px; display: flex; flex-direction: column; position: relative; }
 
 .progress { margin-top: 4px; display: flex; gap: 6px; }
 .progress .pip { flex: 1; height: 3px; border-radius: 2px; background: rgba(30,37,68,0.10); }
@@ -22,7 +22,7 @@ h1.h { margin-top: 14px; font-family: var(--serif); font-weight: 800; font-size:
 .finding .copy .data { font-family: var(--mono); }
 
 .path { margin-top: 24px; background: var(--bg-secondary); border-radius: 22px; padding: 20px 22px; position: relative; overflow: hidden; }
-.path::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(67,186,202,0.20) 0%, transparent 70%); pointer-events: none; }
+.path::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(75,175,186,0.20) 0%, transparent 70%); pointer-events: none; }
 .path .label { color: var(--accent); font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
 .path h2 { margin-top: 8px; font-family: var(--serif); font-size: 24px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
 .path p { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--text-secondary); }
@@ -40,3 +40,46 @@ h1.h { margin-top: 14px; font-family: var(--serif); font-weight: 800; font-size:
 .btnPrimary span { display: inline-flex; align-items: center; gap: 8px; }
 .btnPrimary svg { width: 16px; height: 16px; }
 .btnGhost { color: var(--text-secondary); font-style: italic; font-family: var(--serif); font-size: 16px; background: none; }
+
+/* decorative scene — hidden on day, revealed on night behind the header */
+.scene { display: none; }
+
+/* ============================================================
+   NIGHT — papercraft-night findings (see app/BRAND.md)
+   ============================================================ */
+:global(.screen.night) .scene {
+  display: block;
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 100px; width: 100%;
+  pointer-events: none; z-index: -1;
+}
+:global(.screen.night) .progress .pip { background: var(--night-bg-3); }
+:global(.screen.night) .progress .pipDone { background: var(--accent); }
+:global(.screen.night) .whoLine .name { color: var(--night-text-3); }
+:global(.screen.night) h1.h { color: var(--night-text-1); }
+:global(.screen.night) .bodyCopy { color: var(--night-text-2); }
+:global(.screen.night) .bodyCopy .em { color: var(--night-text-1); }
+
+:global(.screen.night) .findings {
+  border-top-color: var(--hairline-night);
+  border-bottom-color: var(--hairline-night);
+}
+:global(.screen.night) .finding { border-bottom-color: var(--hairline-night); }
+:global(.screen.night) .finding .num { color: var(--night-text-3); }
+:global(.screen.night) .finding .copy { color: var(--night-text-1); }
+
+:global(.screen.night) .path {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .path h2 { color: var(--night-text-1); }
+:global(.screen.night) .path p { color: var(--night-text-2); }
+:global(.screen.night) .step { border-top-color: var(--hairline-night); }
+:global(.screen.night) .step .l { color: var(--night-text-1); }
+:global(.screen.night) .step .when { color: var(--night-text-3); }
+
+/* primary CTA — filled teal, ink-white, fully rounded */
+:global(.screen.night) .btnPrimary {
+  background: var(--accent-deep); color: var(--night-text-1); border-radius: 999px;
+}
+:global(.screen.night) .btnGhost { color: var(--night-text-2); }

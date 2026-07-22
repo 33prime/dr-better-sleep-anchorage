@@ -1,16 +1,16 @@
 .root { padding: 18px 20px 0; height: 100%; }
 
 .header {
-  display: flex; align-items: center; gap: 16px;
-  padding: 4px 0 8px;
+  display: flex; align-items: center; gap: 20px;
+  padding: 8px 0 10px;
 }
 .id .name {
-  font-family: var(--serif); font-weight: 800;
-  font-size: 28px; line-height: 1.05; color: var(--text-primary);
+  font-family: var(--serif); font-weight: 700;
+  font-size: 38px; line-height: 1.05; color: var(--text-primary);
 }
 .id .meta {
-  margin-top: 4px;
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+  margin-top: 6px;
+  font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.14em;
   color: var(--text-tertiary); text-transform: uppercase;
 }
 
@@ -24,8 +24,8 @@
 .card {
   background: var(--bg-secondary);
   border: 1px solid var(--hairline);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 18px;
+  padding: 18px;
   width: 100%;
   text-align: left;
 }
@@ -45,19 +45,21 @@
   text-transform: uppercase; color: var(--text-tertiary);
 }
 .deviceStats .v {
-  margin-top: 5px;
-  font-family: var(--mono); font-weight: 300; font-size: 24px;
-  letter-spacing: -0.03em; color: var(--text-primary);
+  margin-top: 6px;
+  font-family: var(--mono); font-weight: 400; font-size: 30px;
+  letter-spacing: -0.02em; color: var(--text-primary);
 }
-.deviceStats .of { font-size: 12px; color: var(--text-tertiary); letter-spacing: 0; }
+.deviceStats .of { font-size: 13px; color: var(--text-tertiary); letter-spacing: 0; }
 .meter {
-  margin-top: 16px; height: 4px; border-radius: 2px;
-  background: rgba(30,37,68,0.08); position: relative; overflow: hidden;
+  margin-top: 18px; height: 5px; border-radius: 3px;
+  background: rgba(27,35,64,0.1); position: relative; overflow: hidden;
 }
 .meter > i {
-  position: absolute; left: 0; top: 0; bottom: 0;
-  background: var(--accent); border-radius: 2px;
+  position: absolute; top: 0; bottom: 0;
+  border-radius: 3px;
 }
+.meterTeal { left: 0; background: var(--accent); }
+.meterCoral { background: var(--coral); }
 
 .rowLink {
   margin-top: 10px;
@@ -98,14 +100,15 @@
   background: rgba(30,37,68,0.06); border-radius: 11px; padding: 4px;
 }
 .segBtn {
-  padding: 9px 0; border-radius: 8px;
-  font-size: 13px; font-weight: 700; color: var(--text-secondary);
+  padding: 11px 0; border-radius: 10px;
+  font-size: 14.5px; font-weight: 700; color: var(--text-secondary);
   background: none; border: 0; cursor: pointer;
   transition: background 160ms, color 160ms, box-shadow 160ms;
 }
+/* selected segment is coral — warmth marks the user's choice (mock 04) */
 .segOn {
-  background: var(--bg-primary); color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(30,37,68,0.12);
+  background: var(--coral); color: #2A1B22;
+  box-shadow: 0 2px 6px rgba(214,106,108,0.3);
 }
 
 /* List rows */
@@ -128,3 +131,38 @@
 }
 
 .scrollPad { height: 96px; }
+
+/* ============================================================
+   NIGHT — matches mock 04
+   ============================================================ */
+:global(.screen.night) .id .name { color: var(--night-text-1); }
+:global(.screen.night) .id .meta { color: var(--night-text-2); }
+:global(.screen.night) .sectionLabel { color: var(--night-text-2); }
+:global(.screen.night) .card {
+  background: var(--night-bg-2);
+  border-color: var(--hairline-night);
+}
+:global(.screen.night) .deviceTop { color: var(--night-text-1); }
+:global(.screen.night) .deviceTop svg { color: var(--accent); }
+:global(.screen.night) .deviceStats .k { color: var(--night-text-2); }
+:global(.screen.night) .deviceStats .v { color: var(--night-text-1); }
+:global(.screen.night) .deviceStats .of { color: var(--night-text-3); }
+:global(.screen.night) .meter { background: var(--night-bg-3); }
+:global(.screen.night) .rowLink {
+  background: var(--night-bg-2);
+  border-color: var(--hairline-night);
+  color: var(--night-text-1);
+}
+:global(.screen.night) .rowTitle { color: var(--night-text-1); }
+:global(.screen.night) .rowSub { color: var(--night-text-2); }
+:global(.screen.night) .switch { background: var(--night-bg-3); }
+:global(.screen.night) .switch.on { background: var(--accent); }
+:global(.screen.night) .seg { background: rgba(247,248,251,0.05); }
+:global(.screen.night) .segBtn { color: var(--night-text-2); }
+:global(.screen.night) .segOn { background: var(--coral); color: #2A1B22; }
+:global(.screen.night) .listRow {
+  color: var(--night-text-1);
+  border-bottom-color: var(--hairline-night);
+}
+:global(.screen.night) .listRow svg { color: var(--accent); }
+:global(.screen.night) .signout { border-color: var(--hairline-night); }

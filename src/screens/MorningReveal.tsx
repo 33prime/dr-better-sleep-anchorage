@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { useStore, lastNight, baselineSnores, daysSince } from '../store';
 import { TickNumber } from '../components/TickNumber';
+import { PaperStar } from '../components/paper/PaperScene';
 import { ArrowRight } from '../components/icons';
 import { fmtDateLong, fmtDelta, fmtDuration, parseIsoDate } from '../utils/format';
 import s from './MorningReveal.module.css';
@@ -40,6 +41,15 @@ export function MorningReveal() {
 
   return (
     <div className={s.root}>
+      {/* pre-dawn sky — the last stars before sunrise (night theme only) */}
+      <svg className={s.scene} viewBox="0 0 393 300" aria-hidden focusable="false">
+        <PaperStar x={300} y={40} scale={1} delay={1.8} />
+        <PaperStar x={344} y={92} scale={0.7} delay={2.6} />
+        <PaperStar x={366} y={152} scale={0.6} delay={0.3} />
+        <PaperStar x={286} y={128} scale={0.55} delay={3.1} />
+        <PaperStar x={54} y={52} scale={0.7} delay={0.9} />
+      </svg>
+
       <motion.div className={s.eyebrow} {...fadeUp(0.2)}>
         {fmtDateLong(parseIsoDate(last.date))} · 6:42 AM
       </motion.div>
@@ -83,7 +93,7 @@ function Cell({ label, value, unit, delta, deltaSub, delay, deltaClass }: {
           : value}
         {unit && <span className={s.u}>{unit}</span>}
       </div>
-      <div className={s.d} style={deltaClass === 'muted' ? { color: 'var(--text-tertiary)' } : undefined}>
+      <div className={`${s.d}${deltaClass === 'muted' ? ` ${s.muted}` : ''}`}>
         {delta} {deltaSub && <span className={s.from}>{deltaSub}</span>}
       </div>
     </motion.div>

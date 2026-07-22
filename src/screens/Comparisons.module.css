@@ -25,6 +25,7 @@
 .pct { font-family: var(--mono); font-weight: 300; font-size: 32px; letter-spacing: -0.04em; color: var(--text-primary); }
 .pct .u { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--text-secondary); margin-left: 6px; }
 
+.distChart { --dist-grid: rgba(30,37,68,0.15); --dist-ink: var(--text-primary); --dist-cap: var(--text-tertiary); }
 .distChart svg { width: 100%; height: 110px; margin-top: 14px; display: block; overflow: visible; }
 .axis { margin-top: 6px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9.5px; color: var(--text-tertiary); }
 
@@ -46,3 +47,45 @@
 .metric .bar .you { position: absolute; top: -2px; height: 8px; width: 8px; border-radius: 50%; background: var(--accent); transform: translateX(-4px); }
 .metric .bar .you::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 16px; height: 16px; border-radius: 50%; background: var(--accent-soft); opacity: 0.5; z-index: -1; }
 .metric .scale { margin-top: 4px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); }
+
+/* ============================================================
+   NIGHT — "Papercraft Night" (see app/BRAND.md). Teal is the cohort
+   data + "you" marker; coral stays out of it (this screen is all data).
+   Content-dense, kept quiet — no decor. Day theme above is untouched.
+   ============================================================ */
+:global(.screen.night) .nav .back { color: var(--night-text-2); }
+:global(.screen.night) .nav .opts { color: var(--night-text-3); }
+:global(.screen.night) .nav .opts .on { color: var(--night-text-1); border-bottom-color: var(--accent); }
+
+:global(.screen.night) .label { color: var(--night-text-2); }
+:global(.screen.night) .lede { color: var(--night-text-2); }
+:global(.screen.night) .lede .em { color: var(--night-text-1); }
+
+:global(.screen.night) .chip { border-color: var(--hairline-night); color: var(--night-text-2); }
+:global(.screen.night) .chip strong { color: var(--night-text-1); }
+:global(.screen.night) .chip.active { border-color: var(--accent); color: var(--accent); }
+
+:global(.screen.night) .ttl { color: var(--night-text-1); }
+:global(.screen.night) .distSub { color: var(--night-text-3); }
+:global(.screen.night) .pct { color: var(--night-text-1); }
+:global(.screen.night) .pct .u { color: var(--night-text-2); }
+
+:global(.screen.night) .distChart {
+  --dist-grid: var(--hairline-night);
+  --dist-ink: var(--night-text-1);
+  --dist-cap: var(--night-text-3);
+}
+:global(.screen.night) .axis { color: var(--night-text-3); }
+
+:global(.screen.night) .copy { color: var(--night-text-2); }
+:global(.screen.night) .copy .em { color: var(--night-text-1); }
+
+:global(.screen.night) .strip { border-top-color: var(--hairline-night); }
+:global(.screen.night) .metric { border-bottom-color: var(--hairline-night); }
+:global(.screen.night) .metric .nm { color: var(--night-text-1); }
+:global(.screen.night) .metric .nm .pp { color: var(--night-text-3); }
+:global(.screen.night) .metric .vk { color: var(--night-text-2); }
+:global(.screen.night) .metric .vv { color: var(--night-text-1); }
+:global(.screen.night) .metric .vv.you { color: var(--accent); }
+:global(.screen.night) .metric .bar { background: var(--night-bg-3); }
+:global(.screen.night) .metric .bar .avg { background: var(--night-text-3); }

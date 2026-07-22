@@ -3,12 +3,35 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* papercraft horizon — real paper art (harvested from the design handoff),
+   bleeds edge-to-edge behind the topbar + greeting. Light/dark are separate
+   crops; the bottom fades into the page so the hills dissolve under the H1. */
+.scene {
+  position: absolute; top: 0; left: -20px; right: -20px;
+  height: 116px;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('/scenes/home-horizon-light.png');
+  background-size: 100% auto;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 78%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0, #000 78%, transparent 100%);
+}
+.night .scene { background-image: url('/scenes/home-horizon-dark.png'); }
+.sky {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 118px; z-index: 0; pointer-events: none;
 }
 
 .topbar {
-  height: 56px;
+  height: 52px;
   display: flex; align-items: center; justify-content: space-between;
   flex: none;
+  position: relative; z-index: 1;
 }
 .iconBtn {
   width: 32px; height: 32px;
@@ -18,32 +41,37 @@
 .iconBtn svg { width: 20px; height: 20px; }
 
 .trackBtn {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 9px 15px; border-radius: 999px;
-  background: rgba(67,186,202,0.12);
-  border: 1px solid rgba(67,186,202,0.35);
-  color: var(--accent);
-  font-family: var(--sans); font-size: 13px; font-weight: 700;
-  cursor: pointer;
-}
-.night .trackBtn { background: rgba(67,186,202,0.16); border-color: rgba(67,186,202,0.45); color: var(--accent-soft); }
-
-.greeting { margin-top: 24px; flex: none; }
-.greeting h1 {
-  font-family: var(--serif); font-weight: 800;
-  font-size: 34px; letter-spacing: -0.005em; line-height: 1.05;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px; border-radius: 999px;
+  background: rgba(75,175,186,0.10);
+  border: 1px solid rgba(75,175,186,0.45);
   color: var(--text-primary);
+  font-family: var(--sans); font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+}
+.night .trackBtn { background: rgba(18,27,58,0.35); border-color: rgba(116,199,208,0.6); color: var(--night-text-1); }
+/* the pill's crescent: teal in the misty day, coral at night (per the mocks) */
+.trackMoon { color: var(--accent); }
+.night .trackMoon { color: var(--coral); }
+
+.greeting { margin-top: 56px; flex: none; position: relative; z-index: 1; }
+.greeting h1 {
+  font-family: var(--serif); font-weight: 700;
+  font-size: 37px; letter-spacing: -0.015em; line-height: 1.05;
+  color: var(--text-primary);
+  white-space: nowrap;
 }
 .greeting .date {
-  margin-top: 6px;
-  font-family: var(--mono); font-weight: 300;
-  font-size: 12px; letter-spacing: 0.06em;
+  margin-top: 8px;
+  font-family: var(--mono); font-weight: 500;
+  font-size: 13px; letter-spacing: 0.18em;
   color: var(--text-tertiary); text-transform: uppercase;
 }
 
 /* partner card */
 .partner {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex; align-items: center; gap: 12px;
   padding: 12px 14px;
   background:
@@ -53,24 +81,24 @@
   flex: none;
 }
 .partnerAvatar {
-  width: 32px; height: 32px;
+  width: 52px; height: 52px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #F3C9CA, #E5898B 55%, #B5616B);
-  box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.2);
   flex: none;
+  display: block;
+  filter: drop-shadow(0 3px 5px rgba(4,8,24,0.3));
 }
 .partnerBody { flex: 1; min-width: 0; }
 .partnerLine {
   font-family: var(--sans); font-weight: 400;
-  font-size: 14px; line-height: 1.35;
+  font-size: 15.5px; line-height: 1.35;
   color: var(--text-primary);
   text-wrap: pretty;
 }
 .partnerLine strong { font-weight: 600; }
 .partnerSub {
-  margin-top: 3px;
-  font-family: var(--mono); font-weight: 300;
-  font-size: 11px; letter-spacing: 0.04em;
+  margin-top: 4px;
+  font-family: var(--sans); font-weight: 600;
+  font-size: 13.5px; letter-spacing: 0.01em;
   color: var(--text-tertiary);
 }
 .partnerSub .up { color: var(--positive); font-weight: 500; margin-right: 4px; }
@@ -116,43 +144,49 @@
 .hero {
   margin-top: 16px;
   background: var(--bg-secondary);
-  border-radius: 22px;
+  border-radius: 24px;
   padding: 24px;
   position: relative;
   overflow: hidden;
   flex: none;
 }
+.heroHills {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 54px;
+  pointer-events: none;
+}
 .hero .label {
-  font-family: var(--mono); font-weight: 300;
-  font-size: 10px; letter-spacing: 0.22em;
+  font-family: var(--mono); font-weight: 600;
+  font-size: 11px; letter-spacing: 0.22em;
   text-transform: uppercase; color: var(--text-tertiary);
 }
 .hero .numRow {
-  margin-top: 14px;
+  margin-top: 8px;
   display: flex; align-items: baseline; gap: 12px;
 }
 .hero .num {
-  font-family: var(--mono); font-weight: 300;
-  font-size: 76px; line-height: 0.9; letter-spacing: -0.05em;
+  font-family: var(--mono); font-weight: 400;
+  font-size: 82px; line-height: 0.9; letter-spacing: -0.05em;
   color: var(--text-primary);
 }
 .hero .unit {
   font-family: var(--serif); font-style: italic;
-  font-size: 22px; color: var(--text-secondary);
+  font-size: 25px; color: var(--text-secondary);
 }
 .hero .delta {
   margin-top: 10px;
   display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--sans); font-weight: 500; font-size: 13px;
+  font-family: var(--sans); font-weight: 600; font-size: 15px;
   color: var(--positive);
 }
 .hero .delta .arrow { font-family: var(--mono); font-weight: 400; }
 .hero .delta .from { color: var(--text-tertiary); font-weight: 400; }
 .hero .sparkAxis {
-  margin-top: 4px;
+  margin-top: 6px;
   display: flex; justify-content: space-between;
-  font-family: var(--mono); font-size: 9px;
-  color: var(--text-tertiary); letter-spacing: 0.08em;
+  font-family: var(--mono); font-weight: 500; font-size: 10px;
+  color: var(--text-secondary); letter-spacing: 0.18em;
+  position: relative;
 }
 
 .statusRow {
@@ -162,10 +196,17 @@
 }
 .stat {
   background: var(--bg-secondary);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 14px 12px;
-  min-height: 92px;
+  min-height: 96px;
   display: flex; flex-direction: column; justify-content: space-between;
+  position: relative;
+}
+.statDecor {
+  position: absolute; top: 10px; right: 10px;
+  width: 34px; height: 20px;
+  pointer-events: none;
+  opacity: 0.9;
 }
 .stat .k {
   font-family: var(--mono); font-weight: 300;
@@ -173,8 +214,8 @@
   color: var(--text-tertiary);
 }
 .stat .v {
-  font-family: var(--mono); font-weight: 300;
-  font-size: 22px; letter-spacing: -0.03em;
+  font-family: var(--mono); font-weight: 400;
+  font-size: 24px; letter-spacing: -0.02em;
   color: var(--text-primary); margin-top: 6px;
 }
 .stat .t {
@@ -262,7 +303,7 @@
   border-radius: 8px;
   display: grid; place-items: center;
   color: var(--accent);
-  background: rgba(67,186,202,0.18);
+  background: rgba(75,175,186,0.18);
   flex: none;
 }
 .rec .ico svg { width: 18px; height: 18px; }
@@ -288,14 +329,12 @@
 .night .greeting h1 { color: var(--night-text-1); }
 .night .greeting .date { color: var(--night-text-3); }
 .night .partner {
-  background:
-    radial-gradient(ellipse 120% 100% at 0% 50%, rgba(218,165,160,0.10) 0%, transparent 70%),
-    rgba(255,255,255,0.025);
-  border: 1px solid var(--hairline-night);
+  background: rgba(255,255,255,0.035);
+  border: 1px solid transparent;
 }
 .night .partnerLine { color: var(--night-text-1); }
 .night .partnerSub { color: var(--night-text-3); }
-.night .partnerSub .up { color: #43BACA; }
+.night .partnerSub .up { color: var(--accent); }
 .night .partnerSub .down { color: var(--night-text-2); }
 .night .nudge {
   background:
@@ -309,34 +348,32 @@
 .night .nudgeSub { color: var(--night-text-2); }
 .night .nudge .chev { color: var(--night-text-3); }
 .night .hero {
-  background:
-    radial-gradient(ellipse 120% 80% at 50% 0%, rgba(67,186,202,0.07) 0%, transparent 70%),
-    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
-  border: 1px solid var(--hairline-night);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid transparent;
 }
-.night .hero .label { color: var(--night-text-3); }
+.night .hero .label { color: var(--night-text-2); }
 .night .hero .num {
   color: var(--night-text-1);
-  text-shadow: 0 0 32px rgba(67,186,202,0.08);
+  text-shadow: 0 0 32px rgba(75,175,186,0.08);
 }
-.night .hero .unit { color: var(--night-text-2); }
-.night .hero .delta { color: #43BACA; }
+.night .hero .unit { color: var(--night-text-1); }
+.night .hero .delta { color: var(--accent); }
 .night .hero .delta .from { color: var(--night-text-3); }
-.night .hero .sparkAxis { color: var(--night-text-3); }
+.night .hero .sparkAxis { color: var(--night-text-2); }
 .night .stat {
-  background: rgba(255,255,255,0.025);
-  border: 1px solid var(--hairline-night);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid transparent;
 }
 .night .stat .k { color: var(--night-text-3); }
 .night .stat .v { color: var(--night-text-1); }
 .night .stat .t { color: var(--night-text-2); }
-.night .stat .t .up { color: #43BACA; }
+.night .stat .t .up { color: var(--accent); }
 .night .stat .t .down { color: var(--night-text-2); }
 .night .context {
   border-top: 1px solid var(--hairline-night);
   border-bottom: 1px solid var(--hairline-night);
 }
-.night .context::before { box-shadow: 0 0 12px rgba(67,186,202,0.4); }
+.night .context::before { box-shadow: 0 0 12px rgba(75,175,186,0.4); }
 .night .context .label { color: var(--night-text-3); }
 .night .context .copy { color: var(--night-text-1); }
 .night .context .chev { color: var(--night-text-3); }
@@ -351,7 +388,7 @@
   background: rgba(255,255,255,0.018);
   border: 1px solid var(--hairline-night);
 }
-.night .rec .ico { color: var(--accent-soft); background: rgba(67,186,202,0.10); }
+.night .rec .ico { color: var(--accent-soft); background: rgba(75,175,186,0.10); }
 .night .rec .title { color: var(--night-text-1); }
 .night .rec .sub { color: var(--night-text-2); }
 .night .rec .chev { color: var(--night-text-3); }

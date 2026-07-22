@@ -6,7 +6,7 @@ import { buildSeedState, type AppState } from './seed';
 // Bump this when the persisted shape changes so stale state from an older
 // deploy is discarded instead of crashing on a missing field (e.g. a phone
 // that cached state from before `partner` existed).
-const KEY = 'dr-better-sleep:v3';
+const KEY = 'dr-better-sleep:v4'; // v4: story-driven demo seed matching the papercraft mocks
 
 type Listener = (state: AppState) => void;
 

@@ -40,11 +40,11 @@ export function App() {
 
   const themeForRoute = ((): 'day' | 'night' => {
     if (location === '/night') return 'night';
-    if (location === '/' || location === '/dashboard/dark') {
-      const dark = uiTheme === 'dark' || (uiTheme === 'auto' && shouldUseDarkDashboard()) || location === '/dashboard/dark';
-      return dark ? 'night' : 'day';
-    }
-    return 'day';
+    if (location === '/dashboard/dark') return 'night';
+    // Every screen follows the appearance setting — the papercraft-night
+    // brand is dark-first across the whole app.
+    const dark = uiTheme === 'dark' || (uiTheme === 'auto' && shouldUseDarkDashboard());
+    return dark ? 'night' : 'day';
   })();
 
   const showTabBar = TABBAR_ROUTES.includes(location);

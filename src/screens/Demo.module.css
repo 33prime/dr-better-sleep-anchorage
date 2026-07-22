@@ -1,35 +1,69 @@
-.root { padding: 18px 20px 0; height: 100%; }
+.root { padding: 18px 20px 0; height: 100%; position: relative; }
 
-.header { padding: 4px 0 8px; }
-.h { font-family: var(--serif); font-weight: 800; font-size: 28px; color: var(--text-primary); }
-.sub { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--text-tertiary); }
+.header { padding: 4px 0 0; position: relative; }
+.headerScene {
+  position: absolute; top: -6px; left: 0; right: 0;
+  width: 100%; height: 90px;
+  pointer-events: none;
+}
+.h { font-family: var(--serif); font-weight: 700; font-size: 38px; color: var(--text-primary); position: relative; }
+.sub { margin-top: 6px; font-size: 14px; line-height: 1.5; color: var(--text-tertiary); max-width: 280px; position: relative; }
+
+/* horizon ridge divider between the header and the scenarios */
+.ridge {
+  margin: 6px -20px 0;
+  height: 62px;
+  overflow: hidden;
+  pointer-events: none;
+}
 
 .sectionLabel {
-  margin: 22px 0 8px;
-  font-family: var(--mono); font-weight: 700;
-  font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  margin: 20px 0 10px;
+  font-family: var(--mono); font-weight: 600;
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--text-tertiary);
 }
 
-.group { display: flex; flex-direction: column; gap: 8px; }
+.group { display: flex; flex-direction: column; gap: 10px; }
 .action {
   display: flex; align-items: center; justify-content: space-between;
-  width: 100%; padding: 15px 16px; border-radius: 14px;
-  background: var(--bg-secondary); border: 1px solid var(--hairline);
-  font-size: 15px; font-weight: 600; color: var(--text-primary); cursor: pointer;
+  width: 100%; padding: 18px 18px; border-radius: 16px;
+  background: var(--bg-secondary); border: 1px solid rgba(214,106,108,0.45);
+  font-size: 16px; font-weight: 600; color: var(--text-primary); cursor: pointer;
 }
 .tagOk, .tagWarn {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: var(--mono); font-weight: 600; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
 }
 .tagOk { color: var(--accent); }
-.tagWarn { color: var(--warn); }
+.tagWarn { color: var(--coral); }
 
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .chip {
-  padding: 13px 8px; border-radius: 12px;
-  background: var(--bg-secondary); border: 1px solid var(--hairline);
+  padding: 15px 4px; border-radius: 16px;
+  background: transparent; border: 1.3px solid var(--accent);
   font-size: 12.5px; font-weight: 600; color: var(--text-primary);
   cursor: pointer; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* the two accents alternate; every 4th chip is filled coral (mock 05) */
+.chip:nth-child(4n + 2) { border-color: var(--coral); }
+.chip:nth-child(4n) {
+  background: var(--coral); border-color: var(--coral);
+  color: #2A1B22; font-weight: 700;
 }
 
 .scrollPad { height: 100px; }
+
+/* ============================================================
+   NIGHT — matches mock 05
+   ============================================================ */
+:global(.screen.night) .h { color: var(--night-text-1); }
+:global(.screen.night) .sub { color: var(--night-text-2); }
+:global(.screen.night) .sectionLabel { color: var(--night-text-2); }
+:global(.screen.night) .action {
+  background: var(--night-bg-2);
+  border-color: rgba(214,106,108,0.5);
+  color: var(--night-text-1);
+}
+:global(.screen.night) .chip { color: var(--night-text-1); }
+:global(.screen.night) .chip:nth-child(4n) { color: #2A1B22; }

@@ -47,8 +47,20 @@
 .section h2 { font-family: var(--serif); font-size: 20px; font-weight: 800; }
 .section .meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); }
 
-.snore { background: var(--bg-secondary); border-radius: 22px; padding: 20px; }
-.snore .legend { margin-top: 8px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.08em; }
+.snore { background: var(--bg-secondary); border-radius: 22px; padding: 20px; position: relative; }
+.snore .legend { margin-top: 8px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.08em; position: relative; z-index: 1; }
+
+/* papercraft dunes behind the snore chart's baseline — the one quiet
+   decorative moment on this screen. Night only, so day stays unchanged. */
+.hills { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 40px; pointer-events: none; z-index: 0; display: none; }
+
+/* SVG chart primitives (hypnogram + snore bars). Base = day values so the day
+   theme is untouched; the NIGHT section swaps the neutrals. Data uses --accent
+   / annotations use --coral inline (theme-independent) in the TSX. */
+.grid { stroke: var(--hairline); }
+.axisLabel { font-family: var(--mono); fill: var(--text-tertiary); letter-spacing: 0.1em; }
+.marker { font-family: var(--mono); letter-spacing: 0.1em; }
+.baseline { stroke: var(--hairline-strong); }
 
 .insight {
   margin-top: 14px;
@@ -78,3 +90,63 @@
 .aside .label { color: var(--accent); font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
 .aside h3 { margin-top: 6px; font-family: var(--serif); font-style: italic; font-size: 19px; line-height: 1.2; color: var(--text-primary); }
 .aside p { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); text-wrap: pretty; }
+
+/* ============================================================
+   NIGHT — papercraft night per-night detail (see app/BRAND.md).
+   Cards go navy with hairline borders; teal stays the data color,
+   coral the annotation; axis neutrals shift to night-text-3.
+   ============================================================ */
+:global(.screen.night) .nav .back,
+:global(.screen.night) .nav .more { color: var(--night-text-2); }
+
+:global(.screen.night) .head .label { color: var(--night-text-3); }
+:global(.screen.night) .head h1 { color: var(--night-text-1); }
+:global(.screen.night) .head .sub { color: var(--night-text-2); }
+
+:global(.screen.night) .hero .num { color: var(--night-text-1); }
+:global(.screen.night) .hero .unit { color: var(--night-text-2); }
+
+:global(.screen.night) .hyp {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .hyp .row .k { color: var(--night-text-3); }
+:global(.screen.night) .hyp .row .total { color: var(--night-text-1); }
+:global(.screen.night) .hypX { color: var(--night-text-3); }
+:global(.screen.night) .hypLegend .l { border-top-color: var(--hairline-night); }
+:global(.screen.night) .hypLegend .l .k { color: var(--night-text-3); }
+:global(.screen.night) .hypLegend .l .v { color: var(--night-text-1); }
+
+:global(.screen.night) .section h2 { color: var(--night-text-1); }
+:global(.screen.night) .section .meta { color: var(--night-text-3); }
+
+:global(.screen.night) .snore {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .snore .legend {
+  color: var(--night-text-2);
+  text-shadow: 0 1px 3px rgba(4,8,24,0.7); /* stays readable over the coral dunes */
+}
+:global(.screen.night) .hills { display: block; }
+
+:global(.screen.night) .insight { border-color: var(--hairline-night); }
+:global(.screen.night) .insight .copy { color: var(--night-text-1); }
+
+:global(.screen.night) .pos {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .pos .k { color: var(--night-text-3); }
+:global(.screen.night) .pos .v { color: var(--night-text-1); }
+:global(.screen.night) .pos .bar { background: var(--night-bg-3); }
+:global(.screen.night) .pos .pct { color: var(--night-text-2); }
+
+:global(.screen.night) .aside { border-top-color: var(--hairline-night); }
+:global(.screen.night) .aside h3 { color: var(--night-text-1); }
+:global(.screen.night) .aside p { color: var(--night-text-2); }
+
+/* SVG chart neutrals */
+:global(.screen.night) .grid { stroke: var(--hairline-night); }
+:global(.screen.night) .axisLabel { fill: var(--night-text-3); }
+:global(.screen.night) .baseline { stroke: var(--hairline-night); }

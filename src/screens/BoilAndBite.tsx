@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { store } from '../store';
 import { Avatar } from '../components/Avatar';
+import { SceneHills } from '../components/paper/PaperScene';
 import { CloseIcon, ArrowRight } from '../components/icons';
 import { isoDate, pad2 } from '../utils/format';
 import { showToast } from '../components/Toast';
@@ -27,7 +28,7 @@ const STEPS: Step[] = [
   {
     name: 'Submerge',
     headline: <>Lower it in.<br /><span style={{ fontStyle: 'italic' }}>Hold for sixty seconds.</span></>,
-    lede: <>The silicone softens and becomes pliable. <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Don't go past 90 seconds</strong> — too long and it loses shape memory.</>,
+    lede: <>The silicone softens and becomes pliable. <strong className={s.emph}>Don't go past 90 seconds</strong> — too long and it loses shape memory.</>,
     tip: <>Use a slotted spoon or tongs to lower the device. <em style={{ fontFamily: 'var(--serif)' }}>Don't drop it in</em> — it can stick to the bottom of the pan and warp on one side.</>,
     duration: 60,
   },
@@ -35,7 +36,7 @@ const STEPS: Step[] = [
     name: 'Cool',
     headline: <>Lift it out and<br /><span style={{ fontStyle: 'italic' }}>count to ten.</span></>,
     lede: <>Ten seconds is the sweet spot — pliable, not hot. If it's burning, give it five more.</>,
-    tip: <>Keep it on a paper towel. <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Don't skip this</strong> — the impression sets while it cools.</>,
+    tip: <>Keep it on a paper towel. <strong className={s.emph}>Don't skip this</strong> — the impression sets while it cools.</>,
     duration: 10,
   },
   {
@@ -101,8 +102,12 @@ export function BoilAndBite() {
       s2.onboarding.boilCompleted = true;
       s2.onboarding.boilStep = STEPS.length;
       s2.onboarding.complete = true;
-      s2.device.fittedAt = isoDate(new Date());
-      s2.device.strapPosition = 1;
+      // Only stamp the device on a true first fit — a re-fit or demo replay
+      // must not reset the seeded story (day 55, strap 3, streak 31).
+      if (!s2.device.fittedAt) {
+        s2.device.fittedAt = isoDate(new Date());
+        s2.device.strapPosition = 1;
+      }
     });
     playChime();
     showToast('Fitted! Welcome to the dashboard.');
@@ -148,6 +153,11 @@ export function BoilAndBite() {
         <p className={s.lede}>{step.lede}</p>
 
         <div className={s.ringWrap}>
+          {/* night-only paper hills rising behind the timer's baseline
+             (sized wrapper — SceneHills always fills its parent) */}
+          <div className={s.ringHills} aria-hidden>
+            <SceneHills variant="low" />
+          </div>
           <div className={s.ring}>
             <svg viewBox="0 0 240 240">
               <circle className={s.track} cx={120} cy={120} r={110} />

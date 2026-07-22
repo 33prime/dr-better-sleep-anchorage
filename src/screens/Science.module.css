@@ -54,12 +54,60 @@
 .find .insight .em { font-family: var(--serif); font-style: italic; color: var(--text-primary); }
 .find .insight .data { font-family: var(--mono); color: var(--text-primary); }
 
-.find.flag .conf { color: #E5898B; }
-.find.flag .insight { border-left-color: #E5898B; }
+.find.flag .conf { color: var(--coral); }
+.find.flag .insight { border-left-color: var(--coral); }
 
-.spec { margin-top: 18px; height: 120px; position: relative; border-radius: 10px; overflow: hidden; background: rgba(30,37,68,0.04); }
+.spec { --spec-panel: rgba(30,37,68,0.04); margin-top: 18px; height: 120px; position: relative; border-radius: 10px; overflow: hidden; background: var(--spec-panel); }
 .spec svg { width: 100%; height: 100%; display: block; }
 .spec .legend { position: absolute; left: 10px; bottom: 8px; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); }
 .spec .freq { position: absolute; right: 10px; top: 8px; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); }
 
 .footnote { margin-top: 24px; font-size: 11.5px; color: var(--text-tertiary); line-height: 1.5; font-family: var(--serif); font-style: italic; text-wrap: pretty; padding-left: 12px; border-left: 1px solid var(--hairline); }
+
+/* ============================================================
+   NIGHT — "Papercraft Night" (see app/BRAND.md). Teal carries the
+   acoustic data; coral flags the one attention finding. Content-dense
+   screen, kept quiet — no decor. Day theme above is untouched.
+   ============================================================ */
+:global(.screen.night) .nav .back { color: var(--night-text-2); }
+:global(.screen.night) .nav .badge { color: var(--night-text-3); border-color: var(--hairline-night); }
+
+:global(.screen.night) .label { color: var(--night-text-2); }
+:global(.screen.night) .lede { color: var(--night-text-2); }
+:global(.screen.night) .lede .em { color: var(--night-text-1); }
+
+:global(.screen.night) .finger {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .finger .k { color: var(--night-text-2); }
+:global(.screen.night) .finger .ts { color: var(--night-text-3); }
+:global(.screen.night) .finger .v { color: var(--night-text-1); }
+:global(.screen.night) .finger .reason { border-top-color: var(--hairline-night); color: var(--night-text-2); }
+:global(.screen.night) .finger .reason .em { color: var(--night-text-1); }
+
+:global(.screen.night) .breakdown { background: rgba(247,248,251,0.10); }
+:global(.screen.night) .b { background: var(--night-bg-2); }
+:global(.screen.night) .b .nm { color: var(--night-text-2); }
+:global(.screen.night) .b .pc { color: var(--night-text-1); }
+:global(.screen.night) .b .desc { color: var(--night-text-2); }
+
+:global(.screen.night) .spec { --spec-panel: rgba(247,248,251,0.05); }
+:global(.screen.night) .spec .legend,
+:global(.screen.night) .spec .freq { color: var(--night-text-3); }
+
+:global(.screen.night) .trendK { color: var(--night-text-2); }
+:global(.screen.night) .trendLegend { color: var(--night-text-2); }
+
+:global(.screen.night) .h2 { color: var(--night-text-1); }
+:global(.screen.night) .h2sub { color: var(--night-text-2); }
+
+:global(.screen.night) .find { border-bottom-color: var(--hairline-night); }
+:global(.screen.night) .find:first-of-type { border-top-color: var(--hairline-night); }
+:global(.screen.night) .find .nm { color: var(--night-text-1); }
+:global(.screen.night) .find .conf.med { color: var(--night-text-3); }
+:global(.screen.night) .find .insight { color: var(--night-text-2); }
+:global(.screen.night) .find .insight .em { color: var(--night-text-1); }
+:global(.screen.night) .find .insight .data { color: var(--night-text-1); }
+
+:global(.screen.night) .footnote { color: var(--night-text-3); border-left-color: var(--hairline-night); }

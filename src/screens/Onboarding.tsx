@@ -3,6 +3,7 @@ import { useStore } from '../store';
 import { Avatar } from '../components/Avatar';
 import { ArrowRight } from '../components/icons';
 import { Wordmark } from '../components/Wordmark';
+import { PaperStar, PaperMoon } from '../components/paper/PaperScene';
 import s from './Onboarding.module.css';
 
 export function Onboarding() {
@@ -70,8 +71,16 @@ export function Onboarding() {
 
   return (
     <div className={s.root}>
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 16px' }}>
-        <Wordmark size={19} tone="onLight" />
+      {/* night-only papercraft cluster tucked behind the header */}
+      <svg viewBox="0 0 340 100" className={s.scene} aria-hidden focusable="false">
+        <PaperStar x={30} y={26} scale={0.9} delay={0.5} />
+        <PaperStar x={78} y={54} scale={0.6} delay={2.2} />
+        <PaperStar x={296} y={58} scale={0.7} delay={1.3} />
+        <PaperMoon x={286} y={16} scale={1.7} />
+      </svg>
+
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 16px', position: 'relative' }}>
+        <Wordmark size={19} tone="auto" />
       </div>
       <div className={s.progress}>
         {[0, 1, 2, 3, 4, 5, 6].map(i => (

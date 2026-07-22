@@ -61,12 +61,12 @@ export function proactiveOpener(state: AppState): string | null {
   // 1) Weekend + meaningful wine effect → a gentle heads-up.
   if (weekend && mult !== null && mult > 1.25) {
     const pct = Math.round((mult - 1) * 100);
-    return `heads up — it's the weekend, and on the nights you've had a drink you've snored about *${pct}% more*. nothing dramatic, just something to keep in mind tonight.`;
+    return `heads up — it's the weekend, and on the nights you've had a drink you've snored about ${pct}% more. nothing dramatic, just something to keep in mind tonight.`;
   }
 
   // 2) Last night notably above baseline → note the uptick, ask what changed.
   if (last && baseline > 0 && last.totalSnores > baseline * 1.2) {
-    return `last night ran a little louder — *${last.totalSnores}* snores against your usual ${Math.round(baseline)}. anything different before bed?`;
+    return `last night ran a little louder — ${last.totalSnores} snores against your usual ${Math.round(baseline)}. anything different before bed?`;
   }
 
   // 3) Streak milestone → quiet encouragement, mention Sarah if she's resting.
@@ -75,17 +75,17 @@ export function proactiveOpener(state: AppState): string | null {
     const partner = partnerSleptThroughLastN(state, streak >= 14 ? 14 : 7);
     const sarahResting = partner.total > 0 && partner.slept >= Math.ceil(partner.total * 0.7);
     if (sarahResting) {
-      return `that's *${streak} nights* with the device now — and ${state.partner.name}'s slept through most of them. quietly proud of you.`;
+      return `that's ${streak} nights with the device now — and ${state.partner.name}'s slept through most of them. quietly proud of you.`;
     }
-    return `*${streak} nights* in. you've built a real rhythm here — that's the part most people never get to.`;
+    return `${streak} nights in. you've built a real rhythm here — that's the part most people never get to.`;
   }
 
   // 4) Otherwise → a calm check-in referencing last night vs baseline.
   if (last && baseline > 0) {
     if (last.totalSnores < baseline * 0.9) {
-      return `quiet one last night — *${last.totalSnores}* snores, under your ${Math.round(baseline)} baseline. you're trending the right way.`;
+      return `quiet one last night — ${last.totalSnores} snores, under your ${Math.round(baseline)} baseline. you're trending the right way.`;
     }
-    return `last night landed right around your usual — *${last.totalSnores}* snores vs a ${Math.round(baseline)} baseline. steady. anything on your mind?`;
+    return `last night landed right around your usual — ${last.totalSnores} snores vs a ${Math.round(baseline)} baseline. steady. anything on your mind?`;
   }
 
   return null;

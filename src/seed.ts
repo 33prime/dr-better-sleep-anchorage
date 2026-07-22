@@ -114,34 +114,53 @@ function rng(seed: number) {
   };
 }
 
-// Snore counts following an exponential decline post-fit, plus per-night noise.
-function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[] {
+// The 31-night demo story (oldest → newest). Hand-tuned so every stat the UI
+// derives matches the design mocks exactly:
+//   · baseline (mean of the 30 nights before last) = 94
+//   · 30-night average = 90 · second half ↓39% vs first half
+//   · last night: 0 snores (↓100%), 90% efficiency (+4pt vs prior 14),
+//     6:47 sleep, 112 min deep
+//   · Sarah slept through 7 of 7 this week, 2 of 7 the week before (↑5)
+// `wine` marks logged-drink nights (the spikes); don't retune one number
+// without rebalancing the half-sums (first half n2–n16 = 1677, second half
+// n17–n31 = 1023, n1 = 120).
+const STORY: Array<{ s: number; wine?: boolean; slept?: boolean }> = [
+  { s: 120, wine: true },
+  { s: 118 }, { s: 162, wine: true }, { s: 108 }, { s: 96, slept: true },
+  { s: 128, wine: true }, { s: 104 }, { s: 152, wine: true }, { s: 118 },
+  { s: 96, slept: true }, { s: 110 }, { s: 88, slept: true },
+  { s: 132, wine: true }, { s: 98 }, { s: 84, slept: true }, { s: 83 },
+  { s: 96, wine: true }, { s: 74 }, { s: 122, wine: true }, { s: 68, slept: true },
+  { s: 60 }, { s: 78 }, { s: 54, slept: true }, { s: 96, wine: true },
+  { s: 48, slept: true }, { s: 60, slept: true }, { s: 88, wine: true, slept: true },
+  { s: 42, slept: true }, { s: 76, slept: true }, { s: 61, slept: true },
+  { s: 0, slept: true },
+];
+
+// Nights from the story: snores, wine, and slept-through come from STORY;
+// secondary signals (stages, positions, HRV) ramp gently with seeded noise.
+function simulateNights(today: Date, fitDaysAgo: number): Night[] {
   const r = rng(0x5ee5);
+  const count = STORY.length;
   const out: Night[] = [];
-  for (let i = count - 1; i >= 0; i--) {
+  for (let idx = 0; idx < count; idx++) {
+    const i = count - 1 - idx; // days ago
     const date = new Date(today);
     date.setDate(today.getDate() - i);
-    const daysSinceFit = (count - 1 - i) - (count - 1 - fitDaysAgo);
+    const { s: totalSnores, wine: alcohol = false, slept: partnerSleptThrough = false } = STORY[idx];
+    const daysSinceFit = fitDaysAgo - i;
     const isPostFit = daysSinceFit >= 0;
-    const dow = date.getDay(); // 0=Sun, 5=Fri, 6=Sat
-    // Alcohol logged: more likely on Fri/Sat; deterministic for clean demo patterns.
-    const alcohol = (dow === 5 || dow === 6) && r() < 0.7;
-    // baseline ~110 snores → drops to ~42 by today
-    const t = isPostFit ? daysSinceFit / fitDaysAgo : 0;
-    const trend = isPostFit ? 110 - 70 * Math.min(1, t) : 110 + (r() - 0.5) * 20;
-    const noise = (r() - 0.5) * 22;
-    // Alcohol amplifies snoring meaningfully — the demo wants this pattern visible.
-    const alcoholMult = alcohol ? (isPostFit ? 1.7 : 1.5) : 1;
-    const totalSnores = Math.max(28, Math.round((trend + noise) * alcoholMult));
+    const t = idx / (count - 1);
+    const isLast = idx === count - 1;
 
-    const sleepDurationMin = 6 * 60 + Math.round(40 + (r() - 0.5) * 60);
-    const efficiency = 0.82 + (isPostFit ? 0.06 * t : 0) + (r() - 0.5) * 0.04;
-    const deepMin = Math.round(95 + (isPostFit ? 12 * t : 0) + (r() - 0.5) * 16);
+    const sleepDurationMin = isLast ? 407 : 370 + Math.round(30 * t + (r() - 0.5) * 40);
+    const efficiency = isLast ? 0.90 : Math.max(0.78, Math.min(0.96, 0.82 + 0.05 * t + (r() - 0.5) * 0.02));
+    const deepMin = isLast ? 112 : Math.round(92 + 14 * t + (r() - 0.5) * 12);
     const remMin = Math.round(80 + (r() - 0.5) * 20);
     const awakeMin = Math.round(18 + (r() - 0.5) * 16);
     const lightMin = sleepDurationMin - deepMin - remMin - awakeMin;
-    const hrv = Math.round(40 + (isPostFit ? 8 * t : 0) + (r() - 0.5) * 6);
-    const restingHr = Math.round(58 + (r() - 0.5) * 4);
+    const hrv = Math.round(39 + 8 * t + (r() - 0.5) * 4);
+    const restingHr = Math.round(58 - 2 * t + (r() - 0.5) * 3);
 
     const onBack = 50 + Math.round((r() - 0.5) * 40);
     const onStomach = 8 + Math.round(r() * 10);
@@ -167,10 +186,7 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
 
     const startHour = 22 + (r() < 0.5 ? 0 : 1);
     const startMin = Math.round(r() * 50);
-    // Partner slept through when snore intensity stayed below a wake threshold.
-    // Threshold scales with whether the device is fitted (post-fit nights are quieter).
-    const wakeThreshold = isPostFit ? 70 : 95;
-    const partnerSleptThrough = totalSnores < wakeThreshold && r() < 0.92;
+    const dow = date.getDay();
 
     // Snore-type mix. The mandibular advancement device treats PALATAL snoring
     // best, so its share declines after the fit; tongue-base is the holdout and
@@ -201,7 +217,7 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
       positions: { side_left: onLeft, side_right: onRight, back: onBack, stomach: onStomach },
       positionSnores: { side_left: sLeft, side_right: sRight, back: sBack, stomach: sStomach },
       snoresByHour,
-      peakDb: Math.round(34 + r() * 6),
+      peakDb: totalSnores === 0 ? 0 : Math.round(34 + r() * 6),
       strapPosition: isPostFit ? Math.min(5, 1 + Math.floor(daysSinceFit / 7)) : 0,
       startedAt: `${pad2(startHour)}:${pad2(startMin)}`,
       endedAt: '06:42',
@@ -216,18 +232,28 @@ function simulateNights(today: Date, count: number, fitDaysAgo: number): Night[]
 function defaultChat(today: Date): ChatMessage[] {
   const t = today.getTime();
   return [
-    { id: 'm1', who: 'them', text: 'Morning, Matt. Solid night.', ts: t - 3 * 60_000 },
-    { id: 'm2', who: 'them', text: 'You were quieter than nine of the last fourteen. Down 38%.', ts: t - 2 * 60_000 },
+    {
+      id: 'm1',
+      who: 'them',
+      text: "morning, matt. the data agrees with you — 0.90 efficiency, 112 minutes deep, and Sarah slept through again. what's interesting: that's two nights in a row at strap position 3. your body's settling into it.",
+      ts: t - 3 * 60_000,
+    },
+    {
+      id: 'm2',
+      who: 'them',
+      text: "quiet one last night — 0 snores, under your 94 baseline. you're trending the right way.",
+      ts: t - 2 * 60_000,
+    },
     {
       id: 'm3',
       who: 'them',
-      card: { kind: 'snore-summary', date: isoDate(today), total: 42, baseline: 68 },
+      card: { kind: 'snore-summary', date: isoDate(today), total: 0, baseline: 94 },
       ts: t - 90_000,
     },
     {
       id: 'm4',
       who: 'them',
-      text: "Two thoughts on this — want me to walk you through what changed at hour three? It's worth a look.",
+      text: "heads up — it's the weekend, and on the nights you've had a drink you've snored about 55% more. nothing dramatic, just something to keep in mind tonight.",
       ts: t - 60_000,
     },
   ];
@@ -272,7 +298,9 @@ function defaultRecommendations(today: Date): Recommendation[] {
 // ---------- factory ----------
 
 export function buildSeedState(today: Date = new Date()): AppState {
-  const fitDaysAgo = 21;
+  // Fitted 55 days ago; tracking covers the last 31 nights (STORY) — so the
+  // UI shows "Day 55 of strap position 3", streak 31, life used 15%.
+  const fitDaysAgo = 55;
   const fitted = new Date(today);
   fitted.setDate(today.getDate() - fitDaysAgo);
 
@@ -308,7 +336,7 @@ export function buildSeedState(today: Date = new Date()): AppState {
       },
       boilCompleted: true,
     },
-    nights: simulateNights(today, 30, fitDaysAgo),
+    nights: simulateNights(today, fitDaysAgo),
     chat: defaultChat(today),
     recommendations: defaultRecommendations(today),
     uiTheme: 'auto',

@@ -4,6 +4,7 @@ import {
   partnerSleptThroughLastN, partnerSleptThroughPrevWeek, wineMultiplier,
 } from '../store';
 import { Avatar } from '../components/Avatar';
+import { SceneHills, PaperStar } from '../components/paper/PaperScene';
 import { Sparkline } from '../components/Sparkline';
 import { TickNumber } from '../components/TickNumber';
 import { ChevronRight, PillIcon } from '../components/icons';
@@ -54,6 +55,16 @@ export function Dashboard() {
 
   return (
     <div className={`${s.root} ${isNight ? s.night : ''}`}>
+      {/* papercraft horizon behind the header — real paper art harvested from
+         the design handoff (light/dark swap + edge fades handled in CSS) */}
+      <div className={s.scene} aria-hidden />
+      {/* a few animated stars twinkle over the static horizon */}
+      <svg className={s.sky} viewBox="0 0 393 118" aria-hidden focusable="false">
+        <PaperStar x={150} y={30} scale={0.9} delay={0.6} />
+        <PaperStar x={228} y={54} scale={0.7} delay={2.1} />
+        <PaperStar x={300} y={26} scale={0.8} delay={3.3} />
+      </svg>
+
       {/* top bar */}
       <div className={s.topbar}>
         <button
@@ -62,10 +73,10 @@ export function Dashboard() {
           aria-label="Your profile"
           style={{ display: 'grid', placeItems: 'center', background: 'none', border: 0, padding: 0 }}
         >
-          <Avatar withDot={!isNight} glow={isNight} />
+          <Avatar size={44} withDot={!isNight} glow={isNight} />
         </button>
         <button className={`${s.trackBtn} tap`} onClick={() => navigate('/night')} aria-label="Start sleep tracking">
-          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden>
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden className={s.trackMoon}>
             <path d="M21 14.5A8.5 8.5 0 1 1 10.9 3.1a6.9 6.9 0 0 0 11.1 11.4Z" fill="currentColor" />
           </svg>
           Track sleep
@@ -82,10 +93,20 @@ export function Dashboard() {
 
       {/* partner card — the emotional anchor */}
       <div className={s.partner}>
-        <div
-          className={s.partnerAvatar}
-          aria-label={`${partner.name} avatar`}
-        />
+        {/* Sarah — sleeping papercraft face */}
+        <svg viewBox="0 0 48 48" className={s.partnerAvatar} role="img" aria-label={`${partner.name} avatar`}>
+          <circle cx="24" cy="24" r="23" fill="#E48C87" />
+          <circle cx="24" cy="24" r="23" fill="none" stroke="rgba(247,248,251,0.85)" strokeWidth="2" />
+          {/* closed eyes, lashes fanning below */}
+          <g stroke="#7C3B41" strokeWidth="1.7" strokeLinecap="round" fill="none">
+            <path d="M13.5 21.5 q3.5 3.5 7 0" />
+            <path d="M27.5 21.5 q3.5 3.5 7 0" />
+            <path d="M14.5 26 l-1 1.6 M17 26.8 l-0.3 1.7 M19.5 26 l0.7 1.6" />
+            <path d="M28.5 26 l-0.7 1.6 M31 26.8 l0.3 1.7 M33.5 26 l1 1.6" />
+          </g>
+          {/* gentle smile */}
+          <path d="M20.5 34 q3.5 2.6 7 0" stroke="#7C3B41" strokeWidth="1.7" strokeLinecap="round" fill="none" />
+        </svg>
         <div className={s.partnerBody}>
           <div className={s.partnerLine}>
             <span className="serif" style={{ fontStyle: 'italic' }}>{partner.name}</span>
@@ -145,13 +166,19 @@ export function Dashboard() {
           <span>{delta.pct}</span>
           <span className={s.from}>from baseline</span>
         </div>
-        <div style={{ marginTop: 18 }}>
+        {/* dunes along the card floor, behind the sparkline */}
+        <div className={s.heroHills} aria-hidden>
+          <SceneHills variant="low" />
+        </div>
+        <div style={{ marginTop: 18, position: 'relative' }}>
           <Sparkline
             values={last14}
             width={360}
-            height={36}
-            stroke={isNight ? '#7FD1DE' : '#43BACA'}
-            fill="#7FD1DE"
+            height={44}
+            strokeWidth={1.8}
+            stroke={isNight ? '#74C7D0' : '#4BAFBA'}
+            fill="#74C7D0"
+            dots
           />
         </div>
         <div className={s.sparkAxis}>
@@ -169,6 +196,9 @@ export function Dashboard() {
           onClick={() => navigate('/trends')}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/trends'); }}
         >
+          <svg viewBox="0 0 40 20" className={s.statDecor} aria-hidden>
+            <path d="M8 16 a6 6 0 0 1 1.5-11 a8 8 0 0 1 14.5-2.5 a6.5 6.5 0 0 1 10 3.5 a5 5 0 0 1 2.5 10 Z" style={{ fill: 'var(--scene-cloud)' }} />
+          </svg>
           <div>
             <div className={s.k}>Sleep</div>
             <div className={s.v}>{fmtDuration(last.sleepDurationMin)}</div>
@@ -207,6 +237,11 @@ export function Dashboard() {
           onClick={() => navigate('/trends')}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/trends'); }}
         >
+          <svg viewBox="0 0 40 24" className={s.statDecor} aria-hidden>
+            <path d="M30 18.5 A8 8 0 1 1 21.3 9.8 A6.2 6.2 0 0 0 30 18.5 Z" style={{ fill: 'var(--cream)' }} transform="translate(4 -4)" />
+            <PaperStar x={8} y={8} scale={0.55} delay={1.2} />
+            <PaperStar x={16} y={18} scale={0.4} delay={2.8} />
+          </svg>
           <div>
             <div className={s.k}>Streak</div>
             <div className={s.v}>{streakNights(state)}</div>

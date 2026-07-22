@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { useStore, store, lastNight } from '../store';
 import { useSnoreDetector } from '../hooks/useSnoreDetector';
 import { fmtClockHM, isoDate, parseIsoDate, pad2 } from '../utils/format';
+import { PaperStar } from '../components/paper/PaperScene';
 import s from './Night.module.css';
 
 const DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -82,6 +83,18 @@ export function Night() {
 
   return (
     <div className={s.root}>
+      {/* quiet cream starfield drifting over the sleeping sky */}
+      <svg className={s.starscape} viewBox="0 0 393 760" aria-hidden focusable="false">
+        <PaperStar x={40} y={70} scale={0.8} delay={0.6} />
+        <PaperStar x={352} y={54} scale={0.9} delay={1.9} />
+        <PaperStar x={300} y={120} scale={0.6} delay={3.1} />
+        <PaperStar x={62} y={150} scale={0.55} delay={2.3} />
+        <PaperStar x={366} y={210} scale={0.7} delay={0.9} />
+        <PaperStar x={26} y={300} scale={0.6} delay={2.7} />
+        <PaperStar x={358} y={430} scale={0.55} delay={1.4} />
+        <PaperStar x={34} y={500} scale={0.7} delay={3.4} />
+      </svg>
+
       <div className={s.top}>
         <div className="label-mono" style={{ color: 'var(--night-text-3)' }}>{live ? 'Listening' : 'Tracking'}</div>
         <div className={s.moon}>{DAY_SHORT[now.getDay()]} · {pad2(now.getHours())}:{pad2(now.getMinutes())}</div>

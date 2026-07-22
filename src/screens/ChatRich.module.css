@@ -1,0 +1,35 @@
+/* ChatRich — additive chart styling on top of the shared Chat.module.css.
+   Kept separate so the Chat screen's stylesheet stays untouched. Base values
+   equal the previous inline colors (day theme unchanged); the NIGHT section
+   swaps the neutrals so the in-bubble charts read on navy. Data = --accent,
+   annotations = --coral (set inline in the TSX, theme-independent). */
+
+.grid { stroke: var(--hairline); }
+
+.chartLegend {
+  margin-top: 8px; display: flex; gap: 14px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-tertiary);
+}
+/* muted secondary-series swatch ("snore events") */
+.swSnore { background: var(--text-tertiary); }
+
+.chartAxis { color: var(--text-tertiary); }
+
+.note { color: var(--text-secondary); }
+.noteEm { color: var(--text-primary); }
+
+.clipTitle { color: var(--text-primary); }
+.clipTime { color: var(--text-tertiary); }
+
+/* ============================================================
+   NIGHT — the rich chat report on navy (see app/BRAND.md).
+   ============================================================ */
+:global(.screen.night) .grid { stroke: var(--hairline-night); }
+:global(.screen.night) .chartLegend { color: var(--night-text-3); }
+:global(.screen.night) .swSnore { background: var(--night-text-3); }
+:global(.screen.night) .chartAxis { color: var(--night-text-3); }
+:global(.screen.night) .note { color: var(--night-text-2); }
+:global(.screen.night) .noteEm { color: var(--night-text-1); }
+:global(.screen.night) .clipTitle { color: var(--night-text-1); }
+:global(.screen.night) .clipTime { color: var(--night-text-3); }

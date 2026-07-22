@@ -4,6 +4,7 @@ import { store } from '../store';
 import { Avatar } from '../components/Avatar';
 import { ArrowRight, ChevronLeft } from '../components/icons';
 import { Wordmark } from '../components/Wordmark';
+import { PaperStar, PaperCloud } from '../components/paper/PaperScene';
 import type { OnboardingState } from '../seed';
 import s from './OnboardingQuestionnaire.module.css';
 
@@ -184,8 +185,16 @@ export function OnboardingQuestionnaire() {
 
   return (
     <div className={s.root}>
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 16px' }}>
-        <Wordmark size={19} tone="onLight" />
+      {/* night-only papercraft cluster tucked behind the header */}
+      <svg viewBox="0 0 340 96" className={s.scene} aria-hidden focusable="false">
+        <PaperStar x={26} y={30} scale={0.9} delay={0.4} />
+        <PaperStar x={306} y={20} scale={0.8} delay={1.6} />
+        <PaperStar x={322} y={56} scale={0.6} delay={2.6} />
+        <PaperCloud x={244} y={14} scale={0.7} drift={2} />
+      </svg>
+
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 16px', position: 'relative' }}>
+        <Wordmark size={19} tone="auto" />
       </div>
 
       <div className={s.progress}>

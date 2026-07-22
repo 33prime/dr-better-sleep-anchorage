@@ -21,7 +21,7 @@ export function Profile() {
   return (
     <div className={s.root}>
       <div className={s.header}>
-        <Avatar size={60} />
+        <Avatar size={88} withDot />
         <div className={s.id}>
           <div className={s.name}>{state.user.name}</div>
           <div className={s.meta}>{state.user.ageRange} · {state.user.sex} · BMI {state.user.bmiRange}</div>
@@ -32,7 +32,7 @@ export function Profile() {
       <div className={s.sectionLabel}>Your device</div>
       <button className={`${s.card} ${s.deviceCard} tap`} onClick={() => navigate('/onboarding/device')}>
         <div className={s.deviceTop}>
-          <Wordmark size={16} tone="onLight" />
+          <Wordmark size={22} tone="auto" />
           <ChevronRight />
         </div>
         <div className={s.deviceStats}>
@@ -40,7 +40,11 @@ export function Profile() {
           <div><div className={s.k}>In use</div><div className={s.v}>{used}<span className={s.of}> nights</span></div></div>
           <div><div className={s.k}>Life used</div><div className={s.v}>{pctLife}<span className={s.of}>%</span></div></div>
         </div>
-        <div className={s.meter}><i style={{ width: `${pctLife}%` }} /></div>
+        {/* teal = life used; the coral cap marks the wear of the current strap */}
+        <div className={s.meter}>
+          <i className={s.meterTeal} style={{ width: `${pctLife}%` }} />
+          <i className={s.meterCoral} style={{ left: `${pctLife}%`, width: '9%' }} />
+        </div>
       </button>
       <button className={`${s.rowLink} tap`} onClick={() => navigate('/reorder')}>
         <span>Reorder or replace device</span><ChevronRight />

@@ -3,7 +3,7 @@
 .nav .back { color: var(--text-secondary); padding: 6px 8px; display: flex; align-items: center; gap: 4px; font-family: var(--serif); font-style: italic; font-size: 14px; background: none; border: 0; }
 .nav .back svg { width: 22px; height: 22px; }
 .nav .more { color: var(--text-secondary); padding: 6px 8px; background: none; border: 0; }
-.body { padding: 4px 24px 28px; }
+.body { padding: 4px 24px 28px; position: relative; }
 .label { color: var(--text-tertiary); font-family: var(--mono); font-weight: 300; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
 .h { margin-top: 4px; font-family: var(--serif); font-size: 30px; line-height: 1.05; font-weight: 800; }
 .h .it { font-style: italic; }
@@ -29,3 +29,51 @@
 .cta .btn { width: 100%; height: 50px; border-radius: 14px; background: var(--text-primary); color: var(--bg-primary); display: grid; place-items: center; font-size: 15px; font-weight: 500; border: 0; }
 .cta .btn span { display: inline-flex; align-items: center; gap: 8px; }
 .cta .btn svg { width: 16px; height: 16px; }
+
+/* inline emphasis in callout copy (theme-aware via override below) */
+.emph { color: var(--text-primary); font-weight: 500; }
+
+/* decorative scene — hidden on day, revealed on night behind the header */
+.scene { display: none; }
+
+/* ============================================================
+   NIGHT — papercraft-night device overview (see app/BRAND.md)
+   ============================================================
+   The diagram's day colors live on the SVG presentation attributes;
+   these night rules override the "paper" fills and "ink" strokes only —
+   teal accents carry through both themes untouched. */
+:global(.screen.night) .scene {
+  display: block;
+  position: absolute; top: -2px; left: 0; right: 0;
+  height: 92px; width: 100%;
+  pointer-events: none; z-index: -1;
+}
+:global(.screen.night) .nav .back { color: var(--night-text-2); }
+:global(.screen.night) .nav .more { color: var(--night-text-2); }
+:global(.screen.night) .label { color: var(--night-text-3); }
+
+:global(.screen.night) .diagram {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .diagram .meta { color: var(--night-text-3); }
+/* diagram: flip paper fills to a raised navy, ink strokes to a hairline */
+:global(.screen.night) .dShadow { fill: transparent; }
+:global(.screen.night) .dPaper { fill: var(--night-bg-3); }
+:global(.screen.night) .dInk { stroke: var(--night-text-3); }
+
+:global(.screen.night) .callouts { border-top-color: var(--hairline-night); }
+:global(.screen.night) .co { border-bottom-color: var(--hairline-night); }
+:global(.screen.night) .co .name { color: var(--night-text-1); }
+:global(.screen.night) .co .desc { color: var(--night-text-2); }
+:global(.screen.night) .emph { color: var(--night-text-1); }
+
+:global(.screen.night) .specs { background: var(--hairline-night); }
+:global(.screen.night) .specs .s { background: var(--night-bg-2); }
+:global(.screen.night) .specs .k { color: var(--night-text-2); }
+:global(.screen.night) .specs .v { color: var(--night-text-1); }
+
+/* primary CTA — filled teal, ink-white, fully rounded */
+:global(.screen.night) .cta .btn {
+  background: var(--accent-deep); color: var(--night-text-1); border-radius: 999px;
+}

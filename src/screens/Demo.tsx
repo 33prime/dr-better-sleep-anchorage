@@ -2,6 +2,7 @@ import { useLocation } from 'wouter';
 import { store, lastNight } from '../store';
 import { isoDate, parseIsoDate } from '../utils/format';
 import { showToast } from '../components/Toast';
+import { HeroScene, PaperMoon, PaperStar } from '../components/paper/PaperScene';
 import s from './Demo.module.css';
 
 const QUICK_JUMPS: Array<[string, string]> = [
@@ -60,8 +61,18 @@ export function Demo() {
   return (
     <div className={s.root}>
       <div className={s.header}>
+        <svg viewBox="0 0 393 90" className={s.headerScene} aria-hidden focusable="false">
+          <PaperStar x={296} y={22} scale={0.8} delay={0.8} />
+          <PaperMoon x={330} y={16} scale={2} />
+          <PaperStar x={378} y={58} scale={0.7} delay={2.4} />
+        </svg>
         <h1 className={s.h}>Demo</h1>
         <p className={s.sub}>Stage the app for a walkthrough. Not part of the shipping product.</p>
+      </div>
+
+      {/* horizon ridge divider — the bottom band of the hero scene */}
+      <div className={s.ridge} aria-hidden>
+        <HeroScene style={{ height: 150, marginTop: -84 }} />
       </div>
 
       <div className={s.sectionLabel}>Scenarios</div>

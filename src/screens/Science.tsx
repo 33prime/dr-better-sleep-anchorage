@@ -155,15 +155,15 @@ function Spectrogram() {
     <svg viewBox="0 0 320 120" preserveAspectRatio="none" aria-hidden>
       <defs>
         <linearGradient id="palatal" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor="#43BACA" stopOpacity="0.05" />
-          <stop offset="20%" stopColor="#43BACA" stopOpacity="0.55" />
-          <stop offset="50%" stopColor="#43BACA" stopOpacity="0.9" />
-          <stop offset="80%" stopColor="#43BACA" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="#43BACA" stopOpacity="0.05" />
+          <stop offset="0%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.05 }} />
+          <stop offset="20%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.55 }} />
+          <stop offset="50%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.9 }} />
+          <stop offset="80%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.55 }} />
+          <stop offset="100%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.05 }} />
         </linearGradient>
       </defs>
       <g transform="translate(0,8)">
-        <rect width="320" height="20" fill="rgba(30,37,68,0.04)" />
+        <rect width="320" height="20" style={{ fill: 'var(--spec-panel)' }} />
         <g fill="url(#palatal)" opacity="0.35">
           <rect x="40" y="6" width="8" height="8" />
           <rect x="86" y="7" width="6" height="6" />
@@ -173,7 +173,7 @@ function Spectrogram() {
         </g>
       </g>
       <g transform="translate(0,34)">
-        <rect width="320" height="22" fill="rgba(30,37,68,0.04)" />
+        <rect width="320" height="22" style={{ fill: 'var(--spec-panel)' }} />
         <g fill="url(#palatal)" opacity="0.55">
           <rect x="20" y="4" width="14" height="14" />
           <rect x="54" y="6" width="10" height="10" />
@@ -186,8 +186,8 @@ function Spectrogram() {
         </g>
       </g>
       <g transform="translate(0,62)">
-        <rect width="320" height="26" fill="rgba(30,37,68,0.04)" />
-        <g fill="#43BACA" opacity="0.92">
+        <rect width="320" height="26" style={{ fill: 'var(--spec-panel)' }} />
+        <g style={{ fill: 'var(--accent)' }} opacity="0.92">
           <rect x="6" y="4" width="22" height="18" />
           <rect x="36" y="2" width="26" height="22" />
           <rect x="72" y="3" width="24" height="20" />
@@ -200,7 +200,7 @@ function Spectrogram() {
         </g>
       </g>
       <g transform="translate(0,94)">
-        <rect width="320" height="22" fill="rgba(30,37,68,0.04)" />
+        <rect width="320" height="22" style={{ fill: 'var(--spec-panel)' }} />
         <g fill="url(#palatal)" opacity="0.7">
           <rect x="14" y="5" width="14" height="12" />
           <rect x="48" y="6" width="12" height="10" />

@@ -2,7 +2,21 @@
   height: 100%;
   display: flex; flex-direction: column;
   padding: 88px 28px 40px;
+  position: relative;
 }
+
+/* pre-dawn star cluster — night-only ambiance so the day reveal stays clean */
+.scene {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 300px; width: 100%;
+  pointer-events: none;
+  display: none;
+  z-index: 0;
+}
+
+/* content sits above the sky */
+.eyebrow, .headline, .sub, .numbers, .footer { position: relative; z-index: 1; }
+
 .eyebrow {
   font-family: var(--mono); font-weight: 300;
   font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
@@ -52,6 +66,7 @@
   font-size: 12px; color: var(--positive);
 }
 .cell .d .from { color: var(--text-tertiary); font-weight: 400; }
+.cell .d.muted { color: var(--text-tertiary); }
 
 .footer {
   margin-top: 40px;
@@ -72,3 +87,20 @@
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--text-tertiary);
 }
+
+/* ============================================================
+   NIGHT — the morning payoff under the papercraft sky.
+   Cream stars over deep navy; ink-white words, whispered numerals.
+   ============================================================ */
+:global(.screen.night) .scene { display: block; }
+:global(.screen.night) .eyebrow { color: var(--night-text-3); }
+:global(.screen.night) .headline { color: var(--night-text-1); }
+:global(.screen.night) .sub { color: var(--night-text-2); }
+:global(.screen.night) .cell .k { color: var(--night-text-3); }
+:global(.screen.night) .cell .v { color: var(--night-text-1); }
+:global(.screen.night) .cell .u { color: var(--night-text-2); }
+:global(.screen.night) .cell .d .from { color: var(--night-text-3); }
+:global(.screen.night) .cell .d.muted { color: var(--night-text-3); }
+:global(.screen.night) .footer { border-top-color: var(--hairline-night); }
+:global(.screen.night) .cta { color: var(--night-text-1); }
+:global(.screen.night) .dayLabel { color: var(--night-text-3); }

@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { useStore, store } from '../store';
 import { Avatar } from '../components/Avatar';
+import { PaperCloud, PaperMoon, PaperStar } from '../components/paper/PaperScene';
 import { ChevronLeft, ArrowRight } from '../components/icons';
 import { Menu } from '../components/Menu';
 import { fmtClockHM } from '../utils/format';
@@ -38,6 +39,8 @@ export function Chat() {
     if (!text) return;
     const id = `proactive-${new Date().toDateString()}`;
     if (store.get().chat.some(m => m.id === id)) return;
+    // The seeded conversation may already say the same thing — don't repeat it.
+    if (store.get().chat.some(m => m.text === text)) return;
     store.set(s2 => { s2.chat = [...s2.chat, { id, who: 'them', text, ts: Date.now() }]; });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -86,12 +89,22 @@ export function Chat() {
 
   return (
     <div className={s.root}>
+      {/* star / moon / cloud margin decorations, behind the conversation */}
+      <svg viewBox="0 0 393 780" className={s.scene} aria-hidden focusable="false">
+        <PaperStar x={30} y={150} scale={0.8} delay={0.6} />
+        <PaperMoon x={334} y={108} scale={2} />
+        <PaperCloud x={310} y={148} scale={0.85} drift={1} />
+        <PaperCloud x={-14} y={228} scale={0.9} drift={2} />
+        <PaperStar x={352} y={470} scale={0.7} delay={2.2} />
+        <PaperCloud x={322} y={560} scale={0.9} drift={1} />
+      </svg>
+
       <div className={s.header}>
         <button className={`${s.back} tap`} onClick={() => navigate('/')}>
           <ChevronLeft />
         </button>
         <div className={s.who}>
-          <Avatar size={36} />
+          <Avatar size={44} ring="coral" />
           <div>
             <div className={s.name}>Dr. Sommers</div>
             <div className={s.status}>Listening</div>
@@ -115,7 +128,7 @@ export function Chat() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
               >
-                <Avatar size={22} style={{ marginBottom: 4 }} />
+                <Avatar size={34} ring="coral" style={{ marginBottom: 4 }} />
                 <div className={s.stack}>
                   {m.text && <div className={`${s.bubble} ${s.bubbleThem}`}>{m.text}</div>}
                   {m.card?.kind === 'snore-summary' && (

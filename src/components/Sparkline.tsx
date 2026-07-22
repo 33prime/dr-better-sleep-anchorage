@@ -9,6 +9,7 @@ interface Props {
   fill?: string;       // gradient fill color (semi-transparent area under line)
   strokeWidth?: number;
   showLastDot?: boolean;
+  dots?: boolean;      // per-point dots, like the papercraft mocks
   invertY?: boolean;   // when "down is good" — calmer nights sit lower
   className?: string;
 }
@@ -17,10 +18,11 @@ export function Sparkline({
   values,
   width = 360,
   height = 36,
-  stroke = '#43BACA',
-  fill = '#7FD1DE',
+  stroke = '#4BAFBA',
+  fill = '#74C7D0',
   strokeWidth = 1.25,
   showLastDot = true,
+  dots = false,
   invertY = false,
   className,
 }: Props) {
@@ -68,6 +70,19 @@ export function Sparkline({
         animate={{ pathLength: 1, opacity: 1 }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       />
+      {dots && points.slice(0, -1).map((p, i) => {
+        const [x, y] = p.split(',');
+        return (
+          <motion.circle
+            key={i}
+            cx={x} cy={y} r={1.8}
+            fill={stroke}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 + (i / points.length) * 0.6, duration: 0.2 }}
+          />
+        );
+      })}
       {showLastDot && (
         <motion.circle
           cx={lastPoint[0]} cy={lastPoint[1]} r={2.4}

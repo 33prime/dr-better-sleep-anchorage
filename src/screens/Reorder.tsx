@@ -4,6 +4,7 @@ import { ChevronLeft } from '../components/icons';
 import { Menu } from '../components/Menu';
 import { isoDate } from '../utils/format';
 import { showToast } from '../components/Toast';
+import { PaperMoon, PaperStar } from '../components/paper/PaperScene';
 import s from './Reorder.module.css';
 
 export function Reorder() {
@@ -33,6 +34,16 @@ export function Reorder() {
 
   return (
     <div className={s.root}>
+      <div className={s.decor} aria-hidden>
+        <svg viewBox="0 0 122 92" style={{ display: 'block', width: '100%', height: '100%' }} focusable="false">
+          <PaperStar x={26} y={20} scale={0.9} delay={0.4} />
+          <PaperStar x={58} y={46} scale={0.7} delay={1.8} />
+          <PaperStar x={16} y={58} scale={0.8} delay={2.6} />
+          <PaperStar x={72} y={68} scale={0.6} delay={1.1} />
+          <PaperMoon x={86} y={22} scale={1.3} />
+        </svg>
+      </div>
+
       <div className={s.nav}>
         <button className={`${s.back} tap`} onClick={() => navigate('/profile')}>
           <ChevronLeft />
@@ -60,11 +71,11 @@ export function Reorder() {
               </div>
             </div>
             <svg className={s.icon} viewBox="0 0 64 48" aria-hidden>
-              <ellipse cx="32" cy="40" rx="24" ry="3" fill="rgba(30,37,68,0.06)" />
-              <path d="M10,20 Q32,4 54,20 Q53,28 46,32 Q32,24 18,32 Q11,28 10,20 Z" fill="rgba(67,186,202,0.2)" stroke="#43BACA" strokeWidth={0.9} />
-              <path d="M14,28 Q32,42 50,28 Q51,36 44,38 Q32,42 20,38 Q13,36 14,28 Z" fill="rgba(255,255,255,0.7)" stroke="#1E2544" strokeWidth={0.7} />
-              <rect x="2" y="26" width="6" height="3" rx="1" fill="#F0F2F7" stroke="#1E2544" strokeWidth={0.5} />
-              <rect x="56" y="26" width="6" height="3" rx="1" fill="#F0F2F7" stroke="#1E2544" strokeWidth={0.5} />
+              <ellipse cx="32" cy="40" rx="24" ry="3" style={{ fill: 'var(--dev-shadow)' }} />
+              <path d="M10,20 Q32,4 54,20 Q53,28 46,32 Q32,24 18,32 Q11,28 10,20 Z" style={{ fill: 'rgba(75,175,186,0.2)', stroke: 'var(--accent)' }} strokeWidth={0.9} />
+              <path d="M14,28 Q32,42 50,28 Q51,36 44,38 Q32,42 20,38 Q13,36 14,28 Z" style={{ fill: 'var(--dev-fill)', stroke: 'var(--dev-stroke)' }} strokeWidth={0.7} />
+              <rect x="2" y="26" width="6" height="3" rx="1" style={{ fill: 'var(--dev-panel)', stroke: 'var(--dev-stroke)' }} strokeWidth={0.5} />
+              <rect x="56" y="26" width="6" height="3" rx="1" style={{ fill: 'var(--dev-panel)', stroke: 'var(--dev-stroke)' }} strokeWidth={0.5} />
             </svg>
           </div>
           <div className={s.meter}><i style={{ width: `${pctUsed}%` }} /></div>

@@ -1,4 +1,12 @@
-.root { display: flex; flex-direction: column; height: 100%; }
+.root { display: flex; flex-direction: column; height: 100%; position: relative; }
+
+/* margin decorations (stars / moon / clouds), fixed behind the conversation */
+.scene {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
 
 .header {
   position: relative; z-index: 2;
@@ -17,7 +25,7 @@
   display: flex; align-items: center; gap: 10px;
   flex: 1;
 }
-.name { font-family: var(--serif); font-size: 18px; line-height: 1.1; color: var(--text-primary); }
+.name { font-family: var(--serif); font-weight: 700; font-size: 20px; line-height: 1.1; color: var(--text-primary); }
 .status {
   font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--accent); margin-top: 2px;
@@ -45,16 +53,16 @@
   margin: 4px 0;
 }
 
-.row { display: flex; gap: 8px; align-items: flex-end; }
+.row { display: flex; gap: 10px; align-items: flex-end; position: relative; z-index: 1; }
 .rowThem { /* uses default */ }
 .rowMe { justify-content: flex-end; }
-.stack { display: flex; flex-direction: column; gap: 4px; max-width: 78%; }
-.avSpacer { width: 22px; flex: none; }
+.stack { display: flex; flex-direction: column; gap: 4px; max-width: 80%; }
+.avSpacer { width: 34px; flex: none; }
 
 .bubble {
-  padding: 11px 15px;
-  border-radius: 18px;
-  font-size: 14.5px; line-height: 1.45;
+  padding: 13px 17px;
+  border-radius: 20px;
+  font-size: 15px; line-height: 1.5;
   text-wrap: pretty;
 }
 .bubbleThem {
@@ -64,7 +72,7 @@
 }
 .bubbleMe {
   background: var(--accent);
-  color: #1E2544;
+  color: #1B2547;
   border-bottom-right-radius: 6px;
   max-width: 78%;
 }
@@ -109,14 +117,16 @@
 }
 .chip {
   font: inherit;
-  font-size: 13px; line-height: 1.2;
-  padding: 8px 14px;
-  border-radius: 16px;
-  background: rgba(67, 186, 202, 0.12);
-  border: 1px solid rgba(67, 186, 202, 0.28);
-  color: var(--accent);
+  font-size: 12.5px; line-height: 1.2;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1.3px solid var(--accent);
+  color: var(--text-primary);
   white-space: nowrap;
 }
+/* the two accents alternate across the pills, like the mock */
+.chip:nth-child(even) { border-color: var(--coral); }
 
 .composer {
   flex: none;
@@ -126,11 +136,11 @@
   display: flex; gap: 10px; align-items: flex-end;
 }
 .field {
-  flex: 1; min-height: 40px;
+  flex: 1; min-height: 46px;
   background: rgba(255,255,255,0.6);
   border: 1px solid var(--hairline);
-  border-radius: 22px;
-  padding: 0 16px;
+  border-radius: 999px;
+  padding: 0 18px;
   display: flex; align-items: center;
 }
 .fieldInput {
@@ -144,12 +154,49 @@
 }
 .fieldInput::placeholder { color: var(--text-tertiary); font-style: italic; }
 .send {
-  width: 40px; height: 40px;
+  width: 46px; height: 46px;
   border-radius: 50%;
-  background: var(--accent); color: #1E2544;
+  background: var(--accent); color: #1B2547;
   display: grid; place-items: center;
-  box-shadow: 0 6px 18px rgba(67,186,202,0.25);
+  box-shadow: 0 6px 18px rgba(75,175,186,0.25);
   flex: none;
 }
 .send svg { width: 18px; height: 18px; }
-.send:disabled { opacity: 0.5; box-shadow: none; }
+.send:disabled { opacity: 0.65; box-shadow: none; }
+
+/* ============================================================
+   NIGHT — matches mock 03
+   ============================================================ */
+:global(.screen.night) .header { border-bottom: 1px solid rgba(75,175,186,0.55); }
+:global(.screen.night) .back { color: var(--night-text-1); }
+:global(.screen.night) .name { color: var(--night-text-1); }
+:global(.screen.night) .dayRule { color: var(--night-text-3); }
+:global(.screen.night) .bubbleThem {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+  color: var(--night-text-1);
+}
+:global(.screen.night) .bubbleMe {
+  background: var(--accent);
+  color: #0F1A33;
+}
+:global(.screen.night) .ts { color: var(--night-text-3); }
+:global(.screen.night) .card {
+  background: var(--night-bg-2);
+  border: 1px solid var(--hairline-night);
+}
+:global(.screen.night) .card .v { color: var(--night-text-1); }
+:global(.screen.night) .card .u { color: var(--night-text-2); }
+:global(.screen.night) .typing { background: var(--night-bg-2); border: 1px solid var(--hairline-night); }
+:global(.screen.night) .typing span { background: var(--night-text-3); }
+:global(.screen.night) .chip { color: var(--night-text-1); }
+:global(.screen.night) .composer {
+  background: linear-gradient(180deg, rgba(18,27,58,0) 0%, rgba(18,27,58,0.9) 30%, var(--night-bg-1) 70%);
+}
+:global(.screen.night) .field {
+  background: rgba(18,27,58,0.45);
+  border: 1.3px solid rgba(75,175,186,0.55);
+}
+:global(.screen.night) .fieldInput { color: var(--night-text-1); }
+:global(.screen.night) .fieldInput::placeholder { color: var(--night-text-3); }
+:global(.screen.night) .send { background: var(--accent); color: #FFFFFF; }
