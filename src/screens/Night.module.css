@@ -4,7 +4,13 @@
   padding: 24px 28px 36px;
   color: var(--night-text-1);
   position: relative;
+  transition: opacity 900ms ease;
 }
+
+/* Idle-dim — face-down on a nightstand all night, no reason to stay bright.
+   A tap anywhere (handled in JS, not scoped to this element) wakes it. */
+.root.dim { opacity: 0.16; }
+@media (prefers-reduced-motion: reduce) { .root { transition: none; } }
 
 /* cream starfield behind the live-tracking content */
 .starscape {

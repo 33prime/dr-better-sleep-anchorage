@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useStore, store, daysSince } from '../store';
+import { writePartner, writeUiTheme } from '../lib/sync';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Avatar } from '../components/Avatar';
 import { Wordmark } from '../components/Wordmark';
 import { ChevronRight } from '../components/icons';
@@ -11,12 +14,39 @@ const THEMES: Array<'auto' | 'light' | 'dark'> = ['auto', 'light', 'dark'];
 export function Profile() {
   const state = useStore();
   const [, navigate] = useLocation();
+  const [signingOut, setSigningOut] = useState(false);
 
   const used = daysSince(state.device.fittedAt);
   const pctLife = Math.min(100, Math.round((used / state.device.lifespanNights) * 100));
 
-  const setTheme = (t: 'auto' | 'light' | 'dark') => store.set(s2 => { s2.uiTheme = t; });
-  const toggleNotify = () => store.set(s2 => { s2.partner.notifyAtMorning = !s2.partner.notifyAtMorning; });
+  const setTheme = (t: 'auto' | 'light' | 'dark') => writeUiTheme(t);
+  const toggleNotify = () => writePartner({ notifyAtMorning: !state.partner.notifyAtMorning });
+
+  const isAccount = state.mode === 'account' && !!state.auth;
+
+  // `unhydrate()` (via main.tsx's onAuthStateChange -> SIGNED_OUT listener)
+  // drops the store back to local-demo mode once Supabase confirms sign-out
+  // — no need to touch the store here directly.
+  const handleSignOut = async () => {
+    if (!supabase) return;
+    setSigningOut(true);
+    try {
+      await supabase.auth.signOut();
+      showToast('Signed out — back to the local demo.');
+    } catch {
+      showToast("Couldn't sign out — try again.");
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
+  // Only meaningful in local-demo mode: an account's nights live in Supabase
+  // and resetting the local seed shouldn't touch them.
+  const handleResetDemo = () => {
+    store.reset();
+    showToast('Reset to the demo seed.');
+    navigate('/');
+  };
 
   return (
     <div className={s.root}>
@@ -27,6 +57,35 @@ export function Profile() {
           <div className={s.meta}>{state.user.ageRange} · {state.user.sex} · BMI {state.user.bmiRange}</div>
         </div>
       </div>
+
+      {/* Account */}
+      <div className={s.sectionLabel}>Account</div>
+      <div className={s.card}>
+        {isAccount ? (
+          <div className={s.toggleRow}>
+            <div className={s.toggleText}>
+              <div className={s.rowTitle}>Signed in</div>
+              <div className={s.rowSub}>{state.auth!.email}</div>
+            </div>
+          </div>
+        ) : (
+          <div className={s.toggleRow}>
+            <div className={s.toggleText}>
+              <div className={s.rowTitle}>Browsing the local demo</div>
+              <div className={s.rowSub}>Sign in to save your nights to your account.</div>
+            </div>
+          </div>
+        )}
+      </div>
+      {isAccount ? (
+        <button className={`${s.signout} tap`} onClick={handleSignOut} disabled={signingOut}>
+          {signingOut ? 'Signing out…' : 'Sign out'}
+        </button>
+      ) : (
+        <button className={`${s.rowLink} tap`} onClick={() => navigate('/auth')}>
+          <span>Sign in</span><ChevronRight />
+        </button>
+      )}
 
       {/* Device */}
       <div className={s.sectionLabel}>Your device</div>
@@ -99,11 +158,18 @@ export function Profile() {
         <button className={`${s.listRow} tap`} onClick={() => navigate('/onboarding')}>
           <span>Replay onboarding</span><ChevronRight />
         </button>
+        {!isAccount && (
+          <button className={`${s.listRow} tap`} onClick={handleResetDemo}>
+            <span>Reset demo data</span><ChevronRight />
+          </button>
+        )}
       </div>
 
-      <button className={`${s.signout} tap`} onClick={() => showToast('You’ll stay signed in for this demo.')}>
-        Sign out
-      </button>
+      {!isSupabaseConfigured && (
+        <div className={s.rowSub} style={{ marginTop: 10, textAlign: 'center' }}>
+          Sign-in isn't configured for this build — the demo still works locally.
+        </div>
+      )}
 
       <div className={s.scrollPad} />
     </div>

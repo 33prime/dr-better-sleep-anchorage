@@ -1,5 +1,6 @@
 import { useLocation } from 'wouter';
-import { useStore, store } from '../store';
+import { useStore } from '../store';
+import { writeOnboarding } from '../lib/sync';
 import { ChevronLeft, ArrowRight } from '../components/icons';
 import { Menu } from '../components/Menu';
 import { showToast } from '../components/Toast';
@@ -117,7 +118,7 @@ export function DeviceOverview() {
               // This screen can end onboarding (findings → "skip to device");
               // without marking complete, the first-run gate would bounce the
               // user straight back to the questionnaire.
-              store.set(s2 => { s2.onboarding.complete = true; });
+              writeOnboarding({ complete: true });
               navigate('/');
             }}
           >

@@ -68,6 +68,30 @@
 .cell .d .from { color: var(--text-tertiary); font-weight: 400; }
 .cell .d.muted { color: var(--text-tertiary); }
 
+/* "connect a wearable" affordance — replaces the deep-sleep/resting-HR cells
+   on a recorded night that has no wearable-ingest data yet. Spans both
+   columns so it reads as one honest note, not two broken stats. */
+.wearCta {
+  grid-column: 1 / -1;
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 16px;
+}
+.wearIcon {
+  flex: none; width: 20px; height: 20px; margin-top: 1px;
+  color: var(--accent);
+}
+.wearTitle {
+  font-family: var(--serif); font-weight: 700;
+  font-size: 14px; color: var(--text-primary);
+}
+.wearSub {
+  margin-top: 2px;
+  font-size: 12px; line-height: 1.45;
+  color: var(--text-tertiary);
+}
+
 .footer {
   margin-top: 40px;
   display: flex; align-items: center; justify-content: space-between;
@@ -104,3 +128,6 @@
 :global(.screen.night) .footer { border-top-color: var(--hairline-night); }
 :global(.screen.night) .cta { color: var(--night-text-1); }
 :global(.screen.night) .dayLabel { color: var(--night-text-3); }
+:global(.screen.night) .wearCta { border-color: var(--hairline-night); }
+:global(.screen.night) .wearTitle { color: var(--night-text-1); }
+:global(.screen.night) .wearSub { color: var(--night-text-3); }

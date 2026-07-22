@@ -7,7 +7,7 @@ import { PaperCloud, PaperMoon, PaperStar } from '../components/paper/PaperScene
 import { ChevronLeft, ArrowRight } from '../components/icons';
 import { Menu } from '../components/Menu';
 import { fmtClockHM } from '../utils/format';
-import { streamChatReply } from '../utils/chatApi';
+import { streamChatReply, persistChatTurn } from '../utils/chatApi';
 import { suggestedPrompts, proactiveOpener } from '../utils/coachPrompts';
 import s from './Chat.module.css';
 
@@ -59,6 +59,7 @@ export function Chat() {
     // make the whole reply appear at once instead of streaming token-by-token.
     store.set(s2 => { s2.chat = [...s2.chat, { id: userId, who: 'me', text: body, ts: Date.now() }]; });
     setTyping(true);
+    void persistChatTurn(store.get(), 'me', body);
 
     try {
       const history = [...store.get().chat];
@@ -79,6 +80,10 @@ export function Chat() {
       if (!started) {
         store.set(s2 => { s2.chat = [...s2.chat, { id: replyId, who: 'them', text: '…', ts: Date.now() }]; });
         setTyping(false);
+      } else {
+        // Persist the finished reply once streaming settles (see
+        // persistChatTurn's note on why this bypasses the write queue).
+        void persistChatTurn(store.get(), 'them', acc);
       }
     } catch (err) {
       console.error('Chat error:', err);
@@ -139,6 +144,39 @@ export function Chat() {
                         <div className={s.u}>vs. {m.card.baseline} baseline</div>
                       </div>
                       <div className={s.delta}>↓ {Math.round((1 - m.card.total / m.card.baseline) * 100)}%</div>
+                    </div>
+                  )}
+                  {m.card?.kind === 'comparison' && (
+                    <button
+                      className={`${s.card} tap`}
+                      style={{ textAlign: 'left', width: '100%', border: 0, cursor: 'pointer' }}
+                      onClick={() => navigate('/trends/compare')}
+                    >
+                      <div className={s.k}>Two-week comparison</div>
+                      <div className={s.row2}>
+                        <div className={s.u}>Tap to see how you stack up against a similar cohort</div>
+                      </div>
+                    </button>
+                  )}
+                  {m.card?.kind === 'hypnogram' && (
+                    <button
+                      className={`${s.card} tap`}
+                      style={{ textAlign: 'left', width: '100%', border: 0, cursor: 'pointer' }}
+                      onClick={() => navigate(`/night/${m.card && m.card.kind === 'hypnogram' ? m.card.date : 'today'}`)}
+                    >
+                      <div className={s.k}>Sleep stages · {m.card.date}</div>
+                      <div className={s.row2}>
+                        <div className={s.u}>Tap to see the full night breakdown</div>
+                      </div>
+                    </button>
+                  )}
+                  {m.card?.kind === 'audio' && (
+                    <div className={s.card}>
+                      <div className={s.k}>Audio clip · {m.card.window}</div>
+                      <div className={s.row2}>
+                        <div className={s.v}>{m.card.duration}s</div>
+                        <div className={s.u}>recorded snore sample</div>
+                      </div>
                     </div>
                   )}
                 </div>

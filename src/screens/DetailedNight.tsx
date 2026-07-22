@@ -28,13 +28,21 @@ export function DetailedNight() {
   const prevDay = new Date(d); prevDay.setDate(d.getDate() - 1);
   const dayShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const totalMin = n.positions.side_left + n.positions.side_right + n.positions.back + n.positions.stomach;
-  const positions = [
+  // positions/positionSnores/sleep-stage minutes are wearable-ingest fields —
+  // the mic can never produce them (PLAN.md finding #1). Undefined for a
+  // recorded night until a wearable is connected; render an honest
+  // "connect a wearable" affordance for those sections instead of fabricating
+  // numbers.
+  const hasWearable = n.positions !== undefined && n.positionSnores !== undefined;
+  const positions = n.positions && n.positionSnores ? [
     { label: 'Side · left',  mins: n.positions.side_left,  snores: n.positionSnores.side_left  },
     { label: 'Side · right', mins: n.positions.side_right, snores: n.positionSnores.side_right },
     { label: 'Back',         mins: n.positions.back,       snores: n.positionSnores.back       },
     { label: 'Stomach',      mins: n.positions.stomach,    snores: n.positionSnores.stomach    },
-  ];
+  ] : [];
+  const totalMin = positions.reduce((a, p) => a + p.mins, 0);
+  const hasStages = typeof n.awakeMin === 'number' && typeof n.deepMin === 'number'
+    && typeof n.remMin === 'number' && typeof n.lightMin === 'number';
 
   return (
     <div className={s.root}>
@@ -56,7 +64,9 @@ export function DetailedNight() {
           </div>
           <h1>Last night</h1>
           <div className={s.sub}>
-            {fmtDuration(n.sleepDurationMin + n.awakeMin)} in bed · {fmtDuration(n.sleepDurationMin)} asleep · device worn the full night
+            {hasStages
+              ? `${fmtDuration(n.sleepDurationMin + n.awakeMin!)} in bed · ${fmtDuration(n.sleepDurationMin)} asleep · device worn the full night`
+              : `${fmtDuration(n.sleepDurationMin)} asleep · device worn the full night`}
           </div>
         </div>
 
@@ -66,23 +76,32 @@ export function DetailedNight() {
           <div className={s.delta}>{delta.sign} {delta.pct}</div>
         </div>
 
-        {/* Hypnogram */}
-        <div className={s.hyp}>
-          <div className={s.row}>
-            <div className={s.k}>Sleep stages</div>
-            <div className={s.total}>{fmtDuration(n.sleepDurationMin)}</div>
+        {/* Hypnogram — sleep-stage data is wearable-ingest only */}
+        {hasStages ? (
+          <div className={s.hyp}>
+            <div className={s.row}>
+              <div className={s.k}>Sleep stages</div>
+              <div className={s.total}>{fmtDuration(n.sleepDurationMin)}</div>
+            </div>
+            <Hypnogram />
+            <div className={s.hypX}>
+              <span>10 PM</span><span>12 AM</span><span>2 AM</span><span>4 AM</span><span>6 AM</span>
+            </div>
+            <div className={s.hypLegend}>
+              <div className={s.l}><div className={s.k}>Deep</div><div className={s.v}>{fmtDuration(n.deepMin!)}</div></div>
+              <div className={s.l}><div className={s.k}>REM</div><div className={s.v}>{fmtDuration(n.remMin!)}</div></div>
+              <div className={s.l}><div className={s.k}>Light</div><div className={s.v}>{fmtDuration(n.lightMin!)}</div></div>
+              <div className={s.l}><div className={s.k}>Awake</div><div className={s.v}>{fmtDuration(n.awakeMin!)}</div></div>
+            </div>
           </div>
-          <Hypnogram />
-          <div className={s.hypX}>
-            <span>10 PM</span><span>12 AM</span><span>2 AM</span><span>4 AM</span><span>6 AM</span>
+        ) : (
+          <div className={s.hyp}>
+            <div className={s.row}>
+              <div className={s.k}>Sleep stages</div>
+            </div>
+            <div className={s.meta}>Connect a wearable to see sleep stages — the mic can track snoring, not sleep depth.</div>
           </div>
-          <div className={s.hypLegend}>
-            <div className={s.l}><div className={s.k}>Deep</div><div className={s.v}>{fmtDuration(n.deepMin)}</div></div>
-            <div className={s.l}><div className={s.k}>REM</div><div className={s.v}>{fmtDuration(n.remMin)}</div></div>
-            <div className={s.l}><div className={s.k}>Light</div><div className={s.v}>{fmtDuration(n.lightMin)}</div></div>
-            <div className={s.l}><div className={s.k}>Awake</div><div className={s.v}>{fmtDuration(n.awakeMin)}</div></div>
-          </div>
-        </div>
+        )}
 
         {/* Snore intensity */}
         <div className={s.section}>
@@ -100,40 +119,71 @@ export function DetailedNight() {
           <div className={s.insight}>
             <Avatar size={24} />
             <div className={s.copy}>
-              The peak around <span className={s.data}>2:40</span> is when you rolled onto your back. <span className={s.em}>The thing is</span> — the strap held. Last week, position 2 would have slipped right there.
+              {hasWearable ? (
+                <>The peak around <span className={s.data}>2:40</span> is when you rolled onto your back. <span className={s.em}>The thing is</span> — the strap held. Last week, position 2 would have slipped right there.</>
+              ) : (
+                <>The peak was around <span className={s.data}>{peakHourLabel(n.snoresByHour, n.startedAt)}</span>. <span className={s.em}>Worth knowing</span> — connect a wearable and I can tell you what position you were in when it happened.</>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Position breakdown */}
+        {/* Position breakdown — wearable-ingest only; the mic can't sense body position */}
         <div className={s.section}>
           <div className={s.h}>
             <h2>By position</h2>
             <div className={s.meta}>Where you slept</div>
           </div>
-          <div className={s.posGrid}>
-            {positions.map((p) => {
-              const pct = totalMin > 0 ? Math.round((p.mins / totalMin) * 100) : 0;
-              return (
-                <div className={s.pos} key={p.label}>
-                  <div className={s.k}>{p.label}</div>
-                  <div className={s.v}>{fmtDuration(p.mins)}</div>
-                  <div className={s.bar}><div style={{ width: `${pct}%` }} /></div>
-                  <div className={s.pct}>{pct}% · {p.snores} snore{p.snores === 1 ? '' : 's'}</div>
-                </div>
-              );
-            })}
-          </div>
+          {hasWearable ? (
+            <div className={s.posGrid}>
+              {positions.map((p) => {
+                const pct = totalMin > 0 ? Math.round((p.mins / totalMin) * 100) : 0;
+                return (
+                  <div className={s.pos} key={p.label}>
+                    <div className={s.k}>{p.label}</div>
+                    <div className={s.v}>{fmtDuration(p.mins)}</div>
+                    <div className={s.bar}><div style={{ width: `${pct}%` }} /></div>
+                    <div className={s.pct}>{pct}% · {p.snores} snore{p.snores === 1 ? '' : 's'}</div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={s.meta}>Connect a wearable to see position breakdown.</div>
+          )}
         </div>
 
-        <div className={s.aside}>
-          <div className={s.label}>Why this matters</div>
-          <h3>Most of your snoring still happens on your back.</h3>
-          <p>That's normal — gravity pulls the soft palate and tongue base into the airway. The device counters that. As we tighten the strap over the next two weeks, that back-sleeping number is the one to watch.</p>
-        </div>
+        {hasWearable ? (
+          <div className={s.aside}>
+            <div className={s.label}>Why this matters</div>
+            <h3>Most of your snoring still happens on your back.</h3>
+            <p>That's normal — gravity pulls the soft palate and tongue base into the airway. The device counters that. As we tighten the strap over the next two weeks, that back-sleeping number is the one to watch.</p>
+          </div>
+        ) : (
+          <div className={s.aside}>
+            <div className={s.label}>Why this matters</div>
+            <h3>The mic can tell you when — not what position.</h3>
+            <p>Snore timing and intensity are measured straight from tonight's audio. Body position (and whether it's mostly happening on your back, the usual culprit) needs a wearable — connect one to see that breakdown.</p>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+// Honest fallback for the no-wearable case: which clock hour had the most
+// mic-measured snores (real data), rather than a fabricated body-position
+// claim the mic can't back up.
+function peakHourLabel(snoresByHour: number[], startedAt: string): string {
+  if (snoresByHour.length === 0 || !startedAt) return 'no clear peak';
+  let peakIdx = 0;
+  for (let i = 1; i < snoresByHour.length; i++) {
+    if (snoresByHour[i] > snoresByHour[peakIdx]) peakIdx = i;
+  }
+  if (snoresByHour[peakIdx] === 0) return 'no clear peak — a quiet night';
+  const [h, m] = startedAt.split(':').map(Number);
+  const peakHour = (h + peakIdx) % 24;
+  return fmtTime(`${pad2(peakHour)}:${pad2(m)}`);
 }
 
 function fmtTime(hhmm: string): string {

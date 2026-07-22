@@ -1,0 +1,127 @@
+.root { padding: 8px 24px 28px; display: flex; flex-direction: column; min-height: 100%; overflow-y: auto; position: relative; }
+
+.brandRow { display: flex; justify-content: center; padding: 2px 0 28px; position: relative; }
+
+h1.h { margin-top: 8px; font-family: var(--serif); font-weight: 800; font-size: 30px; line-height: 1.1; letter-spacing: -0.005em; color: var(--text-primary); text-wrap: balance; }
+.it { font-style: italic; }
+
+.bodyCopy { margin-top: 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-wrap: pretty; max-width: 34ch; }
+.bodyCopy .em { color: var(--text-primary); font-weight: 600; }
+
+/* ---------- email form ---------- */
+.form { margin-top: 26px; display: flex; flex-direction: column; gap: 8px; }
+.label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.field {
+  min-height: 50px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 0 16px;
+  display: flex; align-items: center;
+}
+.fieldInput {
+  flex: 1; font: inherit; background: transparent; border: 0; outline: none;
+  padding: 13px 0; font-size: 15px; color: var(--text-primary); min-width: 0;
+}
+.fieldInput::placeholder { color: var(--text-tertiary); font-style: italic; }
+
+.error {
+  margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--coral-deep);
+}
+.notice {
+  margin-top: 14px; font-size: 12.5px; line-height: 1.5; color: var(--text-tertiary);
+  text-align: center; text-wrap: pretty;
+}
+
+.divider {
+  margin: 22px 0; display: flex; align-items: center; gap: 12px;
+  color: var(--text-tertiary); font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+
+.skip {
+  margin-top: 18px; align-self: center;
+  font-family: var(--sans); font-size: 13px; color: var(--text-tertiary);
+  padding: 6px 4px;
+}
+
+/* ---------- OTP code entry ---------- */
+.codeRow { margin-top: 26px; display: flex; gap: 10px; justify-content: space-between; }
+.codeBox {
+  width: 46px; height: 56px; text-align: center;
+  font-family: var(--mono); font-size: 22px; font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  outline: none;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.codeBox:focus { border-color: var(--accent); background: rgba(75,175,186,0.08); }
+.codeBox:disabled { opacity: 0.6; }
+
+.linkRow { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.linkBtn {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--accent-deep);
+  padding: 4px;
+}
+.linkBtn:disabled { color: var(--text-tertiary); }
+
+/* ---------- shared buttons ---------- */
+.btn { margin-top: 20px; height: 50px; border-radius: 14px; display: grid; place-items: center; font-size: 15px; font-weight: 500; width: 100%; }
+.btnPrimary { background: var(--text-primary); color: var(--bg-primary); }
+.btnPrimary:disabled { opacity: 0.4; }
+.btnPrimary span { display: inline-flex; align-items: center; gap: 8px; }
+.btnPrimary svg { width: 16px; height: 16px; }
+.btnGhost { color: var(--text-secondary); font-style: italic; font-family: var(--serif); font-size: 16px; background: none; margin-top: 0; }
+.btnGhost:disabled { opacity: 0.5; }
+
+/* decorative scene — hidden on day, revealed on night behind the header */
+.scene { display: none; }
+
+/* ============================================================
+   NIGHT — papercraft-night auth (see app/BRAND.md)
+   ============================================================ */
+:global(.screen.night) .scene {
+  display: block;
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 100px; width: 100%;
+  pointer-events: none; z-index: -1;
+}
+:global(.screen.night) h1.h { color: var(--night-text-1); }
+:global(.screen.night) .bodyCopy { color: var(--night-text-2); }
+:global(.screen.night) .bodyCopy .em { color: var(--night-text-1); }
+
+:global(.screen.night) .label { color: var(--night-text-3); }
+:global(.screen.night) .field {
+  background: rgba(18,27,58,0.45);
+  border: 1.3px solid var(--hairline-night);
+}
+:global(.screen.night) .fieldInput { color: var(--night-text-1); }
+:global(.screen.night) .fieldInput::placeholder { color: var(--night-text-3); }
+:global(.screen.night) .field:focus-within { border-color: var(--accent); }
+
+:global(.screen.night) .error { color: var(--coral); }
+:global(.screen.night) .notice { color: var(--night-text-3); }
+:global(.screen.night) .divider { color: var(--night-text-3); }
+:global(.screen.night) .divider::before, :global(.screen.night) .divider::after { background: var(--hairline-night); }
+:global(.screen.night) .skip { color: var(--night-text-3); }
+
+:global(.screen.night) .codeBox {
+  background: rgba(18,27,58,0.45);
+  border: 1.3px solid var(--hairline-night);
+  color: var(--night-text-1);
+}
+:global(.screen.night) .codeBox:focus { border-color: var(--accent); background: rgba(75,175,186,0.12); }
+:global(.screen.night) .linkBtn { color: var(--accent-soft); }
+:global(.screen.night) .linkBtn:disabled { color: var(--night-text-3); }
+
+/* primary CTA — filled teal, ink-white, fully rounded */
+:global(.screen.night) .btnPrimary {
+  background: var(--accent-deep); color: var(--night-text-1); border-radius: 999px;
+}
+:global(.screen.night) .btnGhost { color: var(--night-text-2); }

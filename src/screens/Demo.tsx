@@ -25,18 +25,37 @@ export function Demo() {
 
   const simulateNight = () => {
     const st = store.get();
+    // Never fabricate data into a real signed-in account — this staging
+    // tool is for the local-demo persona only. See PLAN.md non-negotiable:
+    // "No fabricated data written as source='recorded'".
+    if (st.mode === 'account') {
+      showToast("Can't simulate on a signed-in account — sign out first.");
+      return;
+    }
     const prior = lastNight(st);
     if (!prior) return;
     const nextDate = parseIsoDate(prior.date);
     nextDate.setDate(nextDate.getDate() + 1);
+    // Dev-only simulator — only extrapolates wearable fields (efficiency,
+    // deepMin) when the prior night actually had them (seed/demo nights).
+    // A real recorded night has no wearable data, so the simulated night
+    // that follows it shouldn't invent any either.
     const next = {
       ...prior,
       date: isoDate(nextDate),
       totalSnores: Math.max(20, Math.round(prior.totalSnores * (0.85 + Math.random() * 0.2))),
       sleepDurationMin: prior.sleepDurationMin + Math.round((Math.random() - 0.5) * 30),
-      efficiency: Math.min(0.98, prior.efficiency + (Math.random() - 0.4) * 0.04),
-      deepMin: prior.deepMin + Math.round((Math.random() - 0.5) * 20),
+      efficiency: typeof prior.efficiency === 'number'
+        ? Math.min(0.98, prior.efficiency + (Math.random() - 0.4) * 0.04)
+        : undefined,
+      deepMin: typeof prior.deepMin === 'number'
+        ? prior.deepMin + Math.round((Math.random() - 0.5) * 20)
+        : undefined,
       snoresByHour: prior.snoresByHour.map(v => Math.max(0, Math.round(v * (0.7 + Math.random() * 0.4)))),
+      // Fabricated, not measured — must never carry 'recorded' (or any
+      // source it happened to inherit from `prior`). 'manual' is the closest
+      // existing tag for "not from the mic pipeline".
+      source: 'manual' as const,
     };
     store.set(s2 => {
       s2.nights.push(next);

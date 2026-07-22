@@ -7,9 +7,25 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 // adaptive noise floor AND require low-frequency dominance — that keeps taps,
 // claps and clicks from counting. A refractory window stops one snore from
 // being counted many times. No audio leaves the device; nothing is recorded.
+//
+// In addition to the live aggregate state (for the orb/meter/waveform), each
+// confirmed snore is emitted once as a finished record via `onEvent` — that's
+// the per-event feed `sessionRecorder` buffers and persists.
 
 export type DetectorStatus =
   | 'idle' | 'requesting' | 'listening' | 'denied' | 'unsupported' | 'simulated';
+
+/** One finished snore, ready to hand to a recorder. */
+export interface SnoreEventRecord {
+  ts: number;           // epoch ms, approx onset of the snore
+  durationMs: number;   // how long the loud spell lasted
+  peakDb: number;       // loudest reading during the event
+  // Fractions (sum to 1) of this event's spectral energy in each band —
+  // the vibration site: palatal (low rumble), tongue base (mid), nasal (high).
+  bandPalatal: number;
+  bandTongue: number;
+  bandNasal: number;
+}
 
 interface DetectorState {
   status: DetectorStatus;
@@ -31,8 +47,11 @@ const initial = (): DetectorState => ({
   typeMix: { palatal: 0, tongue: 0, nasal: 0 },
 });
 
-export function useSnoreDetector() {
+export function useSnoreDetector(onEvent?: (event: SnoreEventRecord) => void) {
   const [state, setState] = useState<DetectorState>(initial);
+
+  const onEventRef = useRef(onEvent);
+  useEffect(() => { onEventRef.current = onEvent; }, [onEvent]);
 
   const r = useRef({
     ctx: undefined as AudioContext | undefined,
@@ -44,14 +63,23 @@ export function useSnoreDetector() {
     sim: 0,
     running: false,
     noiseFloor: 0.005,
-    loudSince: 0,
+    loudSince: 0,        // performance.now() the current loud spell began, 0 if not loud
+    loudSinceWall: 0,    // Date.now() paired with loudSince, for real event timestamps
     refractoryUntil: 0,
     snoreCount: 0,
     peakDb: 0,
     smooth: 0,
     levels: new Array(HISTORY).fill(0) as number[],
     frame: 0,
-    typeAccum: { palatal: 0, tongue: 0, nasal: 0 },
+    typeAccum: { palatal: 0, tongue: 0, nasal: 0 }, // running mix, for the live typeMix display
+    // Duration tracking for the *current* confirmed event, independent of the
+    // refractory window so we capture the event's real length even though
+    // the count/flash fire the moment it's confirmed (300ms in).
+    durActive: false,
+    durStartPerf: 0,
+    durStartWall: 0,
+    durPeakDb: 0,
+    durBand: { palatal: 0, tongue: 0, nasal: 0 },
   });
 
   const stop = useCallback(() => {
@@ -63,6 +91,7 @@ export function useSnoreDetector() {
     c.ctx?.close().catch(() => {});
     c.ctx = c.stream = c.analyser = c.td = c.fd = undefined;
     c.raf = c.sim = 0;
+    c.durActive = false;
   }, []);
 
   const tick = useCallback(() => {
@@ -84,6 +113,19 @@ export function useSnoreDetector() {
     for (let i = loBin; i <= hiBin; i++) lo += c.fd[i];
     const lowEnergy = lo / ((hiBin - loBin + 1) * 255); // 0..1
 
+    // Band-energy split, computed every tick so duration tracking can
+    // accumulate it across the whole event, not just the trigger instant.
+    const band = (loHz: number, hiHz: number) => {
+      const bLo = Math.max(1, Math.floor(loHz / binHz));
+      const bHi = Math.min(c.fd!.length - 1, Math.ceil(hiHz / binHz));
+      let s = 0;
+      for (let i = bLo; i <= bHi; i++) s += c.fd![i];
+      return s;
+    };
+    const bPalatal = band(60, 300);   // soft palate — low rumble
+    const bTongue = band(300, 1000);  // tongue base — mid, broadband
+    const bNasal = band(1000, 3000);  // nasal — high flutter
+
     c.smooth = c.smooth * 0.8 + Math.min(1, rms * 8) * 0.2;
     const level = c.smooth;
     const db = Math.round(Math.max(0, Math.min(92, 90 + 20 * Math.log10(rms + 1e-6))));
@@ -94,26 +136,45 @@ export function useSnoreDetector() {
 
     let event = false;
     if (loud) {
-      if (c.loudSince === 0) c.loudSince = now;
-      if (now - c.loudSince > 300 && now > c.refractoryUntil) {
+      if (c.loudSince === 0) { c.loudSince = now; c.loudSinceWall = Date.now(); }
+      if (now - c.loudSince > 300 && now > c.refractoryUntil && !c.durActive) {
         event = true;
         c.snoreCount += 1;
         c.refractoryUntil = now + 1300;
+        // Start duration tracking from the true onset (loudSince), not this tick.
+        c.durActive = true;
+        c.durStartPerf = c.loudSince;
+        c.durStartWall = c.loudSinceWall;
+        c.durPeakDb = db;
+        c.durBand = { palatal: bPalatal, tongue: bTongue, nasal: bNasal };
         c.loudSince = 0;
-        // Classify this snore by the band where its energy sits (vibration site).
-        const band = (loHz: number, hiHz: number) => {
-          const lo = Math.max(1, Math.floor(loHz / binHz));
-          const hi = Math.min(c.fd!.length - 1, Math.ceil(hiHz / binHz));
-          let sum = 0;
-          for (let i = lo; i <= hi; i++) sum += c.fd![i];
-          return sum;
-        };
-        c.typeAccum.palatal += band(60, 300);   // soft palate — low rumble
-        c.typeAccum.tongue += band(300, 1000);  // tongue base — mid, broadband
-        c.typeAccum.nasal += band(1000, 3000);  // nasal — high flutter
+        c.typeAccum.palatal += bPalatal;
+        c.typeAccum.tongue += bTongue;
+        c.typeAccum.nasal += bNasal;
+      } else if (c.durActive) {
+        // Still within the same loud spell — keep extending the event's
+        // duration/peak/band totals until it actually quiets down.
+        c.durPeakDb = Math.max(c.durPeakDb, db);
+        c.durBand.palatal += bPalatal;
+        c.durBand.tongue += bTongue;
+        c.durBand.nasal += bNasal;
       }
     } else {
       c.loudSince = 0;
+      if (c.durActive) {
+        const durationMs = Math.max(1, Math.round(now - c.durStartPerf));
+        const accSum = c.durBand.palatal + c.durBand.tongue + c.durBand.nasal;
+        const record: SnoreEventRecord = {
+          ts: c.durStartWall,
+          durationMs,
+          peakDb: c.durPeakDb,
+          bandPalatal: accSum > 0 ? c.durBand.palatal / accSum : 0,
+          bandTongue: accSum > 0 ? c.durBand.tongue / accSum : 0,
+          bandNasal: accSum > 0 ? c.durBand.nasal / accSum : 0,
+        };
+        c.durActive = false;
+        onEventRef.current?.(record);
+      }
     }
     if (rms > 0.012 && db > c.peakDb) c.peakDb = db;
 
@@ -170,6 +231,7 @@ export function useSnoreDetector() {
       c.noiseFloor = 0.005;
       c.loudSince = 0;
       c.refractoryUntil = 0;
+      c.durActive = false;
       c.typeAccum = { palatal: 0, tongue: 0, nasal: 0 };
       c.running = true;
       setState(s => ({ ...s, status: 'listening' }));
@@ -191,10 +253,23 @@ export function useSnoreDetector() {
       const event = Math.random() < 0.3;
       if (event) {
         c.snoreCount += 1;
-        c.peakDb = Math.max(c.peakDb, 42 + Math.round(Math.random() * 12));
-        c.typeAccum.palatal += 50 + Math.random() * 40;
-        c.typeAccum.tongue += 15 + Math.random() * 22;
-        c.typeAccum.nasal += 5 + Math.random() * 12;
+        const peakDb = 42 + Math.round(Math.random() * 12);
+        c.peakDb = Math.max(c.peakDb, peakDb);
+        const dPalatal = 50 + Math.random() * 40;
+        const dTongue = 15 + Math.random() * 22;
+        const dNasal = 5 + Math.random() * 12;
+        c.typeAccum.palatal += dPalatal;
+        c.typeAccum.tongue += dTongue;
+        c.typeAccum.nasal += dNasal;
+        const dSum = dPalatal + dTongue + dNasal;
+        onEventRef.current?.({
+          ts: Date.now(),
+          durationMs: 300 + Math.round(Math.random() * 1200),
+          peakDb,
+          bandPalatal: dPalatal / dSum,
+          bandTongue: dTongue / dSum,
+          bandNasal: dNasal / dSum,
+        });
       }
       const acc = c.typeAccum;
       const accSum = acc.palatal + acc.tongue + acc.nasal;

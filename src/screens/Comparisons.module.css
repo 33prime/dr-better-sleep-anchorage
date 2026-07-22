@@ -47,6 +47,7 @@
 .metric .bar .you { position: absolute; top: -2px; height: 8px; width: 8px; border-radius: 50%; background: var(--accent); transform: translateX(-4px); }
 .metric .bar .you::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 16px; height: 16px; border-radius: 50%; background: var(--accent-soft); opacity: 0.5; z-index: -1; }
 .metric .scale { margin-top: 4px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--text-tertiary); }
+.metric .meta { margin-top: 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); }
 
 /* ============================================================
    NIGHT — "Papercraft Night" (see app/BRAND.md). Teal is the cohort
@@ -89,3 +90,4 @@
 :global(.screen.night) .metric .vv.you { color: var(--accent); }
 :global(.screen.night) .metric .bar { background: var(--night-bg-3); }
 :global(.screen.night) .metric .bar .avg { background: var(--night-text-3); }
+:global(.screen.night) .metric .meta { color: var(--night-text-3); }

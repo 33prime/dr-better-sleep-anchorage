@@ -23,6 +23,7 @@ import { Reorder } from './screens/Reorder';
 import { Profile } from './screens/Profile';
 import { Science } from './screens/Science';
 import { Demo } from './screens/Demo';
+import { Auth } from './screens/Auth';
 
 const TABBAR_ROUTES = ['/', '/dashboard/dark', '/trends', '/profile', '/demo'];
 
@@ -32,8 +33,11 @@ export function App() {
   const [location, navigate] = useLocation();
 
   // First-run gate: route new users through onboarding until it's complete.
+  // Not a hard auth gate — /auth is exempt so "Sign in" is reachable from
+  // the middle of onboarding, and un-onboarded visitors who bounce back from
+  // there land on /onboarding again rather than looping through /auth.
   useEffect(() => {
-    if (!onboardingComplete && !location.startsWith('/onboarding')) {
+    if (!onboardingComplete && !location.startsWith('/onboarding') && location !== '/auth') {
       navigate('/onboarding', { replace: true });
     }
   }, [onboardingComplete, location, navigate]);
@@ -69,6 +73,7 @@ export function App() {
             <Route path="/onboarding/setup" component={BoilAndBite} />
             <Route path="/onboarding/device" component={DeviceOverview} />
             <Route path="/profile" component={Profile} />
+            <Route path="/auth" component={Auth} />
             <Route path="/reorder" component={Reorder} />
             <Route path="/demo" component={Demo} />
             <Route><Redirect to="/" /></Route>

@@ -7,15 +7,20 @@ export interface Night {
   date: string;          // ISO YYYY-MM-DD
   totalSnores: number;
   sleepDurationMin: number;
-  efficiency: number;    // 0..1
-  hrv: number;           // ms
-  restingHr: number;     // bpm
-  deepMin: number;
-  remMin: number;
-  lightMin: number;
-  awakeMin: number;
-  positions: { side_left: number; side_right: number; back: number; stomach: number }; // minutes
-  positionSnores: { side_left: number; side_right: number; back: number; stomach: number };
+  // Wearable-ingest placeholders. The mic can never produce these — they're
+  // null/absent for 'recorded' nights until a wearable is connected, and
+  // filled for 'demo'/'seed' nights (which represent "wearable connected").
+  // Every screen that reads these MUST guard for undefined instead of
+  // rendering a fabricated number. See PLAN.md "Type conventions".
+  efficiency?: number;    // 0..1
+  hrv?: number;           // ms
+  restingHr?: number;     // bpm
+  deepMin?: number;
+  remMin?: number;
+  lightMin?: number;
+  awakeMin?: number;
+  positions?: { side_left: number; side_right: number; back: number; stomach: number }; // minutes
+  positionSnores?: { side_left: number; side_right: number; back: number; stomach: number };
   snoresByHour: number[]; // 8 hours bedtime → wake
   peakDb: number;
   strapPosition: number; // 1..5
@@ -26,6 +31,13 @@ export interface Night {
   // Acoustic snore-type mix (fractions, sum ~1). Vibration site:
   // palatal (soft palate, low rumble), tongue (tongue base, broadband), nasal (high flutter).
   snoreTypes: { palatal: number; tongue: number; nasal: number };
+  // Additive fields — Night tracking v2 (see PLAN.md "Night tracking v2").
+  snoreTimePct?: number;      // fraction of session inside snore runs (gap threshold 60s)
+  longestQuietMin?: number;
+  // Where this row came from. 'seed' = local demo seed data (buildSeedState);
+  // 'demo' = server-side demo account (scripts/seed-demo.mjs); 'recorded' =
+  // real mic-tracked night; 'manual' = user-logged retroactively.
+  source?: 'recorded' | 'demo' | 'manual' | 'seed';
 }
 
 export interface ChatMessage {
@@ -102,6 +114,18 @@ export interface AppState {
   uiTheme: 'auto' | 'light' | 'dark';
   reorder: { ordered: boolean; orderedAt?: string; remindIn3mo: boolean };
   liveNight: { tracking: boolean; startedAt?: number } | null;
+  // 'local-demo': logged out, everything is the local seed — behaves exactly
+  // like the app always has. 'account': hydrated from Supabase via
+  // sync.hydrate(); nights/chat/recommendations are server truth.
+  mode: 'local-demo' | 'account';
+  auth?: { userId: string; email: string } | null;
+  // Set when the auth session drops (expiry/revocation/sign-out elsewhere)
+  // while a night was actively recording — see src/lib/sync.ts `unhydrate`.
+  // The recorder's writes silently no-op without an authenticated userId, so
+  // this is how the UI surfaces "you're not syncing" instead of the night
+  // just quietly failing to save. Cleared on the next successful hydrate()
+  // or when a fresh recording session starts.
+  authLostMidSession?: boolean;
 }
 
 // ---------- helpers ----------
@@ -224,6 +248,7 @@ function simulateNights(today: Date, fitDaysAgo: number): Night[] {
       alcohol,
       partnerSleptThrough,
       snoreTypes,
+      source: 'seed',
     });
   }
   return out;
@@ -342,5 +367,7 @@ export function buildSeedState(today: Date = new Date()): AppState {
     uiTheme: 'auto',
     reorder: { ordered: false, remindIn3mo: true },
     liveNight: null,
+    mode: 'local-demo',
+    auth: null,
   };
 }

@@ -28,12 +28,19 @@ export function Trends() {
   const d = fmtDelta(secondHalf, firstHalf);
   const last = lastNight(state);
 
-  // Mini-card deltas vs the earliest week (pre-device baseline).
+  // Mini-card deltas vs the earliest week (pre-device baseline). Efficiency/
+  // HRV/resting HR are wearable-ingest fields — undefined on recorded nights
+  // until a wearable is connected — so every array here is filtered to
+  // numeric values before averaging rather than treating a gap as zero.
   const early = state.nights.slice(0, Math.min(7, state.nights.length));
+  const numeric = (xs: (number | undefined)[]): number[] => xs.filter((v): v is number => typeof v === 'number');
   const meanOf = (xs: number[]) => (xs.length ? xs.reduce((a, v) => a + v, 0) / xs.length : 0);
-  const effDeltaPts = Math.round(((last?.efficiency ?? 0) - meanOf(early.map(n => n.efficiency))) * 100);
-  const hrvDelta = Math.round((last?.hrv ?? 0) - meanOf(early.map(n => n.hrv)));
-  const rhrDelta = Math.round((last?.restingHr ?? 0) - meanOf(early.map(n => n.restingHr)));
+  const hasLastEff = typeof last?.efficiency === 'number';
+  const hasLastHrv = typeof last?.hrv === 'number';
+  const hasLastRhr = typeof last?.restingHr === 'number';
+  const effDeltaPts = Math.round(((last?.efficiency ?? 0) - meanOf(numeric(early.map(n => n.efficiency)))) * 100);
+  const hrvDelta = Math.round((last?.hrv ?? 0) - meanOf(numeric(early.map(n => n.hrv))));
+  const rhrDelta = Math.round((last?.restingHr ?? 0) - meanOf(numeric(early.map(n => n.restingHr))));
   const higherBetter = (v: number, unit: string) =>
     v >= 1 ? { text: `↑ ${v}${unit} from baseline`, cls: 'pos' as const }
     : v <= -1 ? { text: `↓ ${Math.abs(v)}${unit} from baseline`, cls: 'flat' as const }
@@ -117,9 +124,9 @@ export function Trends() {
 
       <div className={s.row2}>Other signals</div>
       <div className={s.miniGrid}>
-        <MiniCard label="Sleep efficiency" value={`${Math.round((last?.efficiency ?? 0) * 100)}`} unit="%" deltaText={effD.text} deltaClass={effD.cls} trend={state.nights.slice(-14).map(n => n.efficiency)} />
-        <MiniCard label="HRV (overnight)" value={String(last?.hrv ?? 0)} unit=" ms" deltaText={hrvD.text} deltaClass={hrvD.cls} trend={state.nights.slice(-14).map(n => n.hrv)} />
-        <MiniCard label="Resting HR" value={String(last?.restingHr ?? 0)} unit=" bpm" deltaText={rhrD.text} deltaClass={rhrD.cls} trend={state.nights.slice(-14).map(n => n.restingHr)} />
+        <MiniCard label="Sleep efficiency" value={hasLastEff ? `${Math.round(last!.efficiency! * 100)}` : '—'} unit="%" deltaText={hasLastEff ? effD.text : 'connect a wearable'} deltaClass={effD.cls} trend={numeric(state.nights.slice(-14).map(n => n.efficiency))} />
+        <MiniCard label="HRV (overnight)" value={hasLastHrv ? String(last!.hrv) : '—'} unit=" ms" deltaText={hasLastHrv ? hrvD.text : 'connect a wearable'} deltaClass={hrvD.cls} trend={numeric(state.nights.slice(-14).map(n => n.hrv))} />
+        <MiniCard label="Resting HR" value={hasLastRhr ? String(last!.restingHr) : '—'} unit=" bpm" deltaText={hasLastRhr ? rhrD.text : 'connect a wearable'} deltaClass={rhrD.cls} trend={numeric(state.nights.slice(-14).map(n => n.restingHr))} />
       </div>
     </div>
   );

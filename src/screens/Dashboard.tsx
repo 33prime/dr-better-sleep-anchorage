@@ -34,12 +34,22 @@ export function Dashboard() {
   const baseline = baselineSnores(state);
   const delta = fmtDelta(last.totalSnores, baseline);
   const last14 = state.nights.slice(-14).map(n => n.totalSnores);
+  const latestRec = state.recommendations.length > 0
+    ? [...state.recommendations].sort((a, b) => b.recommendedOn.localeCompare(a.recommendedOn))[0]
+    : null;
 
   // Stat-tile deltas, derived vs the prior 14 nights (excluding last night).
   const prior14 = state.nights.slice(-15, -1);
   const meanOf = (xs: number[]) => (xs.length ? xs.reduce((a, v) => a + v, 0) / xs.length : 0);
   const sleepDiff = last.sleepDurationMin - meanOf(prior14.map(n => n.sleepDurationMin));
-  const effDiffPts = Math.round((last.efficiency - meanOf(prior14.map(n => n.efficiency))) * 100);
+  // Efficiency is a wearable-ingest field — undefined for recorded nights
+  // until a wearable is connected. Never fabricate a number for it.
+  const numericEfficiency = (xs: (number | undefined)[]): number[] =>
+    xs.filter((v): v is number => typeof v === 'number');
+  const hasEfficiency = typeof last.efficiency === 'number';
+  const effDiffPts = hasEfficiency
+    ? Math.round((last.efficiency! - meanOf(numericEfficiency(prior14.map(n => n.efficiency)))) * 100)
+    : 0;
   const isNight =
     location === '/dashboard/dark' ||
     (location === '/' && (state.uiTheme === 'dark' || (state.uiTheme === 'auto' && shouldUseDarkDashboard())));
@@ -220,14 +230,16 @@ export function Dashboard() {
         >
           <div>
             <div className={s.k}>Efficiency</div>
-            <div className={s.v}>{Math.round(last.efficiency * 100)}%</div>
+            <div className={s.v}>{hasEfficiency ? `${Math.round(last.efficiency! * 100)}%` : '—'}</div>
           </div>
           <div className={s.t}>
-            {effDiffPts >= 1
-              ? <><span className={s.up}>↑</span> {effDiffPts}pt vs avg</>
-              : effDiffPts <= -1
-                ? <><span className={s.down}>↓</span> {Math.abs(effDiffPts)}pt vs avg</>
-                : <><span className={s.flat}>→</span> stable</>}
+            {!hasEfficiency
+              ? <span className={s.flat}>connect a wearable</span>
+              : effDiffPts >= 1
+                ? <><span className={s.up}>↑</span> {effDiffPts}pt vs avg</>
+                : effDiffPts <= -1
+                  ? <><span className={s.down}>↓</span> {Math.abs(effDiffPts)}pt vs avg</>
+                  : <><span className={s.flat}>→</span> stable</>}
           </div>
         </div>
         <div
@@ -280,15 +292,19 @@ export function Dashboard() {
         </div>
       )}
 
-      {/* recommendation */}
-      <div className={`${s.rec} tap`} role="button" tabIndex={0} onClick={() => navigate('/reorder')}>
-        <div className={s.ico}><PillIcon /></div>
-        <div className={s.body}>
-          <div className={s.title}>Try magnesium glycinate</div>
-          <div className={s.sub}>Based on your deep-sleep patterns this month.</div>
+      {/* recommendation — most recent entry from state.recommendations
+          (synced/hydrated per-user), not a hardcoded claim shown to
+          everyone regardless of whether the underlying data exists. */}
+      {latestRec && (
+        <div className={`${s.rec} tap`} role="button" tabIndex={0} onClick={() => navigate('/reorder')}>
+          <div className={s.ico}><PillIcon /></div>
+          <div className={s.body}>
+            <div className={s.title}>Try {latestRec.name}</div>
+            <div className={s.sub}>{latestRec.quote}</div>
+          </div>
+          <div className={s.chev}><ChevronRight /></div>
         </div>
-        <div className={s.chev}><ChevronRight /></div>
-      </div>
+      )}
 
       <div className={s.scrollPad} />
     </div>

@@ -1,12 +1,12 @@
 // Reactive store with localStorage persistence. Tiny pub/sub.
 
 import { useSyncExternalStore } from 'react';
-import { buildSeedState, type AppState } from './seed';
+import { buildSeedState, type AppState, type Night } from './seed';
 
 // Bump this when the persisted shape changes so stale state from an older
 // deploy is discarded instead of crashing on a missing field (e.g. a phone
 // that cached state from before `partner` existed).
-const KEY = 'dr-better-sleep:v4'; // v4: story-driven demo seed matching the papercraft mocks
+const KEY = 'dr-better-sleep:v5'; // v5: AppState.mode/auth, optional wearable Night fields
 
 type Listener = (state: AppState) => void;
 
@@ -110,6 +110,34 @@ export function daysSince(iso: string, ref: Date = new Date()): number {
 
 export function findNight(s: AppState, isoDate: string) {
   return s.nights.find(n => n.date === isoDate);
+}
+
+/**
+ * True once real account data has replaced the local demo seed (post-login).
+ * Screens use this to decide whether "connect a wearable" affordances make
+ * sense at all (local-demo nights are all seed-tagged and fully populated).
+ */
+export function isAccountMode(s: AppState): boolean {
+  return s.mode === 'account';
+}
+
+/**
+ * Wearable-ingest fields are nullable placeholders (see PLAN.md finding #1 —
+ * the mic can never produce HR/HRV/sleep-stage/position data). Screens must
+ * check this before rendering those fields instead of assuming they exist.
+ */
+export function hasWearableData(n: Night): boolean {
+  return (
+    n.efficiency !== undefined ||
+    n.hrv !== undefined ||
+    n.restingHr !== undefined ||
+    n.deepMin !== undefined ||
+    n.remMin !== undefined ||
+    n.lightMin !== undefined ||
+    n.awakeMin !== undefined ||
+    n.positions !== undefined ||
+    n.positionSnores !== undefined
+  );
 }
 
 /** Partner slept-through stat over the last `n` nights. */

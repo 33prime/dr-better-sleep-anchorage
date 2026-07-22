@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { store } from '../store';
+import { writeDevice, writeOnboarding } from '../lib/sync';
 import { Avatar } from '../components/Avatar';
 import { SceneHills } from '../components/paper/PaperScene';
 import { CloseIcon, ArrowRight } from '../components/icons';
@@ -98,17 +99,12 @@ export function BoilAndBite() {
   }, [stepIndex, paused]);
 
   const complete = () => {
-    store.set(s2 => {
-      s2.onboarding.boilCompleted = true;
-      s2.onboarding.boilStep = STEPS.length;
-      s2.onboarding.complete = true;
-      // Only stamp the device on a true first fit — a re-fit or demo replay
-      // must not reset the seeded story (day 55, strap 3, streak 31).
-      if (!s2.device.fittedAt) {
-        s2.device.fittedAt = isoDate(new Date());
-        s2.device.strapPosition = 1;
-      }
-    });
+    writeOnboarding({ boilCompleted: true, boilStep: STEPS.length, complete: true });
+    // Only stamp the device on a true first fit — a re-fit or demo replay
+    // must not reset the seeded story (day 55, strap 3, streak 31).
+    if (!store.get().device.fittedAt) {
+      writeDevice({ fittedAt: isoDate(new Date()), strapPosition: 1 });
+    }
     playChime();
     showToast('Fitted! Welcome to the dashboard.');
     navigate('/onboarding/device');
