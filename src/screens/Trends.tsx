@@ -5,6 +5,7 @@ import { Sparkline } from '../components/Sparkline';
 import { TrendChart } from '../components/TrendChart';
 import { PaperCloud, PaperMoon, PaperStar } from '../components/paper/PaperScene';
 import { TickNumber } from '../components/TickNumber';
+import { ScienceNote } from '../components/ScienceNote';
 import { fmtDateShort, fmtDelta, parseIsoDate } from '../utils/format';
 import s from './Trends.module.css';
 
@@ -121,6 +122,8 @@ export function Trends() {
           )}
         </div>
       </div>
+
+      <ScienceNote kind="timing" />
 
       <div className={s.row2}>Other signals</div>
       <div className={s.miniGrid}>

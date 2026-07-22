@@ -502,7 +502,11 @@ function buildChatMessages(nights, userId) {
       kind: 'snore-summary',
       date: n(TOTAL_NIGHTS - 1).dateIso,
       total: n(TOTAL_NIGHTS - 1).totalSnores,
-      baseline: n(1).totalSnores,
+      // "baseline" = pre-fit AVERAGE, not one (possibly wine-spiked) early
+      // night — the card's ↓% must match the story the rest of the app tells.
+      baseline: Math.round(
+        nights.slice(0, FIT_IDX).reduce((a, x) => a + x.totalSnores, 0) / FIT_IDX
+      ),
     },
     7,
     20

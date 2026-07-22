@@ -392,3 +392,13 @@
 .night .rec .title { color: var(--night-text-1); }
 .night .rec .sub { color: var(--night-text-2); }
 .night .rec .chev { color: var(--night-text-3); }
+
+/* explicit "this card goes somewhere" row at the hero's foot */
+.heroCta {
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(30,37,68,0.08);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--accent);
+  position: relative;
+}
+.night .heroCta { border-top-color: rgba(251,247,239,0.12); color: var(--night-accent, #74C7D0); }
+.heroCta svg { width: 16px; height: 16px; flex: none; }

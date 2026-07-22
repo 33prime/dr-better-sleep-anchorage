@@ -8,6 +8,7 @@ import { SceneHills, PaperStar } from '../components/paper/PaperScene';
 import { Sparkline } from '../components/Sparkline';
 import { TickNumber } from '../components/TickNumber';
 import { ChevronRight, PillIcon } from '../components/icons';
+import { ScienceNote } from '../components/ScienceNote';
 import {
   fmtDateLong, fmtDelta, fmtDuration, timeOfDayGreeting, fmtClockHM, shouldUseDarkDashboard,
 } from '../utils/format';
@@ -195,6 +196,11 @@ export function Dashboard() {
           <span>14 NIGHTS AGO</span>
           <span>TONIGHT</span>
         </div>
+        {/* the whole card navigates — this row just says so out loud */}
+        <div className={s.heroCta}>
+          <span>See the full night — every snore, timestamped</span>
+          <ChevronRight />
+        </div>
       </div>
 
       {/* status row */}
@@ -261,6 +267,8 @@ export function Dashboard() {
           <div className={s.t}>nights with device</div>
         </div>
       </div>
+
+      <ScienceNote kind={last.alcohol ? 'alcohol' : 'site'} />
 
       {/* active context */}
       <div

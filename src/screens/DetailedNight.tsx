@@ -9,6 +9,7 @@ import { fmtDelta, fmtDuration, fmtDateShort, parseIsoDate, pad2 } from '../util
 import { SceneHills } from '../components/paper/PaperScene';
 import { clipsForNight, clipBlob, type SnoreClip } from '../lib/clipRecorder';
 import { shareLastNight } from '../lib/share';
+import { ScienceNote } from '../components/ScienceNote';
 import s from './DetailedNight.module.css';
 
 export function DetailedNight() {
@@ -252,6 +253,7 @@ export function DetailedNight() {
               )}
             </div>
           </div>
+          <ScienceNote kind="timing" />
         </div>
 
         {/* Position breakdown — wearable-ingest only; the mic can't sense body position */}
