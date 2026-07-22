@@ -52,11 +52,19 @@ export function Auth() {
     setError(null);
     setLoading(true);
     try {
+      // Invite-only: accounts are created by the team (scripts/create-account.mjs),
+      // never self-serve — an unknown email gets a friendly nudge, not an account.
       const { error: err } = await supabase.auth.signInWithOtp({
         email: email.trim(),
-        options: { shouldCreateUser: true },
+        options: { shouldCreateUser: false },
       });
-      if (err) throw err;
+      if (err) {
+        const msg = err.message?.toLowerCase() ?? '';
+        if (msg.includes('signup') || msg.includes('not allowed') || msg.includes('not found')) {
+          throw new Error("That email isn't on the list yet — Dr. Never Snore is invite-only for now.");
+        }
+        throw err;
+      }
       setStep('code');
       setCooldown(RESEND_COOLDOWN_S);
       if (resend) { setDigits(Array(CODE_LEN).fill('')); boxRefs.current[0]?.focus(); }
@@ -159,8 +167,9 @@ export function Auth() {
             <span className={s.it}>and you're saved.</span>
           </h1>
           <p className={s.bodyCopy}>
-            I'll email you a 6-digit code — no password to remember. Every night
-            you track lives under this address from here on.
+            Enter the email your invite was set up with and I'll send a 6-digit
+            code — no password to remember. Every night you track lives under
+            this address from here on.
           </p>
 
           <form
