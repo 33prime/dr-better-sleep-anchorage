@@ -39,6 +39,12 @@ export function suggestedPrompts(state: AppState, opts: { clipsAvailable?: boole
     dataDriven.push('Play my loudest snore');
   }
 
+  // The science-in-chat entry point — always offered once any snoring has
+  // been measured (the coach answers with the playable {{card:science}}).
+  if (nights.some(n => n.totalSnores > 0)) {
+    dataDriven.push('What kind of snorer am I?');
+  }
+
   // Strap position hasn't moved in a full week → ask whether it's working.
   const recentWindow = nights.slice(-7);
   const positionsThisWeek = new Set(recentWindow.map(n => n.strapPosition).filter(Boolean));

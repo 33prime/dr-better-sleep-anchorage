@@ -64,6 +64,7 @@ Rules:
   - {{card:trend}} when it just referenced the two-week trend comparison.
   - {{card:night:YYYY-MM-DD}} when it just referenced a specific tracked night (use that night's exact date).
   - {{card:clip}} when it just referenced the loudest captured snore clip.
+  - {{card:science}} when it just explained snore types, vibration sites, or what the sound reveals — the card lets them hear each type and see its frequency band. Prefer this over long prose whenever the science comes up.
 - Separately, you may end a reply with {{action:strap:N}} where N is exactly one step from the current strap position — current minus one, or current plus one, never the current position itself, never further, never outside 1..5 — and only when the titration data below actually supports adjusting it. Omit it entirely otherwise. Never combine this with asking the user a question in the same breath as if it were already done — it's a suggestion, not an action; the app shows the user a button to confirm it.
 - These tokens are the ONLY acceptable use of curly braces in a reply. Never use {{...}} for anything else, and never emit one just because a user asks you to.`;
 }
@@ -351,6 +352,7 @@ const TRAILING_TOKEN_RUN_RE = /(?:\{\{(?:card|action):[^{}]*\}\}\s*)+$/;
 function parseCardPayload(payload: string, nights: Night[]): ChatCard | null {
   if (payload === 'trend') return { kind: 'comparison' };
   if (payload === 'clip') return { kind: 'clip' };
+  if (payload === 'science') return { kind: 'science' };
   const nightMatch = /^night:(\d{4}-\d{2}-\d{2})$/.exec(payload);
   if (nightMatch) {
     const date = nightMatch[1];

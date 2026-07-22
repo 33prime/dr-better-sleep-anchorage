@@ -268,3 +268,28 @@
 :global(.screen.night) .fieldInput { color: var(--night-text-1); }
 :global(.screen.night) .fieldInput::placeholder { color: var(--night-text-3); }
 :global(.screen.night) .send { background: var(--accent); color: #FFFFFF; }
+
+/* ---- {{card:science}} — the sound science, in the conversation ---- */
+.scienceCard { margin-top: 8px; background: var(--bg-primary); border-radius: 16px; padding: 14px 14px 12px; min-width: 240px; }
+.scienceTitle { font-family: var(--serif); font-size: 13.5px; color: var(--text-primary); margin-bottom: 10px; }
+.scienceSample { font-family: var(--mono); font-style: normal; font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); }
+.scienceRow { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+.sciencePlay {
+  width: 30px; height: 30px; border-radius: 50%; border: 0; cursor: pointer; flex: none;
+  background: var(--accent); color: #fff; display: grid; place-items: center;
+}
+.sciencePlaying { background: var(--text-primary); }
+.scienceInfo { flex: 1; min-width: 0; }
+.scienceName { font-size: 12.5px; font-weight: 600; color: var(--text-primary); display: flex; align-items: baseline; gap: 8px; }
+.scienceShare { font-family: var(--mono); font-size: 9px; color: var(--accent); }
+.scienceBand { margin-top: 5px; height: 6px; border-radius: 3px; background: rgba(30,37,68,0.07); position: relative; overflow: hidden; }
+.scienceBand i { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: var(--accent); opacity: 0.85; }
+.scienceMore {
+  margin-top: 8px; display: inline-flex; align-items: center; gap: 6px;
+  border: 0; background: none; cursor: pointer; padding: 4px 0;
+  font-family: var(--serif); font-style: italic; font-size: 12.5px; color: var(--accent);
+}
+
+:global(.screen.night) .scienceCard { background: var(--night-bg-2); }
+:global(.screen.night) .scienceTitle, :global(.screen.night) .scienceName { color: var(--night-text-1); }
+:global(.screen.night) .scienceBand { background: rgba(251,247,239,0.1); }

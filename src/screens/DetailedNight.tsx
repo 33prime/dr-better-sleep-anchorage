@@ -5,7 +5,7 @@ import { ChevronLeft } from '../components/icons';
 import { Avatar } from '../components/Avatar';
 import { Menu } from '../components/Menu';
 import { showToast } from '../components/Toast';
-import { fmtDelta, fmtDuration, parseIsoDate, pad2 } from '../utils/format';
+import { fmtDelta, fmtDuration, fmtDateShort, parseIsoDate, pad2 } from '../utils/format';
 import { SceneHills } from '../components/paper/PaperScene';
 import { clipsForNight, clipBlob, type SnoreClip } from '../lib/clipRecorder';
 import { shareLastNight } from '../lib/share';
@@ -80,6 +80,11 @@ export function DetailedNight() {
   const prevDay = new Date(d); prevDay.setDate(d.getDate() - 1);
   const dayShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  const nightIdx = state.nights.findIndex(x => x.date === n.date);
+  const prevNight = nightIdx > 0 ? state.nights[nightIdx - 1] : null;
+  const nextNight = nightIdx >= 0 && nightIdx < state.nights.length - 1 ? state.nights[nightIdx + 1] : null;
+  const isLatest = nightIdx === state.nights.length - 1;
+
   // positions/positionSnores/sleep-stage minutes are wearable-ingest fields —
   // the mic can never produce them (PLAN.md finding #1). Undefined for a
   // recorded night until a wearable is connected; render an honest
@@ -127,10 +132,28 @@ export function DetailedNight() {
 
       <div className={s.body}>
         <div className={s.head}>
-          <div className={s.label}>
-            {dayShort[prevDay.getDay()]} → {dayShort[d.getDay()]} · {fmtTime(n.startedAt)} – {fmtTime(n.endedAt)}
+          <div className={s.headRow}>
+            <div className={s.label}>
+              {dayShort[prevDay.getDay()]} → {dayShort[d.getDay()]} · {fmtTime(n.startedAt)} – {fmtTime(n.endedAt)}
+            </div>
+            {/* flip through tracked nights without going back home */}
+            <div className={s.nightNav}>
+              <button
+                className={`${s.nightNavBtn} tap`}
+                disabled={nightIdx <= 0}
+                aria-label="Previous night"
+                onClick={() => prevNight && navigate(`/night/${prevNight.date}`, { replace: true })}
+              ><ChevronLeft /></button>
+              <span className={s.nightNavDate}>{fmtDateShort(d)}</span>
+              <button
+                className={`${s.nightNavBtn} ${s.nightNavNext} tap`}
+                disabled={nightIdx < 0 || nightIdx >= state.nights.length - 1}
+                aria-label="Next night"
+                onClick={() => nextNight && navigate(`/night/${nextNight.date}`, { replace: true })}
+              ><ChevronLeft /></button>
+            </div>
           </div>
-          <h1>Last night</h1>
+          <h1>{isLatest ? 'Last night' : 'That night'}</h1>
           <div className={s.sub}>
             {hasStages
               ? `${fmtDuration(n.sleepDurationMin + n.awakeMin!)} in bed · ${fmtDuration(n.sleepDurationMin)} asleep · device worn the full night`
@@ -143,6 +166,21 @@ export function DetailedNight() {
           <div className={s.unit}>snores</div>
           <div className={s.delta}>{delta.sign} {delta.pct}</div>
         </div>
+
+        {/* The loudest moment, one obvious tap — not just the timeline chips */}
+        {clips.length > 0 && (
+          <button className={`${s.loudest} ${playingClipId === clips[0].id ? s.loudestOn : ''} tap`} onClick={() => void playClip(clips[0])}>
+            <span className={s.loudestIcon} aria-hidden>
+              {playingClipId === clips[0].id
+                ? <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 13, height: 13 }}><rect x="5" y="4" width="5" height="16" rx="1" /><rect x="14" y="4" width="5" height="16" rx="1" /></svg>
+                : <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 14, height: 14, marginLeft: 2 }}><path d="M6 4l14 8-14 8z" /></svg>}
+            </span>
+            <span className={s.loudestText}>
+              {playingClipId === clips[0].id ? 'Playing your loudest snore…' : 'Hear your loudest snore'}
+              <span className={s.loudestMeta}>{Math.round(clips[0].peakDb)} dB{clips[0].isSample ? ' · sample audio' : ''}</span>
+            </span>
+          </button>
+        )}
 
         {/* Hypnogram — sleep-stage + position data is wearable-ingest only.
             Recorded nights without a wearable get the acoustic story below

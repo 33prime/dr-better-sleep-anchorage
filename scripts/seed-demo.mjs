@@ -472,6 +472,21 @@ function buildChatMessages(nights, userId) {
   );
   push(clipIdx, 'coach', undefined, { kind: 'clip' }, 7, 42);
 
+  // "What kind of snorer am I?" — the science-in-chat exchange: the coach
+  // answers with the playable {{card:science}} (three types, bands, the
+  // user's own mix) instead of a lecture.
+  const sciIdx = TOTAL_NIGHTS - 4;
+  push(sciIdx, 'user', 'what kind of snorer am i?', undefined, 7, 44);
+  push(
+    sciIdx,
+    'coach',
+    "mostly a *palatal* snorer — the classic soft-palate rumble, which is exactly the kind the mouthpiece treats best. here's what each type sounds like, and where yours sits.",
+    undefined,
+    7,
+    45
+  );
+  push(sciIdx, 'coach', undefined, { kind: 'science' }, 7, 46);
+
   // Recent nights / wrap-up
   const lastWineIdx = [...nights].reverse().find((night) => night.wine)?.idx ?? TOTAL_NIGHTS - 8;
   push(lastWineIdx, 'coach', `heads up — nights with a drink are still running about ${Math.round((1.8 + 0.5 / 2 - 1) * 100)}% louder than the rest, even this far in. nothing dramatic, just something to keep in mind.`);

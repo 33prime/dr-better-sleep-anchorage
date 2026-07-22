@@ -11,6 +11,7 @@ import { streamChatReply, persistChatTurn, parseAssistantReply } from '../utils/
 import { suggestedPrompts, proactiveOpener } from '../utils/coachPrompts';
 import { clipsForNight, clipBlob, type SnoreClip } from '../lib/clipRecorder';
 import { writeDevice, writeChatMessage } from '../lib/sync';
+import { SNORE_TYPES, BAND_MAX_HZ } from '../utils/snoreScience';
 import s from './Chat.module.css';
 
 // Guards the account-mode proactive morning opener against a double-fire
@@ -51,6 +52,68 @@ function dayLabel(ts: number): string {
  * contract — no dead "play it" card. The "sample audio" caption below is
  * the non-negotiable honesty rule for any sample-backed playback.
  */
+/**
+ * The `{{card:science}}` renderer — the sound science, in the conversation.
+ * Compact version of the Science screen's type rows: tap-to-play each snore
+ * type's sample, its frequency band on a 0–3 kHz axis, and the user's own
+ * measured share. Samples are synthesized — labeled, per the honesty rule.
+ */
+function ScienceCard() {
+  const types = useStore(st => lastNight(st)?.snoreTypes) ?? { palatal: 0, tongue: 0, nasal: 0 };
+  const [, navigate] = useLocation();
+  const [playing, setPlaying] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => () => { audioRef.current?.pause(); }, []);
+
+  const toggle = (key: string, src: string) => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.addEventListener('ended', () => setPlaying(null));
+      audioRef.current.addEventListener('error', () => setPlaying(null));
+    }
+    const a = audioRef.current;
+    if (playing === key) { a.pause(); setPlaying(null); return; }
+    a.src = src;
+    a.play().then(() => setPlaying(key)).catch(() => setPlaying(null));
+  };
+
+  return (
+    <div className={s.scienceCard}>
+      <div className={s.scienceTitle}>Three snores, three places <span className={s.scienceSample}>· sample audio</span></div>
+      {SNORE_TYPES.map(t => (
+        <div key={t.key} className={s.scienceRow}>
+          <button
+            className={`${s.sciencePlay} ${playing === t.key ? s.sciencePlaying : ''} tap`}
+            onClick={() => toggle(t.key, t.sample)}
+            aria-label={playing === t.key ? `Pause ${t.name} sample` : `Play ${t.name} sample`}
+          >
+            {playing === t.key ? (
+              <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 11, height: 11 }}><rect x="5" y="4" width="5" height="16" rx="1" /><rect x="14" y="4" width="5" height="16" rx="1" /></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 12, height: 12, marginLeft: 1 }}><path d="M6 4l14 8-14 8z" /></svg>
+            )}
+          </button>
+          <div className={s.scienceInfo}>
+            <div className={s.scienceName}>
+              {t.name}
+              {types[t.key] > 0 && <span className={s.scienceShare}>{Math.round(types[t.key] * 100)}% of yours</span>}
+            </div>
+            <div className={s.scienceBand} aria-hidden>
+              <i style={{
+                left: `${(t.loHz / BAND_MAX_HZ) * 100}%`,
+                width: `${((t.hiHz - t.loHz) / BAND_MAX_HZ) * 100}%`,
+              }} />
+            </div>
+          </div>
+        </div>
+      ))}
+      <button className={`${s.scienceMore} tap`} onClick={() => navigate('/trends/science')}>
+        The full science <ArrowRight />
+      </button>
+    </div>
+  );
+}
+
 function ClipCard() {
   const [ready, setReady] = useState(false);
   const [clip, setClip] = useState<SnoreClip | null>(null);
@@ -460,6 +523,7 @@ export function Chat() {
                       </div>
                     )}
                     {m.card?.kind === 'clip' && <ClipCard />}
+                    {m.card?.kind === 'science' && <ScienceCard />}
                     {strapAction !== undefined && Math.abs(strapAction - currentStrapPosition) === 1 && (
                       <button
                         className={`${s.actionChip} tap`}

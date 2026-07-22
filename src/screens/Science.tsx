@@ -5,40 +5,7 @@ import { wineEffect } from '../utils/insights';
 import { ChevronLeft } from '../components/icons';
 import s from './Science.module.css';
 
-// The three snore types, their vibration sites, and their acoustic bands —
-// the same band edges the live detector classifies with (useSnoreDetector),
-// grounded in the band→site mapping literature (see SOURCES below).
-const TYPES = [
-  {
-    key: 'palatal' as const,
-    name: 'Palatal',
-    site: 'Soft palate',
-    loHz: 60, hiHz: 300,
-    character: 'A periodic low rumble — the classic snore. The soft palate flutters as air squeezes past on each breath.',
-    device: 'The type the mouthpiece treats best: advancing the jaw tightens the tissue that flutters.',
-    sample: '/samples/snore-1.wav',
-  },
-  {
-    key: 'tongue' as const,
-    name: 'Tongue base',
-    site: 'Back of the tongue',
-    loHz: 300, hiHz: 1000,
-    character: 'Broadband and irregular — a wetter, rougher sound. The tongue falls back and narrows the airway.',
-    device: 'Also squarely in the mouthpiece’s reach — jaw advancement pulls the tongue base forward with it.',
-    sample: '/samples/snore-2.wav',
-  },
-  {
-    key: 'nasal' as const,
-    name: 'Nasal',
-    site: 'Nasal passages',
-    loHz: 1000, hiHz: 3000,
-    character: 'A high, whistling flutter. Air forced through a congested or narrow nose.',
-    device: 'The one the mouthpiece can’t fix — breathing strips or a saline rinse are the right tools here.',
-    sample: '/samples/snore-3.wav',
-  },
-];
-
-const BAND_MAX_HZ = 3000;
+import { SNORE_TYPES as TYPES, BAND_MAX_HZ } from '../utils/snoreScience';
 
 export function Science() {
   const state = useStore();

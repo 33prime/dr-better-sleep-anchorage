@@ -57,7 +57,8 @@ export type ChatCard =
   // Always refers to the latest night — Chat.tsx resolves which night and
   // which clip (real capture, or Lane C's demo-sample fallback) at render
   // time rather than baking a date/id into the token itself.
-  | { kind: 'clip' };
+  | { kind: 'clip' }
+  | { kind: 'science' };
 
 export interface Recommendation {
   id: string;
