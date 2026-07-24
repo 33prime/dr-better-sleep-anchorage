@@ -15,8 +15,8 @@
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MAX_TOKENS_CAP = 800;
-const ALLOWED_MODELS = new Set(['claude-opus-4-7']);
-const DEFAULT_MODEL = 'claude-opus-4-7';
+const ALLOWED_MODELS = new Set(['claude-sonnet-5']);
+const DEFAULT_MODEL = 'claude-sonnet-5';
 // Generous but bounded — a normal turn (persona + data context + a few
 // messages) is a few thousand chars; this stops someone from paying for our
 // key to summarize a novel.

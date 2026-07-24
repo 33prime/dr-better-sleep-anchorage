@@ -35,7 +35,7 @@ import { fmtClockHM } from './format';
 const SIGN_IN_NUDGE =
   "sign in and I can look at your actual nights — for now, feel free to poke around, I'll be here when you're ready.";
 
-const MODEL = 'claude-opus-4-7';
+const MODEL = 'claude-sonnet-5';
 const PROXY_URL = '/api/chat';
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const DEV_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY as string | undefined;
